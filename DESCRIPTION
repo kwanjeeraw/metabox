@@ -1,0 +1,26 @@
+Package: mETABOX
+Type: Package
+Title: mETABOX
+Version: 1.0
+Date: 2016-03-22
+Authors@R: "Kwanjeera W <kwanich@ucdavid.edu> [aut, cre]"
+Description: mETABOX.
+Depends:
+    R (>= 3.1.1)
+License: GNU GENERAL PUBLIC LICENSE Version 3
+LazyData: true
+Imports:
+    RCurl,
+    jsonlite,
+    igraph,
+    Hmisc,
+    plyr,
+    stringr,
+    reshape2,
+    piano,
+    WGCNA,
+    qpgraph,
+    BioNet,
+    metabomapr,
+    doParallel
+RoxygenNote: 5.0.1
