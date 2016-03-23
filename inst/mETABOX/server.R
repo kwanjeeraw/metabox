@@ -718,4 +718,17 @@ function(input, output, session) {
 #     })
 #     tags$div()
 #   })
+  ##############################
+
+  output$authorANDdate<- output$authorANDdate2 <- renderText({
+    paste0(input$author.input, ", ", format(input$date.input, format = "%B %d %Y"))
+  })
+  output$"dataname" <- output$"dataname2" <- renderText({
+    if(input$subtitle.input==""){
+      paste0(gsub('\\.csv|\\.xlsx','',input$InputData$name))
+    }else{
+      input$subtitle.input
+    }
+  })
+
 }

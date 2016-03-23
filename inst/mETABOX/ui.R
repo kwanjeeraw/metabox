@@ -4,7 +4,8 @@ dashboardPage(skin = "black",
     sidebarMenu(
       menuItem("", tabName = "", badgeLabel = "STATISTICAL ANALYSIS", badgeColor = "orange"),
       menuItem("Statistical Analysis Report", tabName = "report", icon = icon("file-text"), selected = TRUE),
-      menuItem("Statistics", tabName = "abib", icon = icon("bar-chart")),
+      menuItem("Statistics", tabName = "abib", icon = icon("bar-chart"),
+        menuItem("Title", tabName = "title", icon = icon("angle-double-right"))),
       menuItem("", tabName = "", badgeLabel = "INTEGRATIVE ANALYSIS", badgeColor = "blue"),
       menuItem("QueryNetwork", tabName = "bionetwork", icon = icon("code-fork")),
       menuItem("Correlations",  tabName = "correlation", icon = icon("line-chart"),
@@ -41,13 +42,28 @@ dashboardPage(skin = "black",
                h3("Automatic report generator")
               ,p("The report generated is based on default settings, which shows in \"Tutorial\" section. You could
                  also change settings according to your needs in the \"Statistics\" section.")
+              ,fileInput("InputData", "Upload Raw Data")
               ,fluidRow(
-                 box(width = 12, title = "Title", status = "primary", collapsible = TRUE,solidHeader = T,
-                     strong(h1("Statistical Analysis", align = "center")))
-               ))
+                box(width = 12, title = "Title", status = "primary", collapsible = TRUE,solidHeader = T,
+                     strong(h1("Statistical Analysis", align = "center"))
+                     ,h4(textOutput("authorANDdate"), align = "center")
+                     ,h5(textOutput("dataname"),align = 'center')
+               )
 
-      ,tabItem(tabName = "abib"
-      )
+      ))
+
+      ,tabItem(tabName = "title"
+               ,fluidRow(
+                 box(width = 4, title = "Edit Title", status = "warning", collapsible = TRUE, solidHeader = T,
+                     textInput("author.input", "Change Author", value = "Sili Fan"),
+                     dateInput("date.input", "Change Date"),
+                     textInput("subtitle.input", "Change Subtitle"))
+                 ,box(width = 8, title = "Title", status = "primary", collapsible = TRUE,solidHeader = T,
+                     strong(h1("Statistical Analysis", align = "center"))
+                     ,h4(textOutput("authorANDdate2"), align = "center")
+                     ,h5(textOutput("dataname2"),align = 'center')
+               )
+      ))
 
       ,tabItem(tabName = "bionetwork",
               h3("Query biological network"),
