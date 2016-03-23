@@ -53,6 +53,8 @@ dashboardPage(skin = "black",
       ))
 
       ,tabItem(tabName = "title"
+               ,h3("Title")
+               ,p("Author name, date and subtitle could be modified here.")
                ,fluidRow(
                  box(width = 4, title = "Edit Title", status = "warning", collapsible = TRUE, solidHeader = T,
                      textInput("author.input", "Change Author", value = "Sili Fan"),

@@ -1,0 +1,1 @@
+shiny should be downloaded from devtools::install_github("rstudio/shiny"). 3.23.2016
