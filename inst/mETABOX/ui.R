@@ -3,9 +3,10 @@ dashboardPage(skin = "black",
   dashboardSidebar(
     sidebarMenu(
       menuItem("", tabName = "", badgeLabel = "STATISTICAL ANALYSIS", badgeColor = "orange"),
+      menuItem("Statistical Analysis Report", tabName = "report", icon = icon("file-text"), selected = TRUE),
       menuItem("Statistics", tabName = "abib", icon = icon("bar-chart")),
       menuItem("", tabName = "", badgeLabel = "INTEGRATIVE ANALYSIS", badgeColor = "blue"),
-      menuItem("QueryNetwork", tabName = "bionetwork", icon = icon("code-fork"), selected = TRUE),
+      menuItem("QueryNetwork", tabName = "bionetwork", icon = icon("code-fork")),
       menuItem("Correlations",  tabName = "correlation", icon = icon("line-chart"),
         menuItem("Correlation",  tabName = "paircorrelation", icon = icon("angle-double-right")),
         menuItem("PartialCorrelation",  tabName = "partcorrelation", icon = icon("angle-double-right"))),
@@ -36,11 +37,19 @@ dashboardPage(skin = "black",
       )
     ),
     tabItems(
-      tabItem(tabName = "abib",
-              h3("Statistical analysis"),
-              p("Details ... ")
-      ),
-      tabItem(tabName = "bionetwork",
+      tabItem(tabName = "report",
+               h3("Automatic report generator")
+              ,p("The report generated is based on default settings, which shows in \"Tutorial\" section. You could
+                 also change settings according to your needs in the \"Statistics\" section.")
+              ,fluidRow(
+                 box(width = 12, title = "Title", status = "primary", collapsible = TRUE,solidHeader = T,
+                     strong(h1("Statistical Analysis", align = "center")))
+               ))
+
+      ,tabItem(tabName = "abib"
+      )
+
+      ,tabItem(tabName = "bionetwork",
               h3("Query biological network"),
               p("Query the biological network from the graph database, see ", a(href='http://kwanjeeraw.github.io/grinn/fetchgrinn.html',target='_blank','here'),' for argument details.'),
               fluidRow(
