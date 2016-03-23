@@ -719,7 +719,7 @@ function(input, output, session) {
 #     tags$div()
 #   })
   ##############################
-
+  # Title.
   output$authorANDdate<- output$authorANDdate2 <- renderText({
     paste0(input$author.input, ", ", format(input$date.input, format = "%B %d %Y"))
   })
@@ -730,5 +730,16 @@ function(input, output, session) {
       input$subtitle.input
     }
   })
-
+  # Data description.
+  ViewRawData. <- reactive({
+    result =  load.data(input$InputData)
+    return(data.frame(result))
+  })
+  output$ViewRawData <- DT::renderDataTable(ViewRawData.(),extensions = "ColVis"
+                                            , options = list(dom = 'C<"clear">lfrtip',
+                                                             pageLength=15,paging = T,searching = F),
+                                            selection = list(target = "row+column",selected = list(
+                                              rows = row.index.ViewRawData, cols = col.index.ViewRawData
+                                            ))
+  )
 }

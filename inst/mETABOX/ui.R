@@ -49,6 +49,8 @@ dashboardPage(skin = "black",
                      ,h4(textOutput("authorANDdate"), align = "center")
                      ,h5(textOutput("dataname"),align = 'center')
                )
+               ,box(width = 12, title = "Data Description", status = "primary", collapsible = TRUE, solidHeader = T,
+                    "!!!")
 
       ))
 
