@@ -739,11 +739,17 @@ function(input, output, session) {
         result=load.aggregated.data(input$InputData)
         return(result) # e, f, p.
       }else if(input$uploadtype=="Upload expression, feature, phenotype datasets seperately"){
-
+        eData = load.expression.data(input$InputDataExp)
+        fData = load.feature.data(input$InputDataF)
+        pData = load.phenotype.data(input$InputDataP)
+        result = list("expresson" = eData, "feature" = fData, "phenotype" = pData)
+        return(result) # e, f, p.
       }else{
-
+        #!!!
       }
     }
   })
+
+
 
 }
