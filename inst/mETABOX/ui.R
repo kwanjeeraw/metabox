@@ -3,9 +3,10 @@ dashboardPage(skin = "black",
   dashboardSidebar(
     sidebarMenu(
       menuItem("", tabName = "", badgeLabel = "STATISTICAL ANALYSIS", badgeColor = "orange"),
-      menuItem("Statistical Analysis Report", tabName = "report", icon = icon("file-text"), selected = TRUE),
-      menuItem("Statistics", tabName = "abib", icon = icon("bar-chart"),
-        menuItem("Title", tabName = "title", icon = icon("angle-double-right"))),
+      menuItem("Data Uploading", tabName = "uploaddata", icon = icon("bar-chart"),selected = TRUE),
+      menuItem("Statistical Analysis Report", tabName = "Statistical Analysis Report", icon = icon("file-text"),
+               menuItem("Overview", tabName = "report", icon = icon("angle-double-right")),
+               menuItem("Title", tabName = "title", icon = icon("angle-double-right"))),
       menuItem("", tabName = "", badgeLabel = "INTEGRATIVE ANALYSIS", badgeColor = "blue"),
       menuItem("QueryNetwork", tabName = "bionetwork", icon = icon("code-fork")),
       menuItem("Correlations",  tabName = "correlation", icon = icon("line-chart"),
@@ -38,11 +39,48 @@ dashboardPage(skin = "black",
       )
     ),
     tabItems(
-      tabItem(tabName = "report",
+      tabItem(tabName = "uploaddata",
+              h3("Data uploading and Data Modification")
+              ,p("Users could upload their own data file and modify data set according to needs or simply use the defaul dataset.")
+              ,radioButtons("uploadtype", "Upload your data or use example data",
+                            choices = c("Load example dataset","Upload aggregated dataset","Upload expression, feature, phenotype datasets seperately"),
+                            "Load example dataset")
+              ,conditionalPanel(condition = "input.uploadtype == 'Upload aggregated dataset'"
+                                ,div(style="display:inline-block",p("Please read detailed explanation about the "))
+                                ,div(style="display:inline-block",a("upload data format",
+                                                                    href = "https://github.com/kwanjeeraw/mETABOX"))
+                                ,div(style="display:inline-block",p("."))
+                                ,div(style="display:inline-block",p("An example dataset is also "))
+                                ,div(style="display:inline-block",a("provided",href = "https://github.com/kwanjeeraw/mETABOX"))
+                                ,div(style="display:inline-block",p("."))
+                                ,fileInput("InputData", "Upload Aggregated Data"))
+              ,conditionalPanel(condition = "input.uploadtype == 'Upload expression, feature, phenotype datasets seperately'"
+                                ,div(style="display:inline-block",p("Please read detailed explanation about the "))
+                                ,div(style="display:inline-block",a("upload data format",
+                                                                    href = "https://github.com/kwanjeeraw/mETABOX"))
+                                ,div(style="display:inline-block",p("."))
+                                ,div(style="display:inline-block",p("Example datasets are also "))
+                                ,div(style="display:inline-block",a("provided",href = "https://github.com/kwanjeeraw/mETABOX"))
+                                ,div(style="display:inline-block",p(" for expression, feature, phenotype seperately."))
+                                ,div(
+                                  div(style ="display:inline-block",fileInput("InputDataExp", "Upload Expression Data"))
+                                  ,div(style ="display:inline-block",fileInput("InputDataP", "Upload Phenotype Data"))
+                                  ,div(style ="display:inline-block",fileInput("InputDataF", "Upload Feature Data"))
+                                  )
+                                )
+              ,tabsetPanel(
+                tabPanel("Data Summary", "..")
+                ,tabPanel("Feature Data Table", "..")
+                ,tabPanel("Phenotype Data Table", "..")
+                ,tabPanel("Expression Data Table", "..")
+              )
+
+              )
+      ,tabItem(tabName = "report",
                h3("Automatic report generator")
               ,p("The report generated is based on default settings, which shows in \"Tutorial\" section. You could
                  also change settings according to your needs in the \"Statistics\" section.")
-              ,fileInput("InputData", "Upload Raw Data")
+
               ,fluidRow(
                 box(width = 12, title = "Title", status = "primary", collapsible = TRUE,solidHeader = T,
                      strong(h1("Statistical Analysis", align = "center"))
@@ -53,7 +91,6 @@ dashboardPage(skin = "black",
                     "!!!")
 
       ))
-
       ,tabItem(tabName = "title"
                ,h3("Title")
                ,p("Author name, date and subtitle could be modified here.")

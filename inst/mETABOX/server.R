@@ -731,15 +731,19 @@ function(input, output, session) {
     }
   })
   # Data description.
-  ViewRawData. <- reactive({
-    result =  load.data(input$InputData)
-    return(data.frame(result))
+  aggregated.data <- reactive({
+    if(input$uploadtype == "Load example dataset"){
+      NULL
+    }else{
+      if(input$uploadtype == "Upload aggregated dataset"){
+        result=load.aggregated.data(input$InputData)
+        return(result) # e, f, p.
+      }else if(input$uploadtype=="Upload expression, feature, phenotype datasets seperately"){
+
+      }else{
+
+      }
+    }
   })
-  output$ViewRawData <- DT::renderDataTable(ViewRawData.(),extensions = "ColVis"
-                                            , options = list(dom = 'C<"clear">lfrtip',
-                                                             pageLength=15,paging = T,searching = F),
-                                            selection = list(target = "row+column",selected = list(
-                                              rows = row.index.ViewRawData, cols = col.index.ViewRawData
-                                            ))
-  )
+
 }
