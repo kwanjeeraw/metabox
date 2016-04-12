@@ -58,18 +58,27 @@ dashboardPage(skin = "black",
                                 ,div(style="display:inline-block",p("Please read detailed explanation about the "))
                                 ,div(style="display:inline-block",a("upload data format",
                                                                     href = "https://github.com/kwanjeeraw/mETABOX"))
+                                ,div(style="display:inline-block",p(". If the orders of features or subjects do not match,
+                                                                     don't worry we can handle that but please read carefully with the "))
+                                ,div(style="display:inline-block",a("upload data format",
+                                                                    href = "https://github.com/kwanjeeraw/mETABOX"))
                                 ,div(style="display:inline-block",p("."))
-                                ,div(style="display:inline-block",p("Example datasets are also "))
-                                ,div(style="display:inline-block",a("provided",href = "https://github.com/kwanjeeraw/mETABOX"))
-                                ,div(style="display:inline-block",p(" for expression, feature, phenotype seperately."))
+                                ,div(
+                                      div(style="display:inline-block",p("Example datasets are also "))
+                                      ,div(style="display:inline-block",a("provided",href = "https://github.com/kwanjeeraw/mETABOX"))
+                                      ,div(style="display:inline-block",p(" for expression, feature, phenotype seperately."))
+                                )
                                 ,div(
                                   div(style ="display:inline-block",fileInput("InputDataExp", "Upload Expression Data"))
-                                  ,div(style ="display:inline-block",fileInput("InputDataP", "Upload Phenotype Data"))
                                   ,div(style ="display:inline-block",fileInput("InputDataF", "Upload Feature Data"))
+                                  ,div(style ="display:inline-block",fileInput("InputDataP", "Upload Phenotype Data"))
                                   )
                                 )
               ,tabsetPanel(
-                tabPanel("Data Summary", "..")
+                tabPanel("Data Summary",
+                         verbatimTextOutput("summary.data")
+                         ,verbatimTextOutput("test")
+                         )
                 ,tabPanel("Feature Data Table", "..")
                 ,tabPanel("Phenotype Data Table", "..")
                 ,tabPanel("Expression Data Table", "..")

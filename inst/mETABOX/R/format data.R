@@ -44,7 +44,7 @@ load.aggregated.data = function(file, ...){ # returns a expression data frame(eD
   eData <- sapply(eData, as.numeric)
   colnames(eData) = rownames(pData); rownames(eData) = fData[,1]
   eData <- data.frame(t(eData),stringsAsFactors = F)
-  result <- list("expresson" = eData, "feature" = fData, "phenotype" = pData)
+  result <- list("expression" = eData, "feature" = fData, "phenotype" = pData)
   return(result)
 }
 ### Upload expression data.
@@ -84,6 +84,36 @@ load.phenotype.data = function(file,...){
   return(p)
 }
 
+### Summarize dataset.
+summary.aggregated.data <- function(aggregated.data){
+  if(is.null(aggregated.data[["expression"]])|is.null(aggregated.data[["feature"]])|is.null(aggregated.data[["phenotype"]])){
+    paste("Waiting Users To Upload",
+          "Expression Dataset,"[is.null(aggregated.data[["expression"]])],
+            "Feature Datasets,"[is.null(aggregated.data[["feature"]])], "Phenotype Datasets."[is.null(aggregated.data[["phenotype"]])])
+  }else{
+    result <- list()
+    #The aggregated.data is a list containing first the expression data, then feature data and then the phenotype data.
+    e <- aggregated.data[["expression"]]; f<-aggregated.data[["feature"]]; p<-aggregated.data[["phenotype"]]
+    ## First check if the dimension is correct. If it is not correct should return a message to let the user know.
+    if(!nrow(e)==nrow(p)){
+      result[["warnings"]][[length(result[["warnings"]])+1]] = paste0(length(result[["warnings"]])+1,
+                                                                      ". The sample size doesn't match between expression dataset and phenotype dataset.")
+    }
+    if(!ncol(e)==nrow(f)){
+      result[["warnings"]][[length(result[["warnings"]])+1]] = paste0(length(result[["warnings"]])+1,
+                                                                      ". The number of compounds doesn't match between expression dataset and feature dataset.")
+    }
+
+    if(is.null(result[["warnings"]])){#If there is no warnings so we can proceed.
+      result[["Information"]] = paste0("Number of Subjects: ", nrow(e),".\nNumber of Features: ", ncol(e),".")
+    }
+    return(result)
+  }
+
+}
+
+
+
 
 ## Use the format of each row to guess which columns are factor.
 transpose.raw.data = function(rawdata){ #rawdata is columns and rows selected!
@@ -100,6 +130,15 @@ transpose.raw.data = function(rawdata){ #rawdata is columns and rows selected!
   })
   return(data.frame(result))
 }
+
+
+
+
+
+
+
+
+
 ## Missing value.
 deal.with.missing.value = function(data, factor,
                                    missingvalueidx, method ,tol.percent){# should be the transposrawdata() and factor.idx().

@@ -733,21 +733,34 @@ function(input, output, session) {
   # Data description.
   aggregated.data <- reactive({
     if(input$uploadtype == "Load example dataset"){
-      NULL
+      return(list("expression"=NULL, "feature"=NULL,"phenotype"=NULL))
     }else{
       if(input$uploadtype == "Upload aggregated dataset"){
-        result=load.aggregated.data(input$InputData)
+        result=tryCatch(load.aggregated.data(input$InputData),
+                        error = function(e){
+                          list("expression"=NULL, "feature"=NULL,"phenotype"=NULL)
+                        })
         return(result) # e, f, p.
       }else if(input$uploadtype=="Upload expression, feature, phenotype datasets seperately"){
-        eData = load.expression.data(input$InputDataExp)
-        fData = load.feature.data(input$InputDataF)
-        pData = load.phenotype.data(input$InputDataP)
-        result = list("expresson" = eData, "feature" = fData, "phenotype" = pData)
+
+        result = list("expression" = tryCatch(load.expression.data(input$InputDataExp),error = function(e){NULL}),
+                      "feature" =  tryCatch(load.feature.data(input$InputDataF),error = function(e){NULL}),
+                      "phenotype" =tryCatch(load.phenotype.data(input$InputDataP),error = function(e){NULL}))
         return(result) # e, f, p.
       }else{
         #!!!
       }
     }
+  })
+  output$test <- renderPrint({
+
+    c(is.null(aggregated.data()[["expression"]]),
+      is.null(aggregated.data()[["feature"]]),
+      is.null(aggregated.data()[["phenotype"]]))
+
+  })
+  output$summary.data <- renderText({
+    summary.aggregated.data(aggregated.data())[[1]]
   })
 
 
