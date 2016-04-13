@@ -3,7 +3,8 @@ dashboardPage(skin = "black",
   dashboardSidebar(
     sidebarMenu(
       menuItem("", tabName = "", badgeLabel = "STATISTICAL ANALYSIS", badgeColor = "orange"),
-      menuItem("Data Uploading", tabName = "uploaddata", icon = icon("bar-chart"),selected = TRUE),
+      menuItem("Data Uploading", tabName = "uploaddata", icon = icon("upload"),selected = TRUE),
+      menuItem("Data Exploratory", tabName = "exploredata", icon = icon("eye")),
       menuItem("Statistical Analysis Report", tabName = "Statistical Analysis Report", icon = icon("file-text"),
                menuItem("Overview", tabName = "report", icon = icon("angle-double-right")),
                menuItem("Title", tabName = "title", icon = icon("angle-double-right"))),
@@ -43,8 +44,8 @@ dashboardPage(skin = "black",
               h3("Data uploading and Data Modification")
               ,p("Users could upload their own data file and modify data set according to needs or simply use the defaul dataset.")
               ,radioButtons("uploadtype", "Upload your data or use example data",
-                            choices = c("Load example dataset","Upload aggregated dataset","Upload expression, feature, phenotype datasets seperately"),
-                            "Load example dataset")
+                            choices = c("Load example dataset","Upload aggregated dataset","Upload expression, feature, phenotype datasets seperately")
+                            )
               ,conditionalPanel(condition = "input.uploadtype == 'Upload aggregated dataset'"
                                 ,div(style="display:inline-block",p("Please read detailed explanation about the "))
                                 ,div(style="display:inline-block",a("upload data format",
@@ -77,14 +78,26 @@ dashboardPage(skin = "black",
               ,tabsetPanel(
                 tabPanel("Data Summary",
                          verbatimTextOutput("summary.data")
-                         ,verbatimTextOutput("test")
                          )
-                ,tabPanel("Feature Data Table", "..")
-                ,tabPanel("Phenotype Data Table", "..")
-                ,tabPanel("Expression Data Table", "..")
+                ,tabPanel("Feature Data Table",
+                          DT::dataTableOutput("View.fData"))
+                ,tabPanel("Phenotype Data Table",
+                          div(
+                            div(style = "display:inline-block",checkboxInput("editViewpData", "", value = FALSE, width = "18px"))
+                            ,div(style = "display:inline-block",em("By clicking Edit, you can add, delete, change order of subjects,etc."))
+                            )
+                          ,conditionalPanel(condition = "input.editViewpData",
+                                                actionButton("SubmitModificationpData", "Submit Modification")
+                                            )
+                          ,DT::dataTableOutput("View.pData")
+                          )
+                ,tabPanel("Expression Data Table",
+                          DT::dataTableOutput("View.eData"))
               )
 
               )
+      ,tabItem(tabName = "exploredata",
+               h3("Data Exploratory Analysis"))
       ,tabItem(tabName = "report",
                h3("Automatic report generator")
               ,p("The report generated is based on default settings, which shows in \"Tutorial\" section. You could

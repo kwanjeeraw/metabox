@@ -1,15 +1,5 @@
-# library(shinydashboard)
-# library(mETABOX)
-# library(doParallel)
-# library(igraph)
-# library(plotly)
-doParallel::registerDoParallel(cores = 2)
 #load("mynw.RData") #for testing
 #########################################################################
-#########################################################################
-#########################################################################
-
-
 
 
 
@@ -20,3 +10,6 @@ options(repos = c(CRAN = "http://cran.rstudio.com"))
 source("R\\general function.R", local = T)
 source("R\\format data.R", local = T)
 check.get.packages(libs)
+
+
+doParallel::registerDoParallel(cores = 2)

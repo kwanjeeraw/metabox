@@ -105,31 +105,20 @@ summary.aggregated.data <- function(aggregated.data){
     }
 
     if(is.null(result[["warnings"]])){#If there is no warnings so we can proceed.
-      result[["Information"]] = paste0("Number of Subjects: ", nrow(e),".\nNumber of Features: ", ncol(e),".")
+      result[["Expression Dataset"]] = paste0("\tNumber of Subjects: ", nrow(e),".\n\tNumber of Features: ", ncol(e),".")
+      result[["Feature Dataset"]] = paste0("Number of Subjects: ", nrow(e),".\nNumber of Features: ", ncol(e),".")
+      result[["Phenotype Dataset"]] = paste0("\tNumber of Subjects: ", nrow(e),".\n\tNumber of Features: ", ncol(e),".")
+      cat("Phenotype Dataset:\n")
+      cat(result[["Phenotype Dataset"]])
+      cat("\n")
     }
-    return(result)
+
   }
 
 }
 
 
 
-
-## Use the format of each row to guess which columns are factor.
-transpose.raw.data = function(rawdata){ #rawdata is columns and rows selected!
-  result = t(rawdata)
-  factor.idx = which(colSums(apply(result,2,function(x){
-    is.na(as.numeric(x))
-  }))>10)
-  colnames(result) = as.character(result[1,])
-  colnames(result)[factor.idx] = paste0("factor",1:length(factor.idx))### People may change the column name.???
-  result = result[-1,]
-  result = data.frame(result)
-  result[,-factor.idx] = sapply(result[,-factor.idx], function(x){
-    as.numeric(as.character(x))
-  })
-  return(data.frame(result))
-}
 
 
 

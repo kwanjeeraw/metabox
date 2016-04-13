@@ -752,17 +752,29 @@ function(input, output, session) {
       }
     }
   })
-  output$test <- renderPrint({
-
-    c(is.null(aggregated.data()[["expression"]]),
-      is.null(aggregated.data()[["feature"]]),
-      is.null(aggregated.data()[["phenotype"]]))
-
+  output$test <- renderText({
+    if(is.null(aggregated.data()[[1]])){
+      return("FALSE")
+    }else{
+      return("TRUE")
+    }
   })
-  output$summary.data <- renderText({
-    summary.aggregated.data(aggregated.data())[[1]]
+  output$summary.data <- renderPrint({
+    summary.aggregated.data(aggregated.data())
   })
-
-
+  # For Viewdata tabs
+  output$View.eData <- DT::renderDataTable(
+  aggregated.data()[["expression"]], options = list(lengthChange = FALSE)
+  )
+  output$View.fData <- DT::renderDataTable(
+    aggregated.data()[["feature"]], options = list(lengthChange = FALSE)
+  )
+  output$View.pData <- DT::renderDataTable(
+    aggregated.data()[["phenotype"]], options = list(lengthChange = FALSE)
+  )
+  observeEvent(input$SubmitModificationpData, {
+    updateCheckboxInput(session = session, "editViewpData",
+                        "", FALSE)
+  })
 
 }
