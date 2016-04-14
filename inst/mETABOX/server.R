@@ -754,12 +754,13 @@ function(input, output, session) {
   })
 
 
-  f<-NULL # dependency
+  f<-rf <-NULL # dependency
   summary.data <- reactive({
-    summary.aggregated.data(aggregated.data(),factor.name = list(factor(),f)[[which.max(sapply(list(factor(),f),length))]])
+    summary.aggregated.data(aggregated.data(),factor.name = list(factor(),f)[[which.max(sapply(list(factor(),f),length))]],
+                            repeated.factor.name = list(repeatedfactor(),rf)[[which.max(sapply(list(repeatedfactor(),rf),length))]])
   })
   #dependency
-  output$con1 <- renderText({
+  output$con1 <- output$con11 <- renderText({
     if(is.null(summary.data()[["warnings"]])){
       return("  ")
     }else{
@@ -767,24 +768,31 @@ function(input, output, session) {
     }
   })
 
-  output$test = renderUI({
+  output$editfactorUI = renderUI({
     fluidPage(
       p(summary.data()[["warnings"]])
       ,conditionalPanel(condition = "output.con1=='  '"
                         ,h4(strong("Experimental Design"))
-                        ,h5("Factors:")
                         ,div(
-                           div(style="display:inline-block",paste(summary.data()[["factor.name"]],collapse = ", "))
+                          div(style="display:inline-block",h5(strong("Factors:")))
+                          ,div(style="display:inline-block",paste(summary.data()[["factor.name"]],collapse = ", "))
                           ,div(style="display:inline-block",p("."))
-                          ,div(style="display:inline-block",actionLink("editfactor","Edit/View Dataset"))
+                          ,div(style="display:inline-block",actionLink("editfactor","Edit"))
                         )
                         ,conditionalPanel(condition = "output.editfactor == '  '"
-                          ,div(style="display:inline-block",
-                               checkboxGroupInput("factor", label = "Select Factors:",
-                                                  choices = colnames(summary.data()[["dataset"]][["phenotype"]]),
-                                                  selected = summary.data()[["factor.name"]]))
-                          ,div(style="display:inline-block",
-                               actionButton("editfactordone","Submit"))
+                          ,sidebarLayout(
+                            sidebarPanel(
+                              div(style="display:inline-block",
+                                   checkboxGroupInput("factor", label = "Select Factors:",
+                                                      choices = colnames(summary.data()[["dataset"]][["phenotype"]]),
+                                                      selected = summary.data()[["factor.name"]]))
+                              ,div(style="display:inline-block",
+                                   actionButton("editfactordone","Submit"))
+                            ),
+                            mainPanel(
+                              DT::dataTableOutput("View.pData2")
+                            )
+                          )
                         )
                         )
     )
@@ -805,6 +813,51 @@ function(input, output, session) {
     }
   })
 
+  output$editrepeatedfactorUI<-renderUI({
+    fluidPage(
+      conditionalPanel(condition = "output.con11=='  '"
+                       ,div(
+                         div(style="display:inline-block",h5(strong("repeated Factors:")))
+                         ,div(style="display:inline-block",paste(summary.data()[["repeated.factor.name"]],collapse = ", "))
+                         ,div(style="display:inline-block",p("."))
+                         ,div(style="display:inline-block",actionLink("editrepeatedfactor","Edit"))
+                       )
+                       ,conditionalPanel(condition = "output.editrepeatedfactor == '  '"
+                                         ,sidebarLayout(
+                                           sidebarPanel(
+                                             div(style="display:inline-block",
+                                                 checkboxGroupInput("repeatedfactor", label = "Select repeated Factors:"
+                                                                    ,choices = summary.data()[["factor.name"]]
+                                                                    ))
+                                             ,div(style="display:inline-block",
+                                                  actionButton("editrepeatedfactordone","Submit"))
+                                           ),
+                                           mainPanel(
+                                             DT::dataTableOutput("View.pData3")
+                                           )
+                                         )
+
+                       )
+      )
+    )
+  })
+  #dependency
+  output$editrepeatedfactor <- renderText({
+    if(input$editrepeatedfactor%%2){
+      return("  ")
+    }else{
+      return(" ")
+    }
+  })
+  repeatedfactor <- reactive({
+    if(input$editrepeatedfactordone==0){# when just upload the data.
+      return(NULL)
+    }else{
+      rf <<- input$repeatedfactor
+    }
+  })
+
+
 
 
   # For Viewdata tabs
@@ -814,12 +867,17 @@ function(input, output, session) {
   output$View.fData <- DT::renderDataTable(
     aggregated.data()[["feature"]], options = list(lengthChange = FALSE)
   )
-  output$View.pData <- DT::renderDataTable(
+  output$View.pData <- output$View.pData2 <- output$View.pData3 <- DT::renderDataTable(
     aggregated.data()[["phenotype"]], options = list(lengthChange = FALSE)
   )
   observeEvent(input$SubmitModificationpData, {
     updateCheckboxInput(session = session, "editViewpData",
                         "", FALSE)
   })
+
+
+  # Data Exploratory
+  ## 1st PCA.
+
 
 }

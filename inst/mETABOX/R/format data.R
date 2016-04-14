@@ -88,7 +88,7 @@ load.phenotype.data = function(file,...){
 }
 
 ### Summarize dataset.
-summary.aggregated.data <- function(aggregated.data, factor.name = NULL){
+summary.aggregated.data <- function(aggregated.data, factor.name = NULL,repeated.factor.name = NULL){
   result <- list()
   if(is.null(aggregated.data[["expression"]])|is.null(aggregated.data[["feature"]])|is.null(aggregated.data[["phenotype"]])){
     result[["warnings"]] = paste("Waiting Users To Upload",
@@ -120,7 +120,7 @@ summary.aggregated.data <- function(aggregated.data, factor.name = NULL){
       }
 
       confounds = ""
-      repeated.factor.name = ""
+      repeated.factor.name = repeated.factor.name
       batch = ""
       result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
       result[["factor.name"]] = factor.name

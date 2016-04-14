@@ -77,10 +77,12 @@ dashboardPage(skin = "black",
                                 )
               ,tabsetPanel(
                 tabPanel("Data Summary",
-                         uiOutput("test")
-                         ,textOutput("aa")
-                         ,div(style="display:inline-block",textOutput("con1"))
-                         ,div(style="display:inline-block",textOutput("editfactor"))
+                         uiOutput("editfactorUI")
+                         ,uiOutput("editrepeatedfactorUI")
+                         ,div(style="display:inline-block",textOutput("con1")) #dep
+                         ,div(style="display:inline-block",textOutput("con11")) #dep
+                         ,div(style="display:inline-block",textOutput("editfactor")) #dep
+                         ,div(style="display:inline-block",textOutput("editrepeatedfactor")) #dep
                          )
                 ,tabPanel("Feature Data Table",
                           DT::dataTableOutput("View.fData"))
