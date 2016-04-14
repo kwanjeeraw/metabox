@@ -752,16 +752,61 @@ function(input, output, session) {
       }
     }
   })
-  output$test <- renderText({
-    if(is.null(aggregated.data()[[1]])){
-      return("FALSE")
+
+
+  f<-NULL # dependency
+  summary.data <- reactive({
+    summary.aggregated.data(aggregated.data(),factor.name = list(factor(),f)[[which.max(sapply(list(factor(),f),length))]])
+  })
+  #dependency
+  output$con1 <- renderText({
+    if(is.null(summary.data()[["warnings"]])){
+      return("  ")
     }else{
-      return("TRUE")
+      return("")
     }
   })
-  output$summary.data <- renderPrint({
-    summary.aggregated.data(aggregated.data())
+
+  output$test = renderUI({
+    fluidPage(
+      p(summary.data()[["warnings"]])
+      ,conditionalPanel(condition = "output.con1=='  '"
+                        ,h4(strong("Experimental Design"))
+                        ,h5("Factors:")
+                        ,div(
+                           div(style="display:inline-block",paste(summary.data()[["factor.name"]],collapse = ", "))
+                          ,div(style="display:inline-block",p("."))
+                          ,div(style="display:inline-block",actionLink("editfactor","Edit/View Dataset"))
+                        )
+                        ,conditionalPanel(condition = "output.editfactor == '  '"
+                          ,div(style="display:inline-block",
+                               checkboxGroupInput("factor", label = "Select Factors:",
+                                                  choices = colnames(summary.data()[["dataset"]][["phenotype"]]),
+                                                  selected = summary.data()[["factor.name"]]))
+                          ,div(style="display:inline-block",
+                               actionButton("editfactordone","Submit"))
+                        )
+                        )
+    )
   })
+  #dependency.
+  output$editfactor <- renderText({
+    if(input$editfactor%%2){
+      return("  ")
+    }else{
+      return(" ")
+    }
+  })
+  factor <- reactive({
+    if(input$editfactordone==0){# when just upload the data.
+      return(NULL)
+    }else{
+        f <<- input$factor
+    }
+  })
+
+
+
   # For Viewdata tabs
   output$View.eData <- DT::renderDataTable(
   aggregated.data()[["expression"]], options = list(lengthChange = FALSE)

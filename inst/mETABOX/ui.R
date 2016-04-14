@@ -77,7 +77,10 @@ dashboardPage(skin = "black",
                                 )
               ,tabsetPanel(
                 tabPanel("Data Summary",
-                         verbatimTextOutput("summary.data")
+                         uiOutput("test")
+                         ,textOutput("aa")
+                         ,div(style="display:inline-block",textOutput("con1"))
+                         ,div(style="display:inline-block",textOutput("editfactor"))
                          )
                 ,tabPanel("Feature Data Table",
                           DT::dataTableOutput("View.fData"))

@@ -6,6 +6,9 @@
 #                 as.data.frame=T, stringsAsFactors = FALSE)
 # d <- read.csv("mx 69088 C\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.csv", stringsAsFactors = FALSE)
 # e <- read.xlsx2("mx 69088 C\\e.xlsx", sheetIndex = 1,as.data.frame=T,stringsAsFactors = FALSE)
+# e = t(e)
+# colnames = e[1,];e = e[-1,];rownames = rownames(e);e = data.frame(e,stringsAsFactors = F);e = sapply(e, as.numeric);e = data.frame(e,stringsAsFactors = F)
+# colnames(e) = colnames;e = data.frame(e);rownames(e)=rownames
 # f <- read.xlsx2("mx 69088 C\\f.xlsx", sheetIndex = 1,as.data.frame=T,stringsAsFactors = FALSE)
 # p <- read.xlsx2("mx 69088 C\\p.xlsx", sheetIndex = 1,as.data.frame=T,stringsAsFactors = FALSE)
 ## the example data set should be equaled to d.
@@ -85,13 +88,13 @@ load.phenotype.data = function(file,...){
 }
 
 ### Summarize dataset.
-summary.aggregated.data <- function(aggregated.data){
+summary.aggregated.data <- function(aggregated.data, factor.name = NULL){
+  result <- list()
   if(is.null(aggregated.data[["expression"]])|is.null(aggregated.data[["feature"]])|is.null(aggregated.data[["phenotype"]])){
-    paste("Waiting Users To Upload",
+    result[["warnings"]] = paste("Waiting Users To Upload",
           "Expression Dataset,"[is.null(aggregated.data[["expression"]])],
             "Feature Datasets,"[is.null(aggregated.data[["feature"]])], "Phenotype Datasets."[is.null(aggregated.data[["phenotype"]])])
   }else{
-    result <- list()
     #The aggregated.data is a list containing first the expression data, then feature data and then the phenotype data.
     e <- aggregated.data[["expression"]]; f<-aggregated.data[["feature"]]; p<-aggregated.data[["phenotype"]]
     ## First check if the dimension is correct. If it is not correct should return a message to let the user know.
@@ -104,19 +107,30 @@ summary.aggregated.data <- function(aggregated.data){
                                                                       ". The number of compounds doesn't match between expression dataset and feature dataset.")
     }
 
+
     if(is.null(result[["warnings"]])){#If there is no warnings so we can proceed.
-      result[["Expression Dataset"]] = paste0("\tNumber of Subjects: ", nrow(e),".\n\tNumber of Features: ", ncol(e),".")
-      result[["Feature Dataset"]] = paste0("Number of Subjects: ", nrow(e),".\nNumber of Features: ", ncol(e),".")
-      result[["Phenotype Dataset"]] = paste0("\tNumber of Subjects: ", nrow(e),".\n\tNumber of Features: ", ncol(e),".")
-      cat("Phenotype Dataset:\n")
-      cat(result[["Phenotype Dataset"]])
-      cat("\n")
+
+      if(length(factor.name)==0){
+        factor.index = sapply(p,function(x){# guess which columns are experimental factors.
+          length(unique(x))
+        })
+        factor.name = colnames(p)[factor.index < nrow(p)/10 & factor.index > 1]#!!!
+      }else{
+        factor.name = factor.name
+      }
+
+      confounds = ""
+      repeated.factor.name = ""
+      batch = ""
+      result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
+      result[["factor.name"]] = factor.name
+      result[["repeated.factor.name"]] = repeated.factor.name
+      result[["confounds"]] = confounds
+      result[["batch"]] = batch
     }
-
   }
-
+  return(result)
 }
-
 
 
 

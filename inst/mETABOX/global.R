@@ -11,5 +11,5 @@ source("R\\general function.R", local = T)
 source("R\\format data.R", local = T)
 check.get.packages(libs)
 
-
+# devtools::install_github("rstudio/shiny",force=TRUE)
 doParallel::registerDoParallel(cores = 2)
