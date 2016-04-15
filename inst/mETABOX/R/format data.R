@@ -30,7 +30,10 @@ load.aggregated.data = function(file, ...){ # returns a expression data frame(eD
   ### distinguish the type of data. Usually the data is xlsx. So currently, only working on xlsx but not xls. ???
   if(grepl("xlsx", file$name)){
     #### currently, data should be at the first sheetIndex. ???
-    d <- xlsx::read.xlsx2(file$datapath, sheetIndex = 1, stringsAsFactors = FALSE, ...)
+    d <- tryCatch(xlsx::read.xlsx2(file$datapath, sheetIndex = 1, stringsAsFactors = FALSE, ...),
+                  error = function(e){
+                    openxlsx::read.xlsx(file$datapath, sheet = 1)
+                  })
   }
   if(grepl("csv", file$name)){
     d <- read.csv(file$datapath, stringsAsFactors = FALSE, ...)
