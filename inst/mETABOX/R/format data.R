@@ -128,7 +128,7 @@ summary.aggregated.data <- function(aggregated.data, factor.name = NULL,repeated
       result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
       result[["factor.name"]] = factor.name
       result[["repeated.factor.name"]] = repeated.factor.name
-      result[["confounds"]] = confounds
+      result[["confound"]] = confounds
       result[["batch"]] = batch
     }
   }

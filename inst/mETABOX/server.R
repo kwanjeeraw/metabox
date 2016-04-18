@@ -760,13 +760,14 @@ function(input, output, session) {
                             repeated.factor.name = list(repeatedfactor(),rf)[[which.max(sapply(list(repeatedfactor(),rf),length))]])
   })
   #dependency
-  output$con1 <- output$con11 <- renderText({
+  output$con1 <- output$con11 <- output$con111 <-  renderText({ #if warnings then there should be other information.
     if(is.null(summary.data()[["warnings"]])){
       return("  ")
     }else{
       return("")
     }
   })
+
 
   output$editfactorUI = renderUI({
     fluidPage(
@@ -858,8 +859,6 @@ function(input, output, session) {
   })
 
 
-
-
   # For Viewdata tabs
   output$View.eData <- DT::renderDataTable(
   aggregated.data()[["expression"]], options = list(lengthChange = FALSE)
@@ -873,6 +872,19 @@ function(input, output, session) {
   observeEvent(input$SubmitModificationpData, {
     updateCheckboxInput(session = session, "editViewpData",
                         "", FALSE)
+  })
+
+  data <- eventReactive(input$submitdataedit,{ # after user click the SUBMIT, we could have a final edited data set.
+    result = list()
+    result$feature <- aggregated.data()[["feature"]][,] # we could delete features.!!!
+    # attributes(result$feature)$IS !!!
+    # attributes(result$feature)$KNOWN_or_notKNOWN
+    phenotype <- aggregated.data()[["phenotype"]][,]
+    attributes(phenotype)$factor <- input$factor
+    attributes(phenotype)$repeatedfactor <- ifelse(is.null(summary.data()[["repeated.factor.name"]]),"NULL",summary.data()[["repeated.factor.name"]])
+    result$phenotype = phenotype
+    result$expression <- aggregated.data()[["expression"]][,]
+    return(result)
   })
 
 

@@ -1,6 +1,23 @@
 dashboardPage(skin = "black",
+
   dashboardHeader(title=img(src="logo.png", width = 200)),
   dashboardSidebar(
+    tags$head(
+      tags$style(HTML('#continuedataedit{background-color:orange}'
+                      # ,'p {color: purple;}'
+                      ))
+      ,tags$script(HTML('
+        var fakeClick = function(tabName) {
+                        var dropdownList = document.getElementsByTagName("a");
+                        for (var i = 0; i < dropdownList.length; i++) {
+                        var link = dropdownList[i];
+                        if(link.getAttribute("data-value") == tabName) {
+                        link.click();
+                        };
+                        }
+                        };
+                        '))
+    ),
     sidebarMenu(
       menuItem("", tabName = "", badgeLabel = "STATISTICAL ANALYSIS", badgeColor = "orange"),
       menuItem("Data Uploading", tabName = "uploaddata", icon = icon("upload"),selected = TRUE),
@@ -79,10 +96,20 @@ dashboardPage(skin = "black",
                 tabPanel("Data Summary",
                          uiOutput("editfactorUI")
                          ,uiOutput("editrepeatedfactorUI")
+                         ,conditionalPanel(condition = "output.con111=='  '"
+                                           ,actionButton("submitdataedit", "SUBMIT", icon = icon("check")))
+                         ,hr()
+                         ,div(style ="display:inline-block",conditionalPanel(condition = "input.submitdataedit"
+                                           ,actionButton("continuedataedit", "CONTINUE", icon = icon("check"))
+                                           ,em("By clicking CONTINUE, you could start analyzing your data by data exploration analysis,
+                                                                 which usually is the first step of examine your dataset.")),
+                              onclick = "fakeClick('exploredata')")
                          ,div(style="display:inline-block",textOutput("con1")) #dep
                          ,div(style="display:inline-block",textOutput("con11")) #dep
+                         ,div(style="display:inline-block",textOutput("con111")) #dep
                          ,div(style="display:inline-block",textOutput("editfactor")) #dep
                          ,div(style="display:inline-block",textOutput("editrepeatedfactor")) #dep
+                         ,div(style="display:inline-block",textOutput("submitdataedit")) #dep
                          )
                 ,tabPanel("Feature Data Table",
                           DT::dataTableOutput("View.fData"))
