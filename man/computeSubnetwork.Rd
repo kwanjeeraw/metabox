@@ -4,7 +4,7 @@
 \alias{computeSubnetwork}
 \title{Compute a subnetwork}
 \usage{
-computeSubnetwork(edgelist, nodelist, pval, fc, fdr, method, returnas)
+computeSubnetwork(edgelist, nodelist, pval, fc, fdr, internalid, method, returnas)
 }
 \arguments{
 \item{edgelist}{a data frame of edges contains at least source and target pairs}
@@ -16,6 +16,8 @@ computeSubnetwork(edgelist, nodelist, pval, fc, fdr, method, returnas)
 \item{fc}{a numeric vector of fold changes with name attributes corresponding to network nodes}
 
 \item{fdr}{a numeric value specifying false discovery rate. Default is 0.05.}
+
+\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
 
 \item{method}{a string specifying method used to compute the subnetwork. It can be one of bionet, frank. Default is bionet. See \code{details}}
 
@@ -30,7 +32,7 @@ compute a subnetwork or module by integrating omic data and the biological netwo
 The function wraps around the main functions of \pkg{\link{BioNet}} including \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}.
 }
 \details{
-The method \code{bionet} encapsulates the main functions from \pkg{\link{BioNet}} to compute a functional module or significanly changed subnetworks. 
+The method \code{bionet} encapsulates the main functions from \pkg{\link{BioNet}} to compute a functional module or significanly changed subnetworks.
 Those functions include: \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}.
 }
 \examples{
