@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- Core CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="bootstrap/css/sb-admin.css" rel="stylesheet">
+  <link href="bootstrap/css/mETABOX.css" rel="stylesheet">
+  <!-- Custom Fonts -->
+  <link href="bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  <!-- Core JavaScript -->
+  <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+  <script type="text/javascript" src="js/opencpu-0.5.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/mETABOX.js"></script>
+  <!-- Load nav menu -->
+  <script> 
+  $(function(){
+    $("#includedNav").load("nav.html");  
+  });
+  </script>
+  <title>mETABOX</title>
+  <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
+  <!-- Embedded script calling R -->
+  <script>
+  $(function(){
+    //global var
+    var curr_session;
+    var req = ocpu.call("getGraphDb",{}, function(get_session) {//calls R function: getGraphDb
+      //assign to global var
+      curr_session = get_session;
+      curr_session.getObject(function(data){
+        //data is the object returned by the R function
+        $("#dbloc").text(data); 
+      });
+    }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
+    $("#setBtn").click(function(){
+      var url = $("#url").val();  
+      var req = ocpu.call("setGraphDb",{url:url}, function(set_session) {//calls R function: setGraphDb
+        curr_session = set_session;
+        curr_session.getObject(function(data){
+          $("#dbloc").text(data); 
+        });
+      }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
+    });//setBtn
+    $("#resetBtn").click(function(){
+      var req = ocpu.call("setGraphDb",{url:'http://localhost:7474/db/data/'}, function(res_session) {//calls R function: setGraphDb
+        curr_session = res_session;
+        curr_session.getObject(function(data){
+          $("#dbloc").text(data); 
+        });
+      }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call getGraphdb
+    });//resetBtn
+  });
+  </script>
+</head>
+
+<body>
+  <div id="wrapper">
+    <!-- Navigation -->       
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div id="includedNav"></div>     
+    </nav>   
+    <div id="page-wrapper">
+      <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="row">
+          <div class="col-lg-12">
+            <h3>Set database</h3>
+            <div class="alert alert-default alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+              <i class="fa fa-info-circle"></i> Set the database location for the currently working environment, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <!-- Main content -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title">Inputs</h3>
+              </div>
+              <div class="panel-body">
+                <h5>Current database location:</h5>
+                <pre id="dbloc"></pre>
+                <form role="form">
+                  <div class="form-group">
+                    <label for="url">Database URL:</label>
+                    <input class="form-control" type="text" id="url" name="url">
+                    <p class="help-block">e.g. http://localhost:7474/db/data/</p>
+                  </div>
+                  <button id="setBtn" type="button" class="btn btn-primary">Set</button>
+                  <button id="resetBtn" type="reset" class="btn btn-default">Reset</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+</body>
+</html>
