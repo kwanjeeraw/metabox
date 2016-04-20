@@ -1,11 +1,11 @@
 #'Compute Tanimoto similarity network
-#'@description compute Tanimoto similarity for compounds. 
-#'The function wraps around the functions of \pkg{\link{metabomapr}} to compute Tanimoto distances of all given compounds using PubChem fingerprints. 
+#'@description compute Tanimoto similarity for compounds.
+#'The function wraps around the functions of \pkg{\link{metabomapr}} to compute Tanimoto distances of all given compounds using PubChem fingerprints.
 #'@usage computeSimilarity(txtinput, coef, returnas)
-#'@param txtinput a character vector of PubChem CIDs given for structure similarity comparisons. 
+#'@param txtinput a character vector of PubChem CIDs given for structure similarity comparisons.
 #'@param coef a numeric value specifying the minimum Tanimoto similarity correlation coefficient to be included in the output (from 0 to 1, default is 0.7).
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@return 
+#'@return
 #'list of nodes with the following components:
 #'
 #'\code{id} = node internal neo4j id
@@ -39,7 +39,7 @@
 #'@export
 computeSimilarity <- function(txtinput, coef=0.7, returnas="dataframe") UseMethod("computeSimilarity")
 #'@export
-computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe") 
+computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
 {
   out <- tryCatch(
     {
@@ -63,14 +63,20 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
         so = data.frame(id=network$source, gid=network$source, nodename=network$source, nodelabel="Compound", stringsAsFactors = FALSE)
         ta = data.frame(id=network$target, gid=network$target, nodename=network$target, nodelabel="Compound", stringsAsFactors = FALSE)
         sota = unique(rbind(so,ta))
-        nds = fetchNode(txtinput=sota$id, nodetype="compound", searchby="grinnid")
-        if(nrow(nds)>0){
+        networknode = tryCatch({
+          nds = fetchNode(txtinput=sota$id, nodetype="compound", searchby="grinnid")
           nds = nds[c('id','gid','nodename','nodelabel','nodexref')]
           networknode = plyr::rbind.fill(nds,sota)
           networknode = networknode[!duplicated(networknode$gid),]
-        }else{
+        }, error = function(err) {#catch error if there is no db
           networknode = sota
-        }
+        })
+
+#         if(nrow(nds)>0){
+#
+#         }else{
+#
+#         }
         cat("Format and returning network edges ...\n")
         network$source = lapply(network$source, FUN=formatId, y = networknode) #format edgelist
         network$target = lapply(network$target, FUN=formatId, y = networknode) #format edgelist

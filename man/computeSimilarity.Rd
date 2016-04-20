@@ -35,7 +35,7 @@ edgelist with the following components:
 Return empty list or data frame if error or found nothing.
 }
 \description{
-compute Tanimoto similarity for compounds. 
+compute Tanimoto similarity for compounds.
 The function wraps around the functions of \pkg{\link{metabomapr}} to compute Tanimoto distances of all given compounds using PubChem fingerprints.
 }
 \examples{
