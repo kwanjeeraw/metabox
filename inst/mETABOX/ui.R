@@ -3,8 +3,8 @@ dashboardPage(skin = "black",
   dashboardHeader(title=img(src="logo.png", width = 200)),
   dashboardSidebar(
     tags$head(
-      tags$style(HTML('#continuedataedit{background-color:orange}'
-                      # ,'p {color: purple;}'
+      tags$style(HTML('#continuedataedit{background-color:orange}',
+                      '#continuedataedit:hover{color: #cc0000;background-color:red}'
                       ))
       ,tags$script(HTML('
         var fakeClick = function(tabName) {
