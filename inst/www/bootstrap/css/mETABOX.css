@@ -10,6 +10,7 @@
 .bg-blue {background-color: #0073b7}
 .bg-green {background-color: #00a65a}
 .bg-red {background-color: #dd4b39}
+
 .panel-heading a:after {
     font-family:'Glyphicons Halflings';
     content:"\e114";
