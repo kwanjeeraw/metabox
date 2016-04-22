@@ -29,9 +29,9 @@ td.highlight {
 }
 .spinner {
     background: url(../images/loader.gif) 50% 50% no-repeat;
-    -khtml-opacity:.50; 
-    -moz-opacity:.50; 
-    -ms-filter:”alpha(opacity=50)”;
+    -khtml-opacity:.50;
+    -moz-opacity:.50;
+    -ms-filter:?alpha(opacity=50)?;
     filter:alpha(opacity=50);
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.5);
     opacity:.50;
@@ -43,9 +43,9 @@ td.highlight {
 }
 .spinnerText {
     background: url(../images/loaderText.gif) 50% 50% no-repeat;
-    -khtml-opacity:.50; 
-    -moz-opacity:.50; 
-    -ms-filter:”alpha(opacity=50)”;
+    -khtml-opacity:.50;
+    -moz-opacity:.50;
+    -ms-filter:?alpha(opacity=50)?;
     filter:alpha(opacity=50);
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.5);
     opacity:.50;
@@ -54,4 +54,11 @@ td.highlight {
     height: 100%;
     top:15;
     left:0;
+}
+
+
+
+/*Statistics*/
+.small-label{
+  font-weight: 400
 }
