@@ -3,7 +3,7 @@
 #'@usage readInfile(file, header = TRUE, sep ="\t")
 #'@param file
 #'@param header
-#'@param set
+#'@param sep
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@seealso \code{\link{read.csv}}
 #'@examples
