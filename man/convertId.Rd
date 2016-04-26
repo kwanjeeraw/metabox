@@ -12,7 +12,8 @@ The value can be a kind of node property keys, see \code{searchby}. Default is x
 
 \item{nodetype}{a string specifying the type of a query node. It can be one of compound, protein, gene, pathway, rna, dna, biofeature.}
 
-\item{searchby}{a string specifying a node property key used for the query. It can be one of name, synonyms, description, properties, xref. Default is xref.}
+\item{searchby}{a string specifying a node property key used for the query. It can be one of description, grinnid, name, neo4jid, properties, synonyms, xref.
+grinnid (gid) is a grinn database id. It's not the same with neo4jid. Default is xref.}
 
 \item{exactmatch}{logical. If TRUE, it will query for exact results i.e. a case-sensitive and exact keyword or phrase. Default is TRUE.}
 
