@@ -15,9 +15,9 @@
 #'To describe a relationship type, you can specify with a pair of square brackets and the arrow as \code{-[:RELATIONSHIP_TYPE]->}
 #'
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@details The function queries for the heterogeneous network containing the given relationship pattern between the source nodes and/or target nodes based on the database structure. 
+#'@details The function queries for the heterogeneous network containing the given relationship pattern between the source nodes and/or target nodes based on the database structure.
 #'This function can query for the ralationship of length > 1. Use \code{\link{fetchNetwork}} to query for a network of length = 1.
-#'@return 
+#'@return
 #'list of nodes with the following components:
 #'
 #'\code{id} = node internal neo4j id
@@ -62,11 +62,11 @@
 #'@export
 fetchHetNetwork <- function(from=NULL, to=NULL, pattern, returnas="dataframe") UseMethod("fetchHetNetwork")
 #'@export
-fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataframe"){ 
+fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataframe"){
   out <- tryCatch(
     {
       if (!is.character(pattern)) stop("argument 'pattern' must be a character vector")
-      
+
       #construct query
       maxkw = 500 #maximum keywords
       doPar = FALSE
@@ -91,18 +91,18 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
         stop("Error: No query provided")
       }
       querystring = gsub("relpattern", pattern, querystring)
-      
+
       cat("Querying network ...\n")
       if(!doPar){
         if(len <= maxkw){
           qstring = gsub("keyword", paste0("['",paste0(txtinput, collapse = "','"),"']"), querystring)
-        cat(qstring,"\n")      
-          paths = curlRequest.TRANSACTION(cypher=qstring)  
+        cat(qstring,"\n")
+          paths = curlRequest.TRANSACTION(cypher=qstring)
           #paths = jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
         }else{
           cat("Split queries for more than 500 nodes ...\n")
           subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
-          paths = foreach(i=1:length(subinp), .combine=c) %dopar% { 
+          paths = foreach(i=1:length(subinp), .combine=c) %dopar% {
             qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
         cat(qstring,"\n")
             #jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
@@ -123,32 +123,6 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
         paths = unlist(path, recursive = FALSE)
       }
       formatNetworkOutput(paths,returnas)
-#       pathls = unique(unlist(sapply(paths, function(x) x$relationships)))
-#       cat("Format and returning network of size ",length(pathls)," ...\n")
-#       network = foreach(i=1:length(pathls), .combine=rbind) %dopar% {
-#         #fetchRelationship(pathls[i], returnas="dataframe")
-#         formatPathOutput(pathls[i])
-#       }
-#       cat("Format and returning network nodes ...\n")
-#       #format nodeList from edgeList
-#       scname = sapply(network$sourcename, function(x) ifelse(!is.null(x),x,network$source))
-#       sclabel = sapply(network$sourcelabel, function(x) ifelse(!is.null(x),x,""))
-#       scxref = sapply(network$sourcexref, function(x) ifelse(!is.null(x),x,list("")))
-#       trname = sapply(network$targetname, function(x) ifelse(!is.null(x),x,network$target))
-#       trlabel = sapply(network$targetlabel, function(x) ifelse(!is.null(x),x,""))
-#       trxref = sapply(network$targetxref, function(x) ifelse(!is.null(x),x,list("")))
-#       so = data.frame(id=network$source,name=scname,nodelabel=sclabel, stringsAsFactors = FALSE)
-#       so$nodexref = scxref
-#       ta = data.frame(id=network$target,name=trname,nodelabel=trlabel, stringsAsFactors = FALSE)
-#       ta$nodexref = trxref
-#       networknode = unique(rbind(so,ta))
-#       
-#       ## output
-#       switch(returnas,
-#              dataframe = list(nodes = networknode, edges = network),
-#              list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network, seq(nrow(network)))),
-#              json = list(nodes = jsonlite::toJSON(networknode), edges = jsonlite::toJSON(network)),
-#              stop("Error: incorrect 'returnas' type"))
     },
     error=function(e) {
       message(e)

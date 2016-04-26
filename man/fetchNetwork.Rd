@@ -17,7 +17,7 @@ The value must be neo4j ids, see \code{\link{convertId}} for how to convert to n
 
 \item{totype}{a string specifying the type of target nodes. It can be one of compound, protein, gene, pathway, rna, dna, phenotype.}
 
-\item{reltype}{a string specifying a relationship type used for the query. 
+\item{reltype}{a string specifying a relationship type used for the query.
 It can be one of annotation, biochemical_reaction, catalysis, control, conversion, genetic_association, molecular_binding.}
 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
@@ -52,7 +52,7 @@ query the networks of a specific relationship type between the given source and/
 see \url{http://grinnhomepage} for the database structure to construct the network query.
 }
 \details{
-The function queries for the networks containing the given relationship type between the source nodes and/or target nodes based on the database structure. 
+The function queries for the networks containing the given relationship type between the source nodes and/or target nodes based on the database structure.
 This function is specifically to query for the ralationship of length = 1. Use \code{\link{fetchHetNetwork}} to query for a heterogeneous network of variable length.
 }
 \examples{

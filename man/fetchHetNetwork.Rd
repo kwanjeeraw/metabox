@@ -53,7 +53,7 @@ query the networks for the given source and/or target nodes and relationship pat
 see \url{http://grinnhomepage} for the database structure to construct the network query.
 }
 \details{
-The function queries for the heterogeneous network containing the given relationship pattern between the source nodes and/or target nodes based on the database structure. 
+The function queries for the heterogeneous network containing the given relationship pattern between the source nodes and/or target nodes based on the database structure.
 This function can query for the ralationship of length > 1. Use \code{\link{fetchNetwork}} to query for a network of length = 1.
 }
 \examples{
