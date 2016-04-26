@@ -4,17 +4,19 @@
 \alias{computeEnrichment}
 \title{Perform enrichment analysis}
 \usage{
-computeEnrichment(edgelist, pval, fc, method, size, returnas)
+computeEnrichment(edgelist, pval, fc, internalid, method, size, returnas)
 }
 \arguments{
-\item{edgelist}{a two-column data frame of molecular entities and entity set collections. 
+\item{edgelist}{a two-column data frame of molecular entities and entity set collections.
 The first column contains molecular entities and the second column contains entity set collections. See \code{\link{loadGSC}} for details.}
 
-\item{pval}{a numeric vector containing the p-values of molecular entities, computed from statistical analysis, 
+\item{pval}{a numeric vector containing the p-values of molecular entities, computed from statistical analysis,
 with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
 
-\item{fc}{a numeric vector containing fold changes or sign information (positive or negative) of molecular entities 
+\item{fc}{a numeric vector containing fold changes or sign information (positive or negative) of molecular entities
 with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
+
+\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
 
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 
@@ -23,13 +25,11 @@ with name attributes corresponding to the entities. See \code{\link{runGSA}} for
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
-entity sets with the following components:
+enrichment analysis result with the following components:
 
 \code{id} = id of entity set
 
 \code{amount} = number of members in each entity set
-
-\code{Stat} = entity set statistics
 
 \code{p} = entity set p-values
 
