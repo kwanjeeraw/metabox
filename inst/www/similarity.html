@@ -42,7 +42,7 @@
   <script>
   $(function(){
     //global var
-    var curr_session
+    var curr_session;
     var txtinput;
     var nodeTable;
     var edgeTable;
@@ -59,11 +59,11 @@
         });
         session.getObject(function(object){
           robj = object;
+console.log(robj);
           //Table output
           if (robj.edges.length > 0) {
-            var xrefInd = (Object.keys(robj.nodes[0]).length) - 1;
-            nodeTable = drawNodeTable(robj.nodes, xrefInd);
-            edgeTable = drawEdgeTable(robj.edges);
+            nodeTable = drawTable('#nodes',robj.nodes);
+            edgeTable = drawTable('#edges',robj.edges);
           }else{
             if (nodeTable != undefined) {
               nodeTable.clear().draw();
@@ -73,17 +73,19 @@
             $('#edges').empty();
           }
           //Network output
-          cyImg = drawNetwork(robj.nodes, robj.edges);
+          cyImg = drawNetwork(formatNode(robj.nodes), formatEdge(robj.edges));
         });//getObject    
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
     $("#downloadBtn").click(function(){
-      var pngData = cyImg.png();
-      exportNwZip(robj.nodes, robj.edges, pngData);       
+      exportNwZip(robj.nodes, robj.edges, cyImg.png());       
     });//downloadBtn
     $("#subnetworkBtn").click(function(){
       window.location = 'subnetwork.html?rsess='+curr_session.getLoc();//send r object for subnetwork    
+    });//subnetworkBtn
+    $("#ptwBtn").click(function(){
+      window.location = 'pathway.html?rsess='+curr_session.getLoc();//send r object for subnetwork    
     });//subnetworkBtn
   });
   </script>
@@ -127,10 +129,15 @@
                     <input type='file' id="fileinput" name="fileinput" accept='text/plain' onchange='loadTxtFile(event)'>
                     <p class="help-block">One column, separate each ID by a new line</p>
                   </div>
-                  <div class="form-group">
-                    <label for="coef">Minimum Tanimoto similarity correlation coefficient:</label>
-                    <input class="form-control" type="number" id="coef" name="coef" value="0.7" min="0.1" max="1" step="0.05">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="coef">Minimum Tanimoto similarity correlation coefficient:</label>
+                        <input class="form-control" type="number" id="coef" name="coef" value="0.7" min="0.1" max="1" step="0.05">
+                      </div>
+                    </div>
                   </div>
+                  <!-- /.row -->
                   <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
                   <button id="clearBtn" type="reset" class="btn btn-default">Clear</button>
                 </form>
@@ -149,7 +156,7 @@
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" data-value="Console" id="console">
-                <pre id="consolemsg"></pre>
+                <pre id="consolemsg" class="pre-scrollable"></pre>
               </div>
               <div class="tab-pane" data-value="Node" id="node">
                 <table id="nodes" class="display" width="100%"></table>
@@ -166,9 +173,10 @@
             <div class="caption">
               <hr>
               <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-              <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-sitemap"></i> Subnetwork</button>
-              <a class="btn btn-info" href="#"><i class="fa fa-pie-chart"></i> Enrichment</a>
-              <a class="btn btn-warning" href="#"><i class="fa fa-cloud"></i> WordCloud</a>
+              <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
+              <button id="ptwBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> PathwayEnrichment</button>
+              <button id="meshBtn" type="button" class="btn btn-primary"><i class="fa fa-spinner"></i> MeSHEnrichment</button>
+              <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
             </div>
           </div>
         </div>

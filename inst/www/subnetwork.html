@@ -40,16 +40,16 @@
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
   <!-- Embedded script calling R -->
   <script>    
-  $(function(){    
+  $(function(){
     //global var
-    var inp_session
-    var compute_session
+    var inp_session;
+    var compute_session;
+    var inputTable;
     var nodeTable;
     var edgeTable;
     var robj;
     var cyImg;
-    var inputTable;
-    var url = getURLVars('rsess')+"R/.val/json";
+    var url = getURLVars('rsess')+"R/.val/json";    
     $.ajax({
       url: url,
       type: 'GET',
@@ -63,11 +63,11 @@
             inp_session = session;
             session.getObject(function(object){
               //Table output
-              inputTable = $('#inputdt').DataTable({
-                "destroy": true,
-                data: object,
-                columns: formatTableHeader(object[0])
-              });
+              if (inputTable != undefined) {
+                 inputTable.destroy();
+                 $('#inputdt').empty();
+               }
+              inputTable = drawTable('#inputdt',object);
             });//getObject
           }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
         });//fileinput
@@ -84,19 +84,18 @@
               robj = object;
               //Table output
               if (robj.edges.length > 0) {
-                var xrefInd = (Object.keys(robj.nodes[0]).length) - 2;
-                nodeTable = drawNodeTable(robj.nodes, xrefInd);
-                edgeTable = drawEdgeTable(robj.edges);
+                nodeTable = drawTable('#nodes',robj.nodes);
+                edgeTable = drawTable('#edges',robj.edges);
               }else{
                 if (nodeTable != undefined) {
-                  nodeTable.clear().draw();
-                  edgeTable.clear().draw();
+                  nodeTable.destroy();
+                  edgeTable.destroy();
                 }
                 $('#nodes').empty();
                 $('#edges').empty();
               }
               //Network output
-              cyImg = drawNetwork(robj.nodes, robj.edges);
+              cyImg = drawNetwork(formatNode(robj.nodes), formatEdge(robj.edges));
             });//getObject    
             hideSpinner(loadSpinner);
           }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
@@ -109,11 +108,10 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      var pngData = cyImg.png();
-      exportNwZip(robj.nodes, robj.edges, pngData);       
+      exportNwZip(robj.nodes, robj.edges, cyImg.png());       
     });//downloadBtn
-    $("#enrichmentBtn").click(function(){
-      window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
+    $("#ptwBtn").click(function(){
+      window.location = 'pathway.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
     });//enrichmentBtn
   });
   </script>
@@ -133,7 +131,7 @@
             <h3>Compute subnetwork</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Compute an active subnetwork or module by integrating omic data on the biological network, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+              <i class="fa fa-info-circle"></i> Compute an active subnetwork by integrating omic data on the input network, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
             </div>
           </div>
         </div>
@@ -167,8 +165,8 @@
                   <div class="row">
                     <div class="col-lg-12">
                       <ul class="nav nav-tabs">
-                        <li class="active"><a href="#networkOv" data-toggle="tab" data-value="NetworkOv">Network</a></li>
-                        <li><a href="#dataOv" data-toggle="tab" data-value="DataOv">Data</a></li>
+                        <li class="active"><a href="#networkOv" data-toggle="tab" data-value="NetworkOv">Input network</a></li>
+                        <li><a href="#dataOv" data-toggle="tab" data-value="DataOv">Input data</a></li>
                         <li class="pull-right"><h5>Input overview</h5></li>
                       </ul>
                       <div class="tab-content">
@@ -184,7 +182,7 @@
                   <!-- /.row -->
                   <hr>
                   <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-6">
                       <div class="form-group">
                         <label for="fdr">Maximum false discovery rate (FDR):</label>
                         <input id="fdr" name="fdr" type="number" class="form-control" value="0.05" min="0" max="1" step="0.01">
@@ -210,7 +208,7 @@
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" data-value="Console" id="console">
-                <pre id="consolemsg"></pre>
+                <pre id="consolemsg" class="pre-scrollable"></pre>
               </div>
               <div class="tab-pane" data-value="Node" id="node">
                 <table id="nodes" class="display" width="100%"></table>
@@ -225,10 +223,11 @@
         <div class="row">
           <div class="col-lg-12">
             <div class="caption">
-            <hr>
-            <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-            <button id="enrichmentBtn" class="btn btn-info"><i class="fa fa-pie-chart"></i> Enrichment</button>
-            <button class="btn btn-warning" href="#"><i class="fa fa-cloud"></i> WordCloud</button>
+              <hr>
+              <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
+              <button id="ptwBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> PathwayEnrichment</button>
+              <button id="meshBtn" type="button" class="btn btn-primary"><i class="fa fa-spinner"></i> MeSHEnrichment</button>
+              <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
             </div>
           </div>
         </div>
