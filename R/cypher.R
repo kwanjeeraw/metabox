@@ -34,6 +34,20 @@ pathsList <- list(
   fromto = "MATCH ptw = relpattern WHERE ID(from) = toInt(\'keyfrom\') AND ID(to) = toInt(\'keyto\') RETURN DISTINCT ptw"
 )
 
+##list of Cypher to query from-[relationship]->to using GID
+pathList_GID <- list(
+  from = "UNWIND keyword AS x WITH x MATCH ptw = (from:fromtype)-[r:reltype]->(to:totype) WHERE from.GID = x RETURN DISTINCT ptw",
+  to = "UNWIND keyword AS x WITH x MATCH ptw = (from:fromtype)-[r:reltype]->(to:totype) WHERE to.GID = x RETURN DISTINCT ptw",
+  fromto = "MATCH ptw = (from:fromtype)-[r:reltype]->(to:totype) WHERE from.GID = \'keyfrom\' AND to.GID = \'keyto\' RETURN DISTINCT ptw"
+)
+
+##list of Cypher to query from-[relationships]->to using GID
+pathsList_GID <- list(
+  from = "UNWIND keyword AS x WITH x MATCH ptw = relpattern WHERE from.GID = x RETURN DISTINCT ptw",
+  to = "UNWIND keyword AS x WITH x MATCH ptw = relpattern WHERE to.GID = x RETURN DISTINCT ptw",
+  fromto = "MATCH ptw = relpattern WHERE from.GID = \'keyfrom\' AND to.GID = \'keyto\' RETURN DISTINCT ptw"
+)
+
 ###for enrichment analysis
 #x = combGeneNetwork$edges[1:30,]
 #g = graph.edgelist(as.matrix(data.frame(from=unlist(x[,1]),to=unlist(x[,2]))),directed = FALSE)
