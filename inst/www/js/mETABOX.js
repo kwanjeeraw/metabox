@@ -46,11 +46,13 @@ function loadTxtFile(event) {
 };
 
 //@function export network outputs as a zip file
-function exportNwZip(nodes, edges, network){
+//@param nodes, edges array of json objects
+//@param img cytoscapeJS png object
+function exportNwZip(nodes, edges, img){
     var zip = new JSZip();
     zip.file("node.txt", JSONToTabConvertor(nodes,true))
     zip.file("edge.txt", JSONToTabConvertor(edges,true))
-    zip.file("network.png", network.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
+    zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
     zip.generateAsync({type:"base64"})
     .then(function (content) {
       var a = document.createElement('a'); 
@@ -58,6 +60,40 @@ function exportNwZip(nodes, edges, network){
       a.download = "OUTPUT.zip";
       a.click();
     });    
+}
+
+//@function export enrichment outputs as a zip file
+//@param network cytoscape json elements
+//@param img cytoscapeJS png object
+//@param enrichment array of json objects
+function exportEnrichmentZip(network, img, enrichment){
+    var zip = new JSZip();
+    var cynw = formatCyJSON(network);
+    zip.file("node.txt", JSONToTabConvertor(cynw.nodes,true))
+    zip.file("edge.txt", JSONToTabConvertor(cynw.edges,true))
+    zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
+    zip.file("enrichment.txt", JSONToTabConvertor(enrichment,true));
+    zip.generateAsync({type:"base64"})
+    .then(function (content) {
+      var a = document.createElement('a'); 
+      a.href="data:application/zip;base64,"+content;
+      a.download = "OUTPUT.zip";
+      a.click();
+    });    
+}
+
+//@function format cytoscape json elements
+//@param network cytoscape json elements
+function formatCyJSON(network){
+    var nodels = [];
+    var edgels = [];
+    Object.keys(network.elements.nodes).forEach(function(idx) {
+        nodels.push(network.elements.nodes[idx].data);
+    }); 
+    Object.keys(network.elements.edges).forEach(function(idx) {
+        edgels.push(network.elements.edges[idx].data);
+    }); 
+    return {'nodes':nodels,'edges':edgels};
 }
 
 //@function load spinner
@@ -91,9 +127,8 @@ function hideSpinner(spinner){
     $('#notifyBox').modal('hide');
 }
 
-//@code get URL variables
-//@param param, name of form input
-//@return form values
+//@function get URL variables
+//@param param, name of variable
 //@based http://stackoverflow.com/questions/8460265/
 function getURLVars(param)
 {
@@ -119,6 +154,7 @@ function getURLVars(param)
 }
 
 //@function format table header
+//@param jsonData json object
 function formatTableHeader(jsonData){
     var keyls = Object.keys(jsonData);//get list of keys
     var colnames = [];
@@ -128,54 +164,73 @@ function formatTableHeader(jsonData){
     return colnames;
 }
 
-//@function draw node table output
-function drawNodeTable(objNode, xrefInd) {
-    var nodeTable = $('#nodes').DataTable({
+//@function draw table
+//@param id id element
+//@param data array of json objects
+function drawTable(id, data) {
+    var dtTable = $(id).DataTable({
       "destroy": true,
-      "columnDefs": [{
-        "render": function (data, type, row) {
-          return type === 'display' && data.length > 60 ?
-          '<span title=\"' + data + '\">' + data.substr(0, 60) + ' ...</span>' : data;//format xref string
-        },
-        "targets": xrefInd
-      }],
-      data: objNode,
-      columns: formatTableHeader(objNode[0])
+      "scrollX": true,
+      "scrollY": 400,
+      "scrollCollapse": true,
+      "data": data,
+      "columns": formatTableHeader(data[0])
     });
-    return nodeTable;
+    return dtTable;
 }
 
-//@function draw edge table output
-function drawEdgeTable(objEdge) {
-    var edgeTable = $('#edges').DataTable({
-      "destroy": true,
-      data: objEdge,
-      columns: formatTableHeader(objEdge[0])
-    });
-    return edgeTable;
+//@function format node for cytoscapeJS
+//@param nodeArr array of json objects
+function formatNode(nodeArr) {
+    var nodels = [];
+    for (var i = 0; i < nodeArr.length; i++) {//format list of nodes for cytoscapeJS
+      nodels.push({
+          data: nodeArr[i]
+      });
+    }
+    return nodels;
+}
+
+//@function format node for cytoscapeJS
+//@param nodeArr, enrichArr array of json objects
+function formatPieNode(nodeArr, enrichArr) {
+    var nodels = [];
+    for (var i = 0; i < nodeArr.length; i++) {//format list of nodes for cytoscapeJS
+      nodels.push({
+          data: nodeArr[i]
+      }); 
+      Object.keys(enrichArr).forEach(function(idx) {
+        var pie = "pie" + idx;
+        if(enrichArr[idx].member.indexOf(nodeArr[i].id)!= -1){
+             nodels[i].data[pie] = 1; 
+        }
+      }); 
+    }
+    return nodels;
+}
+
+//@function format edge for cytoscapeJS
+//@param edgeArr array of json objects
+function formatEdge(edgeArr) {
+    var edgels = [];
+    for (var i = 0; i < edgeArr.length; i++) {//format list of edges for cytoscapeJS
+      edgels.push({
+          data: edgeArr[i]
+      });
+    }
+    return edgels;
 }
 
 //@function draw cytoscapeJS network
+//@param objNode, objEdge array of json objects accepted by cytoscapeJS [{data:{id:'id',name:'name'}}]
 function drawNetwork(objNode, objEdge){
-    var nodels = [];
-    var edgels = [];
-    for (var i = 0; i < objNode.length; i++) {//format list of nodes for cytoscapeJS
-      nodels.push({
-          data: objNode[i]
-      });
-    }
-    for (var i = 0; i < objEdge.length; i++) {//format list of edges for cytoscapeJS
-      edgels.push({
-          data: objEdge[i]
-      });
-    }
     var cy = cytoscape({//initialize cytoscapeJS
       container: document.getElementById('cy'),
       boxSelectionEnabled: false,
       autounselectify: true,
       elements: {
-        nodes: nodels,
-        edges: edgels
+        nodes: objNode,
+        edges: objEdge
       },
       layout: {
         name: 'cose',
@@ -185,9 +240,33 @@ function drawNetwork(objNode, objEdge){
         .selector('node')
           .css({
             'content': 'data(nodename)',
-            'background-color':'#A4A4A4',
+            'background-color':'#B3B3B3',
             'text-valign': 'bottom',
-            'font-size':'16'
+            'color':'#515151',
+            'text-outline-color':'#FFFFFF',
+            'text-outline-width':0.3,
+            'font-size':14,
+            'pie-size': '98%',
+            'pie-1-background-color': '#D256D4',
+            'pie-1-background-size': 'mapData(pie0, 0, 10, 0, 100)',
+            'pie-2-background-color': '#FFFFB3',
+            'pie-2-background-size': 'mapData(pie1, 0, 10, 0, 100)',
+            'pie-3-background-color': '#8E7FF6',
+            'pie-3-background-size': 'mapData(pie2, 0, 10, 0, 100)',
+            'pie-4-background-color': '#FB8072',
+            'pie-4-background-size': 'mapData(pie3, 0, 10, 0, 100)',
+            'pie-5-background-color': '#80B1D3',
+            'pie-5-background-size': 'mapData(pie4, 0, 10, 0, 100)',
+            'pie-6-background-color': '#FDB462',
+            'pie-6-background-size': 'mapData(pie5, 0, 10, 0, 100)',
+            'pie-7-background-color': '#8ADE69',
+            'pie-7-background-size': 'mapData(pie6, 0, 10, 0, 100)',
+            'pie-8-background-color': '#F4B5D6',
+            'pie-8-background-size': 'mapData(pie7, 0, 10, 0, 100)',
+            'pie-9-background-color': '#FF4848',
+            'pie-9-background-size': 'mapData(pie8, 0, 10, 0, 100)',
+            'pie-10-background-color': '#8DD3C7',
+            'pie-10-background-size': 'mapData(pie9, 0, 10, 0, 100)'
           })
         .selector('node[nodelabel = "Phenotype"]')
           .css({
@@ -258,18 +337,21 @@ function drawNetwork(objNode, objEdge){
           })
           .selector('edge[type = "TANIMOTO_SIMILARITY"]')
           .css({
-            'line-color': '#662506',
-            'target-arrow-shape': 'none'
+            'line-color': '#895238',
+            'target-arrow-shape': 'none',
+            'width': 'mapData(coef, 0, 1, 1, 10)'
           })
           .selector('edge[type = "CORRELATION"]')
           .css({
             'line-color': '#3f007d',
-            'target-arrow-shape': 'none'
+            'target-arrow-shape': 'none',
+            'width': 'mapData(coef, 0, 1, 1, 10)'
           })
           .selector('edge[type = "PARTIAL_CORRELATION"]')
           .css({
             'line-color': '#f16913',
-            'target-arrow-shape': 'none'
+            'target-arrow-shape': 'none',
+            'width': 'mapData(coef, 0, 1, 1, 10)'
           })
         .selector(':selected')
           .css({
