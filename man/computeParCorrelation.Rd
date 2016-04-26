@@ -7,7 +7,7 @@
 computeParCorrelation(x, xtype, coef, pval, alpha, threshold, matrix.completion, returnas)
 }
 \arguments{
-\item{x}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities. 
+\item{x}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
 Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.}
 
 \item{xtype}{a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.}
@@ -29,6 +29,8 @@ list of nodes with the following components:
 
 \code{id} = node id
 
+\code{gid} = node gid
+
 \code{nodename} = node name
 
 edgelist with the following components:
@@ -46,8 +48,8 @@ edgelist with the following components:
 Return empty list or data frame if error or found nothing.
 }
 \description{
-compute the partial correlation network for omic data. 
-The function wraps around the functions of \pkg{\link{qpgraph}}. 
+compute the partial correlation network for omic data.
+The function wraps around the functions of \pkg{\link{qpgraph}}.
 Partial correlation coefficients, p-values and correlation directions are calculated.
 The partial correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
 }
