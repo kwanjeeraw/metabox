@@ -72,6 +72,7 @@
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="bootstrap/css/sb-admin.css" rel="stylesheet">
   <link href="bootstrap/css/mETABOX.css" rel="stylesheet">
+  <link href="bootstrap/css/DataUploading.css" rel="stylesheet">
   <!-- Custom Fonts -->
   <link href="bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -91,6 +92,7 @@
   <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>
   <script type="text/javascript" src="js/jszip.min.js"></script>
   <script type="text/javascript" src="js/spin.js"></script>
+
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <!-- Load nav menu -->
@@ -98,6 +100,8 @@
   $(function(){
     $("#includedNav").load("nav.html");
   });
+
+
   </script>
   <title>mETABOX.DataUploading</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
@@ -121,30 +125,78 @@
         <div class="row col-lg-12">
           <div id = "uploadtype" class = "row col-lg-12">
             <label for="uploadtype">Upload your data or use example data</label>
-            <div style="margin-bottom:.5cm; width:30%">
+            <div style="margin-bottom:.5cm;">
             <label class="small-label">
-              <input type="radio" name="uploadtype" id="upload_example_datasets"\
-              value="upload_example_datasets" onclick="choosefile('example')">
-              <span>Use example dataset</span>
-            </label><br>
+              <input type="radio" name="uploadtype" id="upload_example_datasets"
+              value="upload_example_datasets">
+              <span>Use example dataset; </span>
+            </label>
             <label class="small-label">
-              <input type="radio" name="uploadtype" id="upload_aggregated_datasets"\
-              value="upload_aggregated_datasets" onclick="choosefile('aggregated')">
-              <span>Upload aggregated datasets</span>
-            </label><br>
+              <input type="radio" name="uploadtype" id="upload_aggregated_datasets"
+              value="upload_aggregated_datasets">
+              <span>Upload aggregated datasets; </span>
+            </label>
             <label class="small-label">
-              <input type="radio" name="uploadtype" id="upload_expression_feature_phenotype_datasets"\
-              value="upload_expression_feature_phenotype_datasets" onclick="choosefile('expression_feature_phenotype')">
-              <span>Upload expression, feature,                         phenotype datasets seperately</span>
+              <input type="radio" name="uploadtype" id="upload_expression_feature_phenotype_datasets"
+              value="upload_expression_feature_phenotype_datasets">
+              <span>Upload expression, feature,phenotype datasets seperately</span>
             </label>
           </div>
-          <div id="display_choosefile"></div>
+          <!--<div id="display_choosefile"></div>-->
+          <div  class="aggregated" style="display:none;">
+            <p>Please read detailed explaination about the <a href='https://github.com/kwanjeeraw/mETABOX' target='_blank'>upload data format</a>.
+            An example dataset is also <a href='https://github.com/kwanjeeraw/mETABOX' target='_blank'>provided</a>.</p>
+            <label>Upload Aggregated Data</label>
+            <input id='InputAggregatedData' type='file' name='InputAggregatedData'>
+          </div>
+          <div  class="expression_feature_phenotype" style="display:none;">
+            <p>Please read detailed explaination about the <a href='https://github.com/kwanjeeraw/mETABOX' target='_blank'>upload data format</a>.
+            If the order of features or subjects do not match, don\'t worry we can handle that but please read carefully with
+            the <a href='https://github.com/kwanjeeraw/mETABOX' target='_blank'>upload data format</a>.</p>
+            <p>Example datasets are also <a href='http://www.google.com' target='_blank'>provided</a> for expression, feature and phenotype
+            seperately.
+            </p>
+            <div style='float:left'><label>Upload Expression Data</label> <input id='InputDataExp' type='file'></div>
+            <div style='float:left'><label>Upload Feature Data</label> <input id='InputDataExp' type='file'></div>
+            <div style='float:left'><label>Upload Phenotypen Data</label> <input id='InputDataExp' type='file'></div>
+          </div>
+        </div>
+        </div>
+
+          <div class="container" style="padding-left:0cm;margin-left:0cm;" align="left">
+            <hr>
+            <ul class="nav nav-tabs">
+              <li class="active"><a data-toggle="tab" href="#data_summary_tag">Data Summary</a></li>
+              <li><a data-toggle="tab" href="#feature_data_table_tag">Feature Table</a></li>
+              <li><a data-toggle="tab" href="#phenotype_data_table_tag">Phenotype Table</a></li>
+              <li><a data-toggle="tab" href="#expression_data_table_tag">Expression Table</a></li>
+            </ul>
           </div>
 
-        </div>
+          <div class="tab-content">
+              <div id="data_summary_tag" class="tab-pane fade in active">
+                <h3 id="data_summary_tag_heading">Waiting...</h3>
+                <span class="showall">Waiting Users To Upload <span id="show_e">Expression Dataset,</span><span id="show_f"> Feature Datasets,
+                </span><span id="show_p"> Phenotype Datasets.</span></span>
+                <h3 class="showall_inv">Experimental Design</h3>
+              </div>
+              <div id="feature_data_table_tag" class="tab-pane fade">
+                <h3>Menu 1</h3>
+                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+              </div>
+              <div id="phenotype_data_table_tag" class="tab-pane fade">
+                <h3>Menu 2</h3>
+                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+              </div>
+              <div id="expression_data_table_tag" class="tab-pane fade">
+                <h3>Menu 3</h3>
+                <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+              </div>
+            </div>
+          </div>
 
 
-        </div>
+
 
         <!-- modals -->
         <div id="notifyBox" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">

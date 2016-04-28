@@ -31,16 +31,16 @@
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <!-- Load nav menu -->
-  <script> 
+  <script>
   $(function(){
-    $("#includedNav").load("nav.html");  
+    $("#includedNav").load("nav.html");
   });
   </script>
   <title>mETABOX</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
   <!-- Embedded script calling R -->
-  <script>    
-  $(function(){    
+  <script>
+  $(function(){
     //global var
     var inp_session
     var compute_session
@@ -57,6 +57,7 @@
       success: function (data) {
         //Overview output
         $("#inputnw").text('Input network overview:\nNo of nodes: '+data.nodes.length+'\n'+'No of edges: '+data.edges.length);
+
         $("#fileinput").change(function(){//load data
           var fileinput = $("#fileinput")[0].files[0];
           var req = ocpu.call("readInfile", {file:fileinput, header:true, sep:'\t'}, function(session){//calls R function: readInfile
@@ -71,11 +72,12 @@
             });//getObject
           }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
         });//fileinput
+
         $("#computeBtn").click(function(){
-          var loadSpinner = showSpinner();    
+          var loadSpinner = showSpinner();
           var fdr = Number($("#fdr").val());
           var internalid = $('#internalid').is(':checked');
-          var req = ocpu.call("computeSubnetwork",{edgelist:data.edges, nodelist:data.nodes, pval:inp_session, fdr:fdr, internalid:internalid}, function(session) {//calls R function: computeSubnetwork
+          var req = ocpu.call("computeSubnetwork",{edgelist:data.edges, nodelist:data.nodes, pval:inp_session, fdr:fdr, internalid:internalid},                function(session) {//calls R function: computeSubnetwork
             compute_session = session;
             session.getStdout(function(outtxt){
               $("#consolemsg").text(outtxt);
@@ -97,7 +99,7 @@
               }
               //Network output
               cyImg = drawNetwork(robj.nodes, robj.edges);
-            });//getObject    
+            });//getObject
             hideSpinner(loadSpinner);
           }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
         });//computeBtn
@@ -110,10 +112,10 @@
     });//clearBtn
     $("#downloadBtn").click(function(){
       var pngData = cyImg.png();
-      exportNwZip(robj.nodes, robj.edges, pngData);       
+      exportNwZip(robj.nodes, robj.edges, pngData);
     });//downloadBtn
     $("#enrichmentBtn").click(function(){
-      window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
+      window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for subnetwork
     });//enrichmentBtn
   });
   </script>
@@ -121,10 +123,10 @@
 
 <body>
   <div id="wrapper">
-    <!-- Navigation -->       
+    <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div id="includedNav"></div>
-    </nav>   
+    </nav>
     <div id="page-wrapper">
       <div class="container-fluid">
         <!-- Page Heading -->
