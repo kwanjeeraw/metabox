@@ -31,91 +31,97 @@
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <!-- Load nav menu -->
-  <script>
+  <script> 
   $(function(){
-    $("#includedNav").load("nav.html");
+    $("#includedNav").load("nav.html");  
   });
   </script>
   <title>mETABOX</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
   <!-- Embedded script calling R -->
-  <script>
+  <script>    
   $(function(){
     //global var
-    var curr_session;
-    var txtinput;
+    var inp_session;
+    var compute_session;
+    var inputTable;
     var nodeTable;
-    var edgeTable;
     var robj;
-    var cyImg;
+    $("#fileinput").change(function(){//load data
+      var fileinput = $("#fileinput")[0].files[0];
+      var req = ocpu.call("readInfile", {file:fileinput, header:true, sep:'\t'}, function(session){//calls R function: readInfile
+        inp_session = session;
+        session.getObject(function(object){
+          //Table output
+          if (inputTable != undefined) {
+             inputTable.destroy();
+             $('#inputdt').empty();
+           }
+          inputTable = drawTable('#inputdt',object);
+        });//getObject
+      }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
+    });//fileinput
     $("#computeBtn").click(function(){
-      var loadSpinner = showSpinner();
+      var loadSpinner = showSpinner();   
       var txtinput = $("#txtinput").val().trim().split(/\s+/g);
-      var coef = Number($("#coef").val());
-      var req = ocpu.call("computeSimilarity",{txtinput:txtinput, coef:coef}, function(session) {//calls R function: computeSimilarity
-        curr_session = session;
+      var nodetype = $("#nodetype").val();
+      var searchby = $("#searchby").val();
+      var req = ocpu.call("convertId",{edgelist:data.edges, nodelist:data.nodes, pval:inp_session, fdr:fdr, internalid:internalid}, function(session) {//calls R function: computeSubnetwork
+        compute_session = session;
         session.getStdout(function(outtxt){
           $("#consolemsg").text(outtxt);
         });
         session.getObject(function(object){
           robj = object;
-console.log(robj);
           //Table output
           if (robj.edges.length > 0) {
             nodeTable = drawTable('#nodes',robj.nodes);
             edgeTable = drawTable('#edges',robj.edges);
           }else{
             if (nodeTable != undefined) {
-              nodeTable.clear().draw();
-              edgeTable.clear().draw();
+              nodeTable.destroy();
+              edgeTable.destroy();
             }
             $('#nodes').empty();
             $('#edges').empty();
           }
           //Network output
-<<<<<<< HEAD
-          cyImg = drawNetwork(robj.nodes, robj.edges);
-        });//getObject
-=======
           cyImg = drawNetwork(formatNode(robj.nodes), formatEdge(robj.edges));
         });//getObject    
->>>>>>> origin/master
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
+
+    $("#clearBtn").click(function(){
+      if (inputTable != undefined) {
+        inputTable.clear().draw();
+      }
+    });//clearBtn
     $("#downloadBtn").click(function(){
-<<<<<<< HEAD
-      var pngData = cyImg.png();
-      exportNwZip(robj.nodes, robj.edges, pngData);
-=======
       exportNwZip(robj.nodes, robj.edges, cyImg.png());       
->>>>>>> origin/master
     });//downloadBtn
-    $("#subnetworkBtn").click(function(){
-      window.location = 'subnetwork.html?rsess='+curr_session.getLoc();//send r object for subnetwork
-    });//subnetworkBtn
     $("#ptwBtn").click(function(){
-      window.location = 'pathway.html?rsess='+curr_session.getLoc();//send r object for subnetwork    
-    });//subnetworkBtn
+      window.location = 'pathway.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
+    });//enrichmentBtn
   });
   </script>
 </head>
 
 <body>
   <div id="wrapper">
-    <!-- Navigation -->
+    <!-- Navigation -->       
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div id="includedNav"></div>
-    </nav>
+    </nav>   
     <div id="page-wrapper">
       <div class="container-fluid">
         <!-- Page Heading -->
         <div class="row">
           <div class="col-lg-12">
-            <h3>Compute chemical-structure similarity</h3>
+            <h3>Convert IDs</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Compute Tanimoto similarity network, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+              <i class="fa fa-info-circle"></i> Convert to internal database IDs, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
             </div>
           </div>
         </div>
@@ -130,25 +136,61 @@ console.log(robj);
               <div id="args" class="panel-body collapse in">
                 <form role="form">
                   <div class="form-group">
-                    <label for="txtinput">PubChem IDs:</label>
+                    <label for="txtinput">External IDs:</label>
                     <textarea class="form-control" id="txtinput" name="txtinput" rows="5"></textarea>
                     <p class="help-block">Separate each ID by a new line or space e.g. 1110 10413 196 51 311 43 764 790</p>
-                  </div>
-                  <div class="form-group">
-                    <label>or Upload a file:</label>
-                    <input type='file' id="fileinput" name="fileinput" accept='text/plain' onchange='loadTxtFile(event)'>
-                    <p class="help-block">One column, separate each ID by a new line</p>
                   </div>
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label for="coef">Minimum Tanimoto similarity correlation coefficient:</label>
-                        <input class="form-control" type="number" id="coef" name="coef" value="0.7" min="0.1" max="1" step="0.05">
+                        <label>or Upload a file:</label>
+                        <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
+                        <p class="help-block">Tab-delimited input file, 1st column = IDs</p>
                       </div>
                     </div>
                   </div>
                   <!-- /.row -->
-                  <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <ul class="nav nav-tabs">
+                        <li class="active"><a href="#dataOv" data-toggle="tab" data-value="DataOv">Input file</a></li>
+                        <li class="pull-right"><h5>Input overview</h5></li>
+                      </ul>
+                      <div class="tab-content">
+                        <div class="tab-pane" data-value="DataOv" id="dataOv">
+                          <table id="inputdt" class="display" width="100%"></table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                  <hr>
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label>Select input type:</label>
+                        <select id="nodetype" class="form-control">
+                          <option value="compound" selected>compound</option>
+                          <option value="protein">protein</option>
+                          <option value="gene">gene</option>
+                          <option value="pathway">pathway</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label>Convert from:</label>
+                        <select id="searchby" class="form-control">
+                          <option value="xref" selected>xref</option>
+                          <option value="name">name</option>
+                          <option value="neo4jid">internal ID</option>
+                          <option value="grinnid">grinn ID</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                  <button id="computeBtn" type="button" class="btn btn-primary">Convert</button>
                   <button id="clearBtn" type="reset" class="btn btn-default">Clear</button>
                 </form>
               </div>
@@ -160,8 +202,7 @@ console.log(robj);
           <div class="col-lg-12">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#console" data-toggle="tab" data-value="Console">Console</a></li>
-              <li><a href="#node" data-toggle="tab" data-value="Node">Node</a></li>
-              <li><a href="#edge" data-toggle="tab" data-value="Edge">Edge</a></li>
+              <li><a href="#node" data-toggle="tab" data-value="Node">Output</a></li>
               <li class="pull-right"><h5>Summary</h5></li>
             </ul>
             <div class="tab-content">
@@ -171,9 +212,6 @@ console.log(robj);
               <div class="tab-pane" data-value="Node" id="node">
                 <table id="nodes" class="display" width="100%"></table>
               </div>
-              <div class="tab-pane" data-value="Edge" id="edge">
-                  <table id="edges" class="display" width="100%"></table>
-              </div>
             </div>
           </div>
         </div>
@@ -182,38 +220,7 @@ console.log(robj);
           <div class="col-lg-12">
             <div class="caption">
               <hr>
-              <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-              <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
-              <button id="ptwBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> PathwayEnrichment</button>
-              <button id="meshBtn" type="button" class="btn btn-primary"><i class="fa fa-spinner"></i> MeSHEnrichment</button>
-              <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
-            </div>
-          </div>
-        </div>
-        <!-- /.row -->
-        <br>
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="panel panel-info">
-              <div class="panel-heading">
-                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#">Network</a></h3>
-              </div>
-              <div id="network" class="panel-body collapse in">
-                <div id="cy"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- /.row -->
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Network legend</h3>
-              </div>
-              <div class="panel-body">
-                <img src="image/legend.png"/>
-              </div>
+              <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
             </div>
           </div>
         </div>

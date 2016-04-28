@@ -4,7 +4,8 @@
 #'@param x a character vector or dataframe of keywords used for the mapping e.g. x = c('name1', 'name2'), see below for details.
 #'The value can be a kind of node property keys, see \code{searchby}. Default is xref
 #'@param nodetype a string specifying the type of a query node. It can be one of compound, protein, gene, pathway, rna, dna, biofeature.
-#'@param searchby a string specifying a node property key used for the query. It can be one of name, synonyms, description, properties, xref. Default is xref.
+#'@param searchby a string specifying a node property key used for the query. It can be one of description, grinnid, name, neo4jid, properties, synonyms, xref.
+#'grinnid (gid) is a grinn database id. It's not the same with neo4jid. Default is xref.
 #'@param exactmatch logical. If TRUE, it will query for exact results i.e. a case-sensitive and exact keyword or phrase. Default is TRUE.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
 #'@details If \code{x} is a character vector, the results include the input, the internal neo4j id and grinn id.
@@ -35,9 +36,9 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
       if (class(tmparg) == "try-error") {
         stop("argument 'nodetype' is not valid, choose one from the list: compound,protein,gene,pathway,rna,dna,biofeature")
       }
-      tmparg <- try(searchby <- match.arg(tolower(searchby), c("xref","name","synonyms","description","properties"), several.ok = FALSE), silent = TRUE)
+      tmparg <- try(searchby <- match.arg(tolower(searchby), c("xref","name","synonyms","description","properties","grinnid","neo4jid"), several.ok = FALSE), silent = TRUE)
       if (class(tmparg) == "try-error") {
-        stop("argument 'searchby' is not valid, choose one from the list: name,synonyms,description,properties,xref")
+        stop("argument 'searchby' is not valid, choose one from the list: grinnid,name,neo4jid,synonyms,description,properties,xref")
       }
 
       if(!is.null(dim(x))){#dataframe input
@@ -64,7 +65,13 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
         querystring = paste(querystring,"RETURN DISTINCT ID(node), node.GID")
       }
 
-      querystring = gsub("property", searchby, querystring)
+      if(searchby == 'neo4jid'){
+        querystring = gsub("node.property = \'keyword\'", "ID(node) = toInt(keyword)", querystring)
+      }else if(searchby == 'grinnid'){
+        querystring = gsub("property", "GID", querystring)
+      }else{
+        querystring = gsub("property", searchby, querystring)
+      }
       querystring = gsub("label", nodetype, querystring)
 
       cat("Mapping node ...\n")

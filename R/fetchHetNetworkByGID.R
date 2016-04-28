@@ -1,11 +1,11 @@
 #'Query the heterogeneous networks of several relationship types from the graph database
 #'@description query the networks for the given source and/or target nodes and relationship pattern
 #'see \url{http://grinnhomepage} for the database structure to construct the network query.
-#'@usage fetchHetNetwork(from, to, pattern, returnas)
+#'@usage fetchHetNetworkByGID(from, to, pattern, returnas)
 #'@param from a character vector of source nodes used for the query e.g. from = c('id1', 'id2').
-#'The value must be neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
+#'The value must be grinn ids, see \code{\link{convertId}} for how to convert to grinn ids.
 #'@param to a character vector of target nodes used for the query e.g. to = c('id1', 'id2').
-#'The value must be neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
+#'The value must be grinn ids, see \code{\link{convertId}} for how to convert to grinn ids.
 #'@param pattern a string specifying the relationship pattern used for the query.
 #'
 #'Naming a node as \code{from} is to specify the source node used for the query \code{(from:Nodetype)}.
@@ -48,21 +48,21 @@
 #'#from = list('30777','30741','28116')
 #'#to = c("343","285","255")
 #'#pattern = "(from:Protein)-[:CONTROL]->(to:Gene)-[:CONVERSION]->(:Protein)-[:CATALYSIS]->(:Compound)"
-#'#result = fetchHetNetwork(from, to, pattern)
+#'#result = fetchHetNetworkByGID(from, to, pattern)
 #'#library(igraph)
 #'#plot(graph.data.frame(result[,c(1,4)], directed=FALSE))
 #'#from = c('2','5')
 #'#to = '4'
 #'#pattern = "(from:Protein)-[:MOLECULAR_BINDING]->(to:Protein)"
-#'#result = fetchHetNetwork(from, to, pattern)
+#'#result = fetchHetNetworkByGID(from, to, pattern)
 #'#from = list('30777','30741','28116')
 #'#to = c("343","285","255")
 #'#pattern = "(from:Protein)-[:CONTROL]->(to:Gene)"
-#'#result = fetchHetNetwork(from, to, pattern)
+#'#result = fetchHetNetworkByGID(from, to, pattern)
 #'@export
-fetchHetNetwork <- function(from=NULL, to=NULL, pattern, returnas="dataframe") UseMethod("fetchHetNetwork")
+fetchHetNetworkByGID <- function(from=NULL, to=NULL, pattern, returnas="dataframe") UseMethod("fetchHetNetworkByGID")
 #'@export
-fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataframe"){
+fetchHetNetworkByGID.default <- function(from=NULL, to=NULL, pattern, returnas="dataframe"){
   out <- tryCatch(
     {
       if (!is.character(pattern)) stop("argument 'pattern' must be a character vector")
@@ -71,21 +71,17 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
       maxkw = 500 #maximum keywords
       doPar = FALSE
       if (!is.null(from) && !is.null(to)) {
-        querystring = pathsList["fromto"]
+        querystring = pathsList_GID["fromto"]
         doPar = TRUE #do loop
         from = unique(stringr::str_trim(unlist(from))) #remove whiteline, duplicate
-        from = from[!is.na(suppressWarnings(as.numeric(from)))] #remove string, ID accepts integer only
         to = unique(stringr::str_trim(unlist(to))) #remove whiteline, duplicate
-        to = to[!is.na(suppressWarnings(as.numeric(to)))] #remove string, ID accepts integer only
       }else if (!is.null(from) && is.null(to)) {
-        querystring = pathsList["from"]
+        querystring = pathsList_GID["from"]
         txtinput = unique(stringr::str_trim(unlist(from))) #remove whiteline, duplicate
-        txtinput = txtinput[!is.na(suppressWarnings(as.numeric(txtinput)))] #remove string, ID accepts integer only
         len = length(txtinput)
       }else if (is.null(from) && !is.null(to)) {
-        querystring = pathsList["to"]
+        querystring = pathsList_GID["to"]
         txtinput = unique(stringr::str_trim(unlist(to))) #remove whiteline, duplicate
-        txtinput = txtinput[!is.na(suppressWarnings(as.numeric(txtinput)))] #remove string, ID accepts integer only
         len = length(txtinput)
       }else{
         stop("Error: No query provided")
@@ -96,7 +92,7 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
       if(!doPar){
         if(len <= maxkw){
           qstring = gsub("keyword", paste0("['",paste0(txtinput, collapse = "','"),"']"), querystring)
-        cat(qstring,"\n")
+          cat(qstring,"\n")
           paths = curlRequest.TRANSACTION(cypher=qstring)
           #paths = jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
         }else{
@@ -104,7 +100,7 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
           subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
           paths = foreach(i=1:length(subinp), .combine=c) %dopar% {
             qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
-        cat(qstring,"\n")
+            cat(qstring,"\n")
             #jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
             curlRequest.TRANSACTION(cypher=qstring)
           }
@@ -115,7 +111,7 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
           foreach(j=1:length(to)) %dopar% {
             qstring = gsub("keyfrom", from[i], querystring)
             qstring = gsub("keyto", to[j], qstring)
-        cat(qstring,"\n")
+            cat(qstring,"\n")
             #jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
             curlRequest.TRANSACTION(cypher=qstring)
           }

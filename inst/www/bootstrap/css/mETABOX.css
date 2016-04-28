@@ -10,7 +10,6 @@
 .bg-blue {background-color: #0073b7}
 .bg-green {background-color: #00a65a}
 .bg-red {background-color: #dd4b39}
-
 .panel-heading a:after {
     font-family:'Glyphicons Halflings';
     content:"\e114";
@@ -29,11 +28,11 @@ td.highlight {
 }
 .spinner {
     background: url(../images/loader.gif) 50% 50% no-repeat;
-    -khtml-opacity:.50;
-    -moz-opacity:.50;
-    -ms-filter:?alpha(opacity=50)?;
+    -khtml-opacity:.50; 
+    -moz-opacity:.50; 
+    -ms-filter:alpha(opacity=50);
     filter:alpha(opacity=50);
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.5);
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0.5);
     opacity:.50;
     position: relative;
     width: 200px;
@@ -43,11 +42,11 @@ td.highlight {
 }
 .spinnerText {
     background: url(../images/loaderText.gif) 50% 50% no-repeat;
-    -khtml-opacity:.50;
-    -moz-opacity:.50;
-    -ms-filter:?alpha(opacity=50)?;
+    -khtml-opacity:.50; 
+    -moz-opacity:.50; 
+    -ms-filter:alpha(opacity=50);
     filter:alpha(opacity=50);
-    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=0.5);
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0.5);
     opacity:.50;
     position: fixed;
     width: 100%;
@@ -55,9 +54,6 @@ td.highlight {
     top:15;
     left:0;
 }
-
-
-
 /*Statistics*/
 .small-label{
   font-weight: 400

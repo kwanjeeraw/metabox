@@ -7,10 +7,10 @@
 computeCorrelation(x, y, xtype, ytype, coef, pval, method, returnas)
 }
 \arguments{
-\item{x}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities. 
+\item{x}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
 Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.}
 
-\item{y}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities. 
+\item{y}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
 Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.}
 
 \item{xtype}{a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.}
@@ -30,6 +30,8 @@ list of nodes with the following components:
 
 \code{id} = node id
 
+\code{gid} = node gid
+
 \code{nodename} = node name
 
 edgelist with the following components:
@@ -47,14 +49,14 @@ edgelist with the following components:
 Return empty list or data frame if error or found nothing.
 }
 \description{
-compute the correlation network for one or two omic data sets. 
-The function wraps around \code{\link{corAndPvalue}} function of \pkg{\link{WGCNA}}. 
+compute the correlation network for one or two omic data sets.
+The function wraps around \code{\link{corAndPvalue}} function of \pkg{\link{WGCNA}}.
 Correlation coefficients, p-values and correlation directions are calculated.
 The correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
 }
 \details{
-x and y are data frame in which columns are samples and rows are molecular entities e.g. genes, proteins or compounds. 
-If y is given, then the correlations between the molecular entities of x and of y are computed. Otherwise the correlations between molecular entities of x are computed. 
+x and y are data frame in which columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
+If y is given, then the correlations between the molecular entities of x and of y are computed. Otherwise the correlations between molecular entities of x are computed.
 If grinn functions will be used further, we recommend using the grinn ids for entities, see \code{\link{convertId}}.
 }
 \examples{

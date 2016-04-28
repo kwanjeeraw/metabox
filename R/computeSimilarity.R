@@ -71,12 +71,6 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
         }, error = function(err) {#catch error if there is no db
           networknode = sota
         })
-
-#         if(nrow(nds)>0){
-#
-#         }else{
-#
-#         }
         cat("Format and returning network edges ...\n")
         network$source = lapply(network$source, FUN=formatId, y = networknode) #format edgelist
         network$target = lapply(network$target, FUN=formatId, y = networknode) #format edgelist

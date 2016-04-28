@@ -31,29 +31,34 @@
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <!-- Load nav menu -->
-  <script>
+  <script> 
   $(function(){
-    $("#includedNav").load("nav.html");
+    $("#includedNav").load("nav.html");  
   });
   </script>
   <title>mETABOX</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
   <!-- Embedded script calling R -->
-<<<<<<< HEAD
-  <script>
-=======
   <script>    
->>>>>>> origin/master
-  $(function(){
+  $(function(){    
     //global var
     var inp_session;
     var compute_session;
-    var inputTable;
     var nodeTable;
     var edgeTable;
+    var ptwTable;
+    var inputTable;
     var robj;
     var cyImg;
-    var url = getURLVars('rsess')+"R/.val/json";    
+    var url = getURLVars('rsess')+"R/.val/json";
+//var dn = [{'gid':'1110','id':'8207','nodename':'8207'},{'gid':'1111','id':'8208','nodename':'8208'},{'gid':'1112','id':'8209','nodename':'8209'},{'gid':'1113','id':'8210','nodename':'8210'},{'gid':'1114','id':'8211','nodename':'8211'}];
+//var de = [{'source':'8207','target':'8208','coef':0.1,'type':'TANIMOTO_SIMILARITY'},{'source':'8210','target':'8208','coef':1,'type':'TANIMOTO_SIMILARITY'},{'source':'8209','target':'8211','coef':0.5,'type':'TANIMOTO_SIMILARITY'},{'source':'8210','target':'8207','coef':0.7,'type':'TANIMOTO_SIMILARITY'}];
+//var enr = [{'rank':1,'gid':'mu00020','id':'267316','member':['8207','8208']},{'rank':2,'gid':'mu00022','id':'267317','member':['8207','8208','8209']},
+//           {'rank':4,'gid':'mu00023','id':'267318','member':['8207']},{'rank':3,'gid':'mu00023','id':'267318','member':['8207']},
+//           {'rank':5,'gid':'mu00023','id':'267318','member':['8207']},{'rank':6,'gid':'mu00023','id':'267318','member':['8207']},
+//           {'rank':7,'gid':'mu00023','id':'267318','member':['8207']},{'rank':8,'gid':'mu00023','id':'267318','member':['8207']},
+//           {'rank':9,'gid':'mu00023','id':'267318','member':['8207']},{'rank':10,'gid':'mu00023','id':'267318','member':['8207']}];
+//drawNetwork(formatPieNode(dn,enr), formatEdge(de));
     $.ajax({
       url: url,
       type: 'GET',
@@ -61,7 +66,6 @@
       success: function (data) {
         //Overview output
         $("#inputnw").text('Input network overview:\nNo of nodes: '+data.nodes.length+'\n'+'No of edges: '+data.edges.length);
-
         $("#fileinput").change(function(){//load data
           var fileinput = $("#fileinput")[0].files[0];
           var req = ocpu.call("readInfile", {file:fileinput, header:true, sep:'\t'}, function(session){//calls R function: readInfile
@@ -76,12 +80,11 @@
             });//getObject
           }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
         });//fileinput
-
         $("#computeBtn").click(function(){
-          var loadSpinner = showSpinner();
-          var fdr = Number($("#fdr").val());
+          var loadSpinner = showSpinner();    
+          var method = $("#method").val();
           var internalid = $('#internalid').is(':checked');
-          var req = ocpu.call("computeSubnetwork",{edgelist:data.edges, nodelist:data.nodes, pval:inp_session, fdr:fdr, internalid:internalid},                function(session) {//calls R function: computeSubnetwork
+          var req = ocpu.call("computeNwEnrichment",{edgelist:data.edges, nodelist:data.nodes, annotation:'pathway', internalid:internalid, pval:inp_session, method:method}, function(session) {//calls R function: computeNwEnrichment
             compute_session = session;
             session.getStdout(function(outtxt){
               $("#consolemsg").text(outtxt);
@@ -89,25 +92,38 @@
             session.getObject(function(object){
               robj = object;
               //Table output
-              if (robj.edges.length > 0) {
+              if (robj.enrichment.length > 0) {
                 nodeTable = drawTable('#nodes',robj.nodes);
                 edgeTable = drawTable('#edges',robj.edges);
+                ptwTable = $('#pathways').DataTable({
+                  "createdRow": function( row, data, index ){//format row color
+                    var bgc = ["#D256D4","#FFFFB3","#8E7FF6","#FB8072","#80B1D3","#FDB462","#8ADE69","#F4B5D6","#FF4848","#8DD3C7"];
+                    if ( data.rank < 11 ) {
+                      $('td', row).eq(0).css({
+                        'background-color': bgc[data.rank-1]
+                      });
+                    }
+                  },
+                  "destroy": true,
+                  "scrollX": true,
+                  "scrollY": 400,
+                  "scrollCollapse": true,
+                  "data": robj.enrichment,
+                  "columns": formatTableHeader(robj.enrichment[0])
+                });
               }else{
                 if (nodeTable != undefined) {
                   nodeTable.destroy();
                   edgeTable.destroy();
+                  ptwTable.destroy();
                 }
                 $('#nodes').empty();
                 $('#edges').empty();
+                $('#pathways').empty();
               }
               //Network output
-<<<<<<< HEAD
-              cyImg = drawNetwork(robj.nodes, robj.edges);
-            });//getObject
-=======
-              cyImg = drawNetwork(formatNode(robj.nodes), formatEdge(robj.edges));
+              cyImg = drawNetwork(formatPieNode(robj.nodes, robj.enrichment), formatEdge(robj.edges));
             });//getObject    
->>>>>>> origin/master
             hideSpinner(loadSpinner);
           }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
         });//computeBtn
@@ -119,38 +135,27 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-<<<<<<< HEAD
-      var pngData = cyImg.png();
-      exportNwZip(robj.nodes, robj.edges, pngData);
+      exportEnrichmentZip(cyImg.json(), cyImg.png(), robj.enrichment);
     });//downloadBtn
-    $("#enrichmentBtn").click(function(){
-      window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for subnetwork
-=======
-      exportNwZip(robj.nodes, robj.edges, cyImg.png());       
-    });//downloadBtn
-    $("#ptwBtn").click(function(){
-      window.location = 'pathway.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
->>>>>>> origin/master
-    });//enrichmentBtn
   });
   </script>
 </head>
 
 <body>
   <div id="wrapper">
-    <!-- Navigation -->
+    <!-- Navigation -->       
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div id="includedNav"></div>
-    </nav>
+    </nav>   
     <div id="page-wrapper">
       <div class="container-fluid">
         <!-- Page Heading -->
         <div class="row">
           <div class="col-lg-12">
-            <h3>Compute subnetwork</h3>
+            <h3>Pathway enrichment analysis</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Compute an active subnetwork by integrating omic data on the input network, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+              <i class="fa fa-info-circle"></i> Perform pathway enrichment analysis on the input network, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
             </div>
           </div>
         </div>
@@ -203,8 +208,14 @@
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label for="fdr">Maximum false discovery rate (FDR):</label>
-                        <input id="fdr" name="fdr" type="number" class="form-control" value="0.05" min="0" max="1" step="0.01">
+                        <label>Select method:</label>
+                        <select id="method" class="form-control">
+                          <option value="reporter" selected>reporter</option>
+                          <option value="fisher">fisher</option>
+                          <option value="median">median</option>
+                          <option value="mean">mean</option>
+                          <option value="stouffer">stouffer</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -221,6 +232,7 @@
           <div class="col-lg-12">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#console" data-toggle="tab" data-value="Console">Console</a></li>
+              <li><a href="#pathway" data-toggle="tab" data-value="Pathway">Pathway</a></li>
               <li><a href="#node" data-toggle="tab" data-value="Node">Node</a></li>
               <li><a href="#edge" data-toggle="tab" data-value="Edge">Edge</a></li>
               <li class="pull-right"><h5>Summary</h5></li>
@@ -229,11 +241,14 @@
               <div class="tab-pane active" data-value="Console" id="console">
                 <pre id="consolemsg" class="pre-scrollable"></pre>
               </div>
+              <div class="tab-pane" data-value="Pathway" id="pathway">
+                <table id="pathways" class="display" width="100%"></table>
+              </div>
               <div class="tab-pane" data-value="Node" id="node">
                 <table id="nodes" class="display" width="100%"></table>
               </div>
               <div class="tab-pane" data-value="Edge" id="edge">
-                  <table id="edges" class="display" width="100%"></table>
+                <table id="edges" class="display" width="100%"></table>
               </div>
             </div>
           </div>
@@ -243,10 +258,7 @@
           <div class="col-lg-12">
             <div class="caption">
               <hr>
-              <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-              <button id="ptwBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> PathwayEnrichment</button>
-              <button id="meshBtn" type="button" class="btn btn-primary"><i class="fa fa-spinner"></i> MeSHEnrichment</button>
-              <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
+              <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
             </div>
           </div>
         </div>

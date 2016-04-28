@@ -8,12 +8,12 @@
 #'The value must be neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
 #'@param fromtype a string specifying the type of source nodes. It can be one of compound, protein, gene, pathway, rna, dna, phenotype.
 #'@param totype a string specifying the type of target nodes. It can be one of compound, protein, gene, pathway, rna, dna, phenotype.
-#'@param reltype a string specifying a relationship type used for the query. 
+#'@param reltype a string specifying a relationship type used for the query.
 #'It can be one of annotation, biochemical_reaction, catalysis, control, conversion, genetic_association, molecular_binding.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@details The function queries for the networks containing the given relationship type between the source nodes and/or target nodes based on the database structure. 
+#'@details The function queries for the networks containing the given relationship type between the source nodes and/or target nodes based on the database structure.
 #'This function is specifically to query for the ralationship of length = 1. Use \code{\link{fetchHetNetwork}} to query for a heterogeneous network of variable length.
-#'@return 
+#'@return
 #'list of nodes with the following components:
 #'
 #'\code{id} = node internal neo4j id
@@ -55,7 +55,7 @@
 #'@export
 fetchNetwork <- function(from=NULL, to=NULL, fromtype, totype, reltype, returnas="dataframe") UseMethod("fetchNetwork")
 #'@export
-fetchNetwork.default <- function(from=NULL, to=NULL, fromtype, totype, reltype, returnas="dataframe"){ 
+fetchNetwork.default <- function(from=NULL, to=NULL, fromtype, totype, reltype, returnas="dataframe"){
   out <- tryCatch(
   {
     tmparg <- try(fromtype <- match.arg(tolower(fromtype), c("compound","protein","gene","pathway","rna","dna","phenotype"), several.ok = FALSE), silent = TRUE)
@@ -70,7 +70,7 @@ fetchNetwork.default <- function(from=NULL, to=NULL, fromtype, totype, reltype, 
     if (class(tmparg) == "try-error") {
       stop("argument 'reltype' is not valid, choose one from the list: annotation,biochemical_reaction,catalysis,control,conversion,genetic_association,molecular_binding")
     }
-    
+
     #construct query
     maxkw = 500 #maximum keywords
     fromtype = Hmisc::capitalize(fromtype)
@@ -99,18 +99,18 @@ fetchNetwork.default <- function(from=NULL, to=NULL, fromtype, totype, reltype, 
     querystring = gsub("fromtype", fromtype, querystring)
     querystring = gsub("totype", totype, querystring)
     querystring = gsub("reltype", toupper(reltype), querystring)
-    
+
     cat("Querying network ...\n")
     if(!doPar){
       if(len <= maxkw){
         qstring = gsub("keyword", paste0("['",paste0(txtinput, collapse = "','"),"']"), querystring)
-      cat(qstring,"\n")      
+      cat(qstring,"\n")
         #paths = jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
         paths = curlRequest.TRANSACTION(cypher=qstring)
       }else{
         cat("Split queries for more than 500 nodes ...\n")
         subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
-        paths = foreach(i=1:length(subinp), .combine=c) %dopar% { 
+        paths = foreach(i=1:length(subinp), .combine=c) %dopar% {
           qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
       cat(qstring,"\n")
           #jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
@@ -131,35 +131,6 @@ fetchNetwork.default <- function(from=NULL, to=NULL, fromtype, totype, reltype, 
       paths = unlist(path, recursive = FALSE)
     }
     formatNetworkOutput(paths,returnas)
-#     network = lapply(paths,function(x) rbind(formatNetworkOutput.default(x)))
-#     network = foreach(i=1:length(paths), .combine=rbind) %dopar% {
-#       formatNetworkOutput.default(paths[[i]])
-#     }
-# #     
-# #     network = foreach(i=1:length(paths), .combine=rbind) %dopar% {
-# #       ph = unlist(paths[[i]]$relationships)
-# #       #if(!is.null(ph)) fetchRelationship(ph, returnas="dataframe")
-# #       if(!is.null(ph)) formatPathOutput(ph)
-# #     }
-# #     
-#     cat("Format and returning network nodes ...\n")
-#     #format nodeList from edgeList
-#     scname = sapply(network$sourcename, function(x) ifelse(!is.null(x),x,network$source))
-#     sclabel = sapply(network$sourcelabel, function(x) ifelse(!is.null(x),x,""))
-#     trname = sapply(network$targetname, function(x) ifelse(!is.null(x),x,network$target))
-#     trlabel = sapply(network$targetlabel, function(x) ifelse(!is.null(x),x,""))
-#     so = data.frame(id=network$source,name=scname,nodelabel=sclabel, stringsAsFactors = FALSE, row.names = NULL)
-#     so$nodexref = network$sourcexref
-#     ta = data.frame(id=network$target,name=trname,nodelabel=trlabel, stringsAsFactors = FALSE, row.names = NULL)
-#     ta$nodexref = network$targetxref
-#     networknode = unique(rbind(so,ta))
-    
-#     ## output
-#     switch(returnas,
-#            dataframe = list(nodes = networknode, edges = network),
-#            list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network, seq(nrow(network)))),
-#            json = list(nodes = jsonlite::toJSON(networknode), edges = jsonlite::toJSON(network)),
-#            stop("Error: incorrect 'returnas' type"))
   },
   error=function(e) {
     message(e)
@@ -168,6 +139,6 @@ fetchNetwork.default <- function(from=NULL, to=NULL, fromtype, totype, reltype, 
            dataframe = list(nodes = data.frame(), edges = data.frame()),
            list = list(nodes = list(), edges = list()),
            json = list(nodes = "", edges = ""))
-  })    
+  })
   return(out)
 }
