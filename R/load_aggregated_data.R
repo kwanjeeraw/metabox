@@ -1,9 +1,9 @@
 #'Upload aggregated data.
 #'@description Upload aggregated data.
 #' Load xlsx or csv file and return a list of expression, feature and phenotype dataset. The standard of xlsx or csv file can be found \link{here}.!!!
-#'@usage load_aggregated_data(file, ...)
-#'@param file an object with a child named datapath, which is the direction of the file input
-#'(object can be input$inputID for shiny fileInput(inputID, ...)).
+#'@usage load_aggregated_data(file, type, ...)
+#'@param file the file in read.csv or read.xlsx2.
+#'@param type a string of file name ended either with .xlsx or .csv.
 #'@param ... Additional arguments for xlsx::read.xlsx2 or read.csv.
 #'@details
 #'
@@ -14,22 +14,22 @@
 #'load_aggregated_data(input$inputID,startRow=2)
 #'@export
 
-load_aggregated_data = function(file, ...){ # returns a expression data frame(eData),
+load_aggregated_data = function(file, type,...){ # returns a expression data frame(eData),
   # feature information data.frame(fData),
   # phenotype of samples data.frame(pData);
   ### file should be: input$inputID. fileInput(inputID, ...)
   ### DISPLAY: input$inputID$name.
 
   ### distinguish the type of data. Usually the data is xlsx. So currently, only working on xlsx but not xls. ???
-  if(grepl("xlsx", file$name)){
+  if(grepl("xlsx", type)){
     #### currently, data should be at the first sheetIndex. ???
-    d <- tryCatch(xlsx::read.xlsx2(file$datapath, sheetIndex = 1, stringsAsFactors = FALSE, ...),
+    d <- tryCatch(xlsx::read.xlsx2(file, sheetIndex = 1, stringsAsFactors = FALSE, ...),
                   error = function(e){
-                    openxlsx::read.xlsx(file$datapath, sheet = 1)
+                    openxlsx::read.xlsx(file, sheet = 1)
                   })
   }
-  if(grepl("csv", file$name)){
-    d <- read.csv(file$datapath, stringsAsFactors = FALSE, ...)
+  if(grepl("csv", type)){
+    d <- read.csv(file, stringsAsFactors = FALSE, ...)
   }
   d[d==""] <- NA
   #### fData

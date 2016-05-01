@@ -125,7 +125,6 @@
         <div class="row col-lg-12">
           <div id = "uploadtype", class = "row col-lg-12">
             <label for="uploadtype">Upload your data or use example data</label>
-<<<<<<< HEAD
             <div style="margin-bottom:.5cm;">
             <label class="small-label">
               <input type="radio" name="uploadtype" id="upload_example_datasets"
@@ -142,19 +141,7 @@
               value="upload_expression_feature_phenotype_datasets">
               <span>Upload expression, feature,phenotype datasets seperately</span>
             </label>
-=======
-            <div style="margin-bottom: .5cm">
-            <input type="radio" name="uploadtype" id="upload_example_dataset" value="upload_example_dataset" checked\
-            onclick="choosefile('example')">
-            <label class ="small-label" for="upload_example_dataset">Upload example dataset</label><br>
-            <input type="radio" name="uploadtype" id="upload_aggregated_dataset" value="upload_aggregated_dataset"\
-            onclick="choosefile('aggregated')">
-            <label class ="small-label" for="upload_aggregated_dataset">Upload aggregated dataset</label><br>
-            <input type="radio" name="uploadtype" id="upload_expression_feature_phenotype_datasets"\
-            value="upload_expression_feature_phenotype_datasets" onclick="choosefile('expression_feature_phenotype')">
-            <label class="small-label" for="upload_expression_feature_phenotype_datasets">Upload expression, feature,                         phenotype datasets seperately</label><br>
->>>>>>> parent of d725535... fd;a
-          </div>
+
           <!--<div id="display_choosefile"></div>-->
           <div  class="aggregated" style="display:none;">
             <p>Please read detailed explaination about the <a href='https://github.com/kwanjeeraw/mETABOX' target='_blank'>upload data format</a>.
@@ -175,7 +162,7 @@
           </div>
         </div>
         </div>
-
+        <p style="background-color:red;" id="demo">!</p>
           <div class="container" style="padding-left:0cm;margin-left:0cm;" align="left">
             <hr>
             <ul class="nav nav-tabs">
@@ -192,6 +179,7 @@
                 <span class="showall">Waiting Users To Upload <span id="show_e">Expression Dataset,</span><span id="show_f"> Feature Datasets,
                 </span><span id="show_p"> Phenotype Datasets.</span></span>
                 <h3 class="showall_inv">Experimental Design</h3>
+
               </div>
               <div id="feature_data_table_tag" class="tab-pane fade">
                 <h3>Menu 1</h3>

@@ -4,11 +4,12 @@
 \alias{load_aggregated_data}
 \title{Upload aggregated data.}
 \usage{
-load_aggregated_data(file, ...)
+load_aggregated_data(file, type, ...)
 }
 \arguments{
-\item{file}{an object with a child named datapath, which is the direction of the file input
-(object can be input$inputID for shiny fileInput(inputID, ...)).}
+\item{file}{the file in read.csv or read.xlsx2.}
+
+\item{type}{a string of file name ended either with .xlsx or .csv.}
 
 \item{...}{Additional arguments for xlsx::read.xlsx2 or read.csv.}
 }

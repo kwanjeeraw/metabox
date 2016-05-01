@@ -1,8 +1,7 @@
-
 $(document).ready(function(){//wait untile the document is fully loaded.
 
-    // Decide display input one file or three files.
-    $('input[name="uploadtype"]').click(function(){
+
+    $('input[name="uploadtype"]').click(function(){    // Decide display input one file or three files.
          if($(this).attr("value")=="upload_aggregated_datasets"){
            $(".aggregated").show("fast");
            $(".expression_feature_phenotype").hide("fast");
@@ -15,26 +14,18 @@ $(document).ready(function(){//wait untile the document is fully loaded.
            $(".expression_feature_phenotype").hide("fast");
          }
     });
+
+    var aggregated; //This is the session of list containing three data.frames ("expression","feature","phenotype")
     $("#InputAggregatedData").on("change", function(){
-          if($("#InputAggregatedData")[0].files[0]){//make sure the file is loaded.
-              var showall = document.getElementsByClassName("showall");
-              for (var i = 0; i < showall.length; i ++) {
-                      showall[i].style.display = 'none';
-                  }
-                  document.getElementById("data_summary_tag_heading").innerHTML = "Experimental Design";
+    //verify that a file is selected
+    if($("#csvfile")[0].files[0]){
 
-
-
-          }
-    });
-
-
-
-
-
-
-
-
+      //clear state
+      aggregated = null;
+      var x = document.getElementById("InputAggregatedData");
+      document.getElementById("demo").innerHTML = x.files[0].name;
+    }
+  });
 
 
 
