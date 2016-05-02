@@ -48,6 +48,7 @@
     var nodeTable;
     var robj;
     $("#fileinput").change(function(){//load data
+      $("#txtinput").val("");//clear textarea
       var fileinput = $("#fileinput")[0].files[0];
       var req = ocpu.call("readInfile", {file:fileinput, header:true, sep:'\t'}, function(session){//calls R function: readInfile
         inp_session = session;
@@ -56,17 +57,22 @@
           if (inputTable != undefined) {
              inputTable.destroy();
              $('#inputdt').empty();
-           }
+          }
           inputTable = drawTable('#inputdt',object);
         });//getObject
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//fileinput
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();   
-      var txtinput = $("#txtinput").val().trim().split(/\s+/g);
+      var x;
+      if($("#txtinput").val() == ""){
+        x = inp_session;
+      }else{
+        x = $("#txtinput").val().trim().split(/\s+/g);
+      }
       var nodetype = $("#nodetype").val();
       var searchby = $("#searchby").val();
-      var req = ocpu.call("convertId",{edgelist:data.edges, nodelist:data.nodes, pval:inp_session, fdr:fdr, internalid:internalid}, function(session) {//calls R function: computeSubnetwork
+      var req = ocpu.call("convertId",{x:x, nodetype:nodetype, searchby:searchby}, function(session) {//calls R function: computeSubnetwork
         compute_session = session;
         session.getStdout(function(outtxt){
           $("#consolemsg").text(outtxt);
@@ -74,35 +80,25 @@
         session.getObject(function(object){
           robj = object;
           //Table output
-          if (robj.edges.length > 0) {
-            nodeTable = drawTable('#nodes',robj.nodes);
-            edgeTable = drawTable('#edges',robj.edges);
-          }else{
-            if (nodeTable != undefined) {
-              nodeTable.destroy();
-              edgeTable.destroy();
-            }
-            $('#nodes').empty();
-            $('#edges').empty();
+          if (nodeTable != undefined) {
+            nodeTable.destroy();
           }
-          //Network output
-          cyImg = drawNetwork(formatNode(robj.nodes), formatEdge(robj.edges));
+          $('#nodes').empty();
+          if (robj.length > 0) {
+            nodeTable = drawTable('#nodes',robj);
+          }
         });//getObject    
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
-
     $("#clearBtn").click(function(){
       if (inputTable != undefined) {
         inputTable.clear().draw();
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportNwZip(robj.nodes, robj.edges, cyImg.png());       
+      exportTxtFile(robj);     
     });//downloadBtn
-    $("#ptwBtn").click(function(){
-      window.location = 'pathway.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
-    });//enrichmentBtn
   });
   </script>
 </head>
@@ -157,7 +153,7 @@
                         <li class="pull-right"><h5>Input overview</h5></li>
                       </ul>
                       <div class="tab-content">
-                        <div class="tab-pane" data-value="DataOv" id="dataOv">
+                        <div class="tab-pane active" data-value="DataOv" id="dataOv">
                           <table id="inputdt" class="display" width="100%"></table>
                         </div>
                       </div>
@@ -168,7 +164,7 @@
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Select input type:</label>
+                        <label>Input type:</label>
                         <select id="nodetype" class="form-control">
                           <option value="compound" selected>compound</option>
                           <option value="protein">protein</option>
@@ -230,7 +226,7 @@
           <div class="modal-dialog"><div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4>Computing network...</h4>
+              <h4>Converting ...</h4>
             </div>
             <div class="modal-body"><div style="height:200px">
               <span id="loading_spinner" style="position: absolute;display: block;top: 50%;left: 50%;"></span>
