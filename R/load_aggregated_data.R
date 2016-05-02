@@ -21,14 +21,13 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   ### DISPLAY: input$inputID$name.
 
   ### distinguish the type of data. Usually the data is xlsx. So currently, only working on xlsx but not xls. ???
-  if(grepl("xlsx", type)){
+  if(type){
     #### currently, data should be at the first sheetIndex. ???
     d <- tryCatch(xlsx::read.xlsx2(file, sheetIndex = 1, stringsAsFactors = FALSE, ...),
                   error = function(e){
                     openxlsx::read.xlsx(file, sheet = 1)
                   })
-  }
-  if(grepl("csv", type)){
+  }else{
     d <- read.csv(file, stringsAsFactors = FALSE, ...)
   }
   d[d==""] <- NA
@@ -44,5 +43,7 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   colnames(eData) = rownames(pData); rownames(eData) = fData[,1]
   eData <- data.frame(t(eData),stringsAsFactors = F)
   result <- list("expression" = eData, "feature" = fData, "phenotype" = pData)
+
+  writeLines("sucess!","messages.txt")
   return(result)
 }

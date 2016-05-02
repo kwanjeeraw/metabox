@@ -25,6 +25,7 @@
   <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/mETABOX.js"></script>
   <script type="text/javascript" src="js/DataUploading.js"></script>
+  <script src="bootstrap/js/bootstrap.js"></script>
   <!-- App JavaScript -->
   <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>
@@ -44,6 +45,9 @@
   <title>mETABOX.DataUploading</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
 
+
+
+
 </head>
 
 <body style="background-color:#ecf0f5; font-family:'Source Sans Pro',sans-serif;">
@@ -57,9 +61,13 @@
       <div class="container-fluid">
         <!-- Page Heading -->
         <div class="row col-lg-12">
+      <div id="successdiv"></div>
+      <div id="errordiv"></div>
+      <p style="background-color:yellow;" id="demo"></p>
             <h3>Data uploading and Data Modification</h3>
+
             <p>Users could upload their own data file and modify data set according to needs or simply use the defalt dataset.</p>
-            <p style="background-color:yellow;" id="demo"></p>
+
         </div>
         <div class="row col-lg-12">
           <div id = "uploadtype", class = "row col-lg-12">
@@ -113,10 +121,15 @@
 
           <div class="tab-content">
               <div id="data_summary_tag" class="tab-pane fade in active">
-                <h3 id="data_summary_tag_heading">Waiting...</h3>
-                <span class="showall">Waiting Users To Upload <span id="show_e">Expression Dataset,</span><span id="show_f"> Feature Datasets,
+              <div id="waitingFiles"> <h3 id="data_summary_tag_heading">Waiting...</h3>
+                <span>Waiting Users To Upload <span id="show_e">Expression Dataset,</span><span id="show_f"> Feature Datasets,
                 </span><span id="show_p"> Phenotype Datasets.</span></span>
-                <h3 class="showall_inv">Experimental Design</h3>
+              </div>
+              <div id="FilesUploaded">
+                <h3>Experimental Design</h3>
+                <div style="display:inline-block"><h5>Factors:</h5></div><div id="factors" style="display:inline-block"></div><span>.</span>
+              </div>
+
 
               </div>
               <div id="feature_data_table_tag" class="tab-pane fade">
@@ -133,8 +146,6 @@
               </div>
             </div>
           </div>
-
-
 
 
         <!-- modals -->

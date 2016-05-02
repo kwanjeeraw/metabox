@@ -16,6 +16,14 @@ $(document).ready(function(){//wait untile the document is fully loaded.
     });
 
     var aggregated; //This is the session of list containing three data.frames ("expression","feature","phenotype")
+
+    $("#successdiv").empty();
+    $("#errordiv").empty();
+
+
+    $("#FilesUploaded").hide();
+    $("#waitingFiles").show();
+
     $("#InputAggregatedData").on("change", function(){
     //verify that a file is selected
     if($("#InputAggregatedData")[0].files[0]){
@@ -23,23 +31,37 @@ $(document).ready(function(){//wait untile the document is fully loaded.
       //clear state
       aggregated = null;
       var x = document.getElementById("InputAggregatedData");
+
+
       var req=ocpu.call("load_aggregated_data",{
         file: $("#InputAggregatedData")[0].files[0],
-        type: x.files[0].name
+        type: x.files[0].name.indexOf('xlsx') !== -1
       },function(session){
         aggregated = session;
-      }).fail(function(jqXHR){
-        errormsg(jqXHR.responseText)
+        aggregated.getFile("messages.txt", function(text){
+          successmsg(text);
       });
+        $("#waitingFiles").hide("slow");
+        $("#FilesUploaded").show("slow");
 
-      document.getElementById("demo").innerHTML = "x.files[0].name";
-
+      }).fail(function(jqXHR){
+      errormsg(jqXHR.responseText);
+    });
 
     }
   });
 
+  //now we have aggregated.
 
 
+
+  function successmsg(text){
+    $("#successdiv").empty().append('<div class="alert alert-success alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text + '</div>');
+  }
+
+  function errormsg(text){
+    $("#errordiv").empty().append('<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text + '</div>');
+  }
 
 
 
