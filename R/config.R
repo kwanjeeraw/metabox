@@ -1,4 +1,4 @@
-#'@import RCurl jsonlite igraph WGCNA doParallel
+#'@import RCurl jsonlite igraph WGCNA foreach doParallel
 #'@importFrom Hmisc capitalize
 #'@importFrom plyr rbind.fill
 #'@importFrom stringr str_trim
