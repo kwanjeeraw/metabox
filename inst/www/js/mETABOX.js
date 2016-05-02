@@ -63,16 +63,14 @@ function exportNwZip(nodes, edges, img){
 }
 
 //@function export enrichment outputs as a zip file
-//@param network cytoscape json elements
+//@param nodes, edges, enrichment array of json objects
 //@param img cytoscapeJS png object
-//@param enrichment array of json objects
-function exportEnrichmentZip(network, img, enrichment){
+function exportEnrichmentZip(nodes, edges, enrichment, img){
     var zip = new JSZip();
-    var cynw = formatCyJSON(network);
-    zip.file("node.txt", JSONToTabConvertor(cynw.nodes,true))
-    zip.file("edge.txt", JSONToTabConvertor(cynw.edges,true))
-    zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
+    zip.file("node.txt", JSONToTabConvertor(nodes,true))
+    zip.file("edge.txt", JSONToTabConvertor(edges,true))
     zip.file("enrichment.txt", JSONToTabConvertor(enrichment,true));
+    zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
     zip.generateAsync({type:"base64"})
     .then(function (content) {
       var a = document.createElement('a'); 
@@ -80,6 +78,15 @@ function exportEnrichmentZip(network, img, enrichment){
       a.download = "OUTPUT.zip";
       a.click();
     });    
+}
+
+//@function export tab-delimited text file
+//@param content array of json objects
+function exportTxtFile(content){
+    var a = document.createElement('a'); 
+    a.href = "data:text/plain," + escape(JSONToTabConvertor(content,true));
+    a.download = "OUTPUT.txt";
+    a.click(); 
 }
 
 //@function format cytoscape json elements
@@ -200,12 +207,12 @@ function formatPieNode(nodeArr, enrichArr) {
           data: nodeArr[i]
       }); 
       Object.keys(enrichArr).forEach(function(idx) {
-        var pie = "pie" + idx;
         if(enrichArr[idx].member.indexOf(nodeArr[i].id)!= -1){
-             nodels[i].data[pie] = 1; 
+            var pie = "pie" + enrichArr[idx].rank;
+            nodels[i].data[pie] = 1; 
         }
       }); 
-    }
+    }  
     return nodels;
 }
 
@@ -246,27 +253,27 @@ function drawNetwork(objNode, objEdge){
             'text-outline-color':'#FFFFFF',
             'text-outline-width':0.3,
             'font-size':14,
-            'pie-size': '98%',
-            'pie-1-background-color': '#D256D4',
-            'pie-1-background-size': 'mapData(pie0, 0, 10, 0, 100)',
+            'pie-size': '90%',
+            'pie-1-background-color': '#FF0000',
+            'pie-1-background-size': 'mapData(pie1, 0, 10, 0, 100)',
             'pie-2-background-color': '#FFFFB3',
-            'pie-2-background-size': 'mapData(pie1, 0, 10, 0, 100)',
-            'pie-3-background-color': '#8E7FF6',
-            'pie-3-background-size': 'mapData(pie2, 0, 10, 0, 100)',
-            'pie-4-background-color': '#FB8072',
-            'pie-4-background-size': 'mapData(pie3, 0, 10, 0, 100)',
-            'pie-5-background-color': '#80B1D3',
-            'pie-5-background-size': 'mapData(pie4, 0, 10, 0, 100)',
+            'pie-2-background-size': 'mapData(pie2, 0, 10, 0, 100)',
+            'pie-3-background-color': '#907FFF',
+            'pie-3-background-size': 'mapData(pie3, 0, 10, 0, 100)',
+            'pie-4-background-color': '#D56767',
+            'pie-4-background-size': 'mapData(pie4, 0, 10, 0, 100)',
+            'pie-5-background-color': '#54CCFF',
+            'pie-5-background-size': 'mapData(pie5, 0, 10, 0, 100)',
             'pie-6-background-color': '#FDB462',
-            'pie-6-background-size': 'mapData(pie5, 0, 10, 0, 100)',
-            'pie-7-background-color': '#8ADE69',
-            'pie-7-background-size': 'mapData(pie6, 0, 10, 0, 100)',
+            'pie-6-background-size': 'mapData(pie6, 0, 10, 0, 100)',
+            'pie-7-background-color': '#60DA3E',
+            'pie-7-background-size': 'mapData(pie7, 0, 10, 0, 100)',
             'pie-8-background-color': '#F4B5D6',
-            'pie-8-background-size': 'mapData(pie7, 0, 10, 0, 100)',
-            'pie-9-background-color': '#FF4848',
-            'pie-9-background-size': 'mapData(pie8, 0, 10, 0, 100)',
-            'pie-10-background-color': '#8DD3C7',
-            'pie-10-background-size': 'mapData(pie9, 0, 10, 0, 100)'
+            'pie-8-background-size': 'mapData(pie8, 0, 10, 0, 100)',
+            'pie-9-background-color': '#FD49FF',
+            'pie-9-background-size': 'mapData(pie9, 0, 10, 0, 100)',
+            'pie-10-background-color': '#00715E',
+            'pie-10-background-size': 'mapData(pie10, 0, 10, 0, 100)'
           })
         .selector('node[nodelabel = "Phenotype"]')
           .css({
