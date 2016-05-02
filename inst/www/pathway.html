@@ -51,14 +51,6 @@
     var robj;
     var cyImg;
     var url = getURLVars('rsess')+"R/.val/json";
-//var dn = [{'gid':'1110','id':'8207','nodename':'8207'},{'gid':'1111','id':'8208','nodename':'8208'},{'gid':'1112','id':'8209','nodename':'8209'},{'gid':'1113','id':'8210','nodename':'8210'},{'gid':'1114','id':'8211','nodename':'8211'}];
-//var de = [{'source':'8207','target':'8208','coef':0.1,'type':'TANIMOTO_SIMILARITY'},{'source':'8210','target':'8208','coef':1,'type':'TANIMOTO_SIMILARITY'},{'source':'8209','target':'8211','coef':0.5,'type':'TANIMOTO_SIMILARITY'},{'source':'8210','target':'8207','coef':0.7,'type':'TANIMOTO_SIMILARITY'}];
-//var enr = [{'rank':1,'gid':'mu00020','id':'267316','member':['8207','8208']},{'rank':2,'gid':'mu00022','id':'267317','member':['8207','8208','8209']},
-//           {'rank':4,'gid':'mu00023','id':'267318','member':['8207']},{'rank':3,'gid':'mu00023','id':'267318','member':['8207']},
-//           {'rank':5,'gid':'mu00023','id':'267318','member':['8207']},{'rank':6,'gid':'mu00023','id':'267318','member':['8207']},
-//           {'rank':7,'gid':'mu00023','id':'267318','member':['8207']},{'rank':8,'gid':'mu00023','id':'267318','member':['8207']},
-//           {'rank':9,'gid':'mu00023','id':'267318','member':['8207']},{'rank':10,'gid':'mu00023','id':'267318','member':['8207']}];
-//drawNetwork(formatPieNode(dn,enr), formatEdge(de));
     $.ajax({
       url: url,
       type: 'GET',
@@ -97,7 +89,7 @@
                 edgeTable = drawTable('#edges',robj.edges);
                 ptwTable = $('#pathways').DataTable({
                   "createdRow": function( row, data, index ){//format row color
-                    var bgc = ["#D256D4","#FFFFB3","#8E7FF6","#FB8072","#80B1D3","#FDB462","#8ADE69","#F4B5D6","#FF4848","#8DD3C7"];
+                    var bgc = ["#FF0000","#FFFFB3","#907FFF","#D56767","#54CCFF","#FDB462","#60DA3E","#F4B5D6","#FD49FF","#00715E"];
                     if ( data.rank < 11 ) {
                       $('td', row).eq(0).css({
                         'background-color': bgc[data.rank-1]
@@ -135,7 +127,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(cyImg.json(), cyImg.png(), robj.enrichment);
+      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, cyImg.png());
     });//downloadBtn
   });
   </script>
