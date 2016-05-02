@@ -76,6 +76,8 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
 
       cat("Mapping node ...\n")
       cat("Register parallel computing ...\nWarning: querying a large number of nodes will take long time. \n")
+      require('doParallel')
+      doParallel::registerDoParallel(cores = 2)
       if(isDF){#return all input data
         nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
           qstring = gsub("keyword", txtinput[i], querystring)
@@ -87,7 +89,7 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
             data.frame(txtinput[i],t(as.matrix(rep("",2))), x[i,2:ncol(x)], stringsAsFactors = FALSE)
           }
         }
-        colnames(nodes)[1:3] = c("inputid","neo4jid","grinnid")
+        colnames(nodes) = c("inputid","neo4jid","grinnid",colnames(x)[2:ncol(x)])
       }else{
         nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
           qstring = gsub("keyword", txtinput[i], querystring)
