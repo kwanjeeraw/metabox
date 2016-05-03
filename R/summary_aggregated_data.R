@@ -2,8 +2,8 @@
 #'@description summarize aggregated data.
 #' Summarize the information that is important for mETABOX statistical analysis, e.g. factor_name, repeated.factor_name, etc.
 #'@usage
-#'summary_aggregated_data(aggregated.data, factor.name, repeated.factor.name)
-#'@param aggregated.data an list with three dataframes named as "expression", "feature" and "phenotype". Or simply a object returned from
+#'summary_aggregated_data(aggregated_data, factor.name, repeated.factor.name)
+#'@param aggregated_data an list with three dataframes named as "expression", "feature" and "phenotype". Or simply a object returned from
 #'load_aggregated_data().
 #'@param factor.name The factor names that are related to the study design.
 #'factor.name must be one of the column name of the "phenotype" dataframe. Although the default is NULL, it shouldn't be NULL for mETABOX
@@ -13,7 +13,7 @@
 #'@details
 #'
 #'@return
-#'a list. If the input aggregated.data is not standard, then it returns a warning message telling user to upload needed file.
+#'a list. If the input aggregated_data is not standard, then it returns a warning message telling user to upload needed file.
 #'dataset(list), factor.name(vector of string), repeated.factor.name(vector of string), confound(vector which is a variable),
 #'batch(vector which is a variable of factor)
 #'@author Sili Fan \email{fansili2013@gmail.com}
@@ -22,15 +22,15 @@
 #'@export
 #'
 ### Summarize dataset.
-summary_aggregated_data <- function(aggregated.data, factor.name = NULL,repeated.factor.name = NULL){
+summary_aggregated_data <- function(e,f,p, factor.name = NULL,repeated.factor.name = NULL){
   result <- list()
-  if(is.null(aggregated.data[["expression"]])|is.null(aggregated.data[["feature"]])|is.null(aggregated.data[["phenotype"]])){
+  if(is.null(e)|is.null(f)|is.null(p)){
     result[["warnings"]] = paste("Waiting Users To Upload",
-                                 "Expression Dataset,"[is.null(aggregated.data[["expression"]])],
-                                 "Feature Datasets,"[is.null(aggregated.data[["feature"]])], "Phenotype Datasets."[is.null(aggregated.data[["phenotype"]])])
+                                 "Expression Dataset,"[is.null(e)],
+                                 "Feature Datasets,"[is.null(f)], "Phenotype Datasets."[is.null(p)])
   }else{
-    #The aggregated.data is a list containing first the expression data, then feature data and then the phenotype data.
-    e <- aggregated.data[["expression"]]; f<-aggregated.data[["feature"]]; p<-aggregated.data[["phenotype"]]
+    #The aggregated_data is a list containing first the expression data, then feature data and then the phenotype data.
+    # e <- aggregated_data[["expression"]]; f<-aggregated_data[["feature"]]; p<-aggregated_data[["phenotype"]]
     ## First check if the dimension is correct. If it is not correct should return a message to let the user know.
     if(!nrow(e)==nrow(p)){
       result[["warnings"]][[length(result[["warnings"]])+1]] = paste0(length(result[["warnings"]])+1,

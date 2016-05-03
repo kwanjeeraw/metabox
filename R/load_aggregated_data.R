@@ -42,7 +42,7 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   eData <- sapply(eData, as.numeric)
   colnames(eData) = rownames(pData); rownames(eData) = fData[,1]
   eData <- data.frame(t(eData),stringsAsFactors = F)
-  result <- list("expression" = eData, "feature" = fData, "phenotype" = pData)
+  result <- list(expression = eData, feature = fData, phenotype = pData)
 
   writeLines("sucess!","messages.txt")
   return(result)
