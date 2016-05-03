@@ -76,7 +76,7 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
 #             fc = fcv
 #           }
           pval = pv
-        }else{#use input ids as attribute names
+        }else{#format attribute names from gid to id
           merged = merge(nodelist, pval, by.x = colnames(nodelist)[2], by.y = colnames(pval)[1], all.y = TRUE)
           pv = merged[,ncol(nodelist)+1]
           names(pv) = merged$id
@@ -94,12 +94,19 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
         }else{
           annols = apply(nodelist, 1, function(x) fetchNetworkByGID(to=x["gid"], fromtype="pathway", totype = x["nodelabel"], reltype = "ANNOTATION")) #query annotation pairs
         }
-        annonws = combineNetworks(annols) #combine annotation pairs
-        era = computeEnrichment(edgelist = annonws$edges[,2:1], pval = pval, fc = fc, internalid = internalid, method = method, size=size, returnas="dataframe") #compute enrichment
-        era = era[order(era$`p adj (non-dir_)`),]
-        era$rank = seq(1:nrow(era))
-        era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
-        era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
+        if(!is.null(unlist(annols))){
+          annonws = combineNetworks(annols) #combine annotation pairs
+          era = computeEnrichment(edgelist = annonws$edges[,2:1], pval = pval, fc = fc, method = method, size=size, returnas="dataframe") #compute enrichment
+          era = era[order(era$`p adj (non-dir_)`),]
+          era$rank = seq(1:nrow(era))
+          era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
+          era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
+        }
+        else{
+          nodelist = list()
+          edgelist = list()
+          era = list()
+        }
       }else if(tolower(method) == 'mesh'){#mesh enrichment
         stop('Under development')
       }else{
