@@ -4,14 +4,13 @@
 \alias{readInfile}
 \title{Read a file}
 \usage{
-readInfile(file, header = TRUE, sep ="\t")
+readInfile(file, header, sep, rowname)
 }
 \description{
 read a file overriding read.csv for GUI
 }
 \examples{
-# Set database location to local server
-# readInFile("http://localhost:7474/db/data/cypher")
+# readInFile("location")
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}
