@@ -1,14 +1,13 @@
 #'Perform enrichment analysis
 #'@description perform enrichment analysis by integrating the statistical values of molecular entities and the compound, protein or gene set collections.
 #'The function wraps around the main functions of \pkg{\link{piano}}.
-#'@usage computeEnrichment(edgelist, pval, fc, internalid, method, size, returnas)
+#'@usage computeEnrichment(edgelist, pval, fc, method, size, returnas)
 #'@param edgelist a two-column data frame of molecular entities and entity set collections.
 #'The first column contains molecular entities and the second column contains entity set collections. See \code{\link{loadGSC}} for details.
 #'@param pval a numeric vector containing the p-values of molecular entities, computed from statistical analysis,
 #'with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.
 #'@param fc a numeric vector containing fold changes or sign information (positive or negative) of molecular entities
 #'with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.
-#'@param internalid boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
 #'@param method a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}
 #'@param size a numeric vector specifying the minimum and maximum number of members in each entity set collection to be used in the analysis. Default is c(3,500).
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
@@ -40,9 +39,9 @@
 #'#library(igraph)
 #'#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
 #'@export
-computeEnrichment <- function(edgelist, pval, fc=NULL, internalid=TRUE, method="reporter", size=c(3,500), returnas="dataframe") UseMethod("computeEnrichment")
+computeEnrichment <- function(edgelist, pval, fc=NULL, method="reporter", size=c(3,500), returnas="dataframe") UseMethod("computeEnrichment")
 #'@export
-computeEnrichment.default <- function (edgelist, pval, fc=NULL, internalid=TRUE, method="reporter", size=c(3,500), returnas="dataframe"){
+computeEnrichment.default <- function (edgelist, pval, fc=NULL, method="reporter", size=c(3,500), returnas="dataframe"){
   out <- tryCatch(
     {
     tmparg <- try(method <- match.arg(tolower(method), c("reporter","fisher","median","mean","stouffer"), several.ok = FALSE), silent = TRUE)
