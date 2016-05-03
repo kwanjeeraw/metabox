@@ -4,7 +4,7 @@
 \alias{computeCorrelation}
 \title{Compute a weighted correlation network}
 \usage{
-computeCorrelation(x, y, xtype, ytype, coef, pval, method, returnas)
+computeCorrelation(x, y, xtype, ytype, internalid, coef, pval, method, returnas)
 }
 \arguments{
 \item{x}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
@@ -16,6 +16,8 @@ Columns are samples and rows are molecular entities e.g. genes, proteins or comp
 \item{xtype}{a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.}
 
 \item{ytype}{a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.}
+
+\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
 
 \item{coef}{a numeric value specifying the minimum absolute correlation coefficient to be included in the output (from 0 to 1, default is 0.7).}
 

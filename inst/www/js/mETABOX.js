@@ -245,7 +245,7 @@ function drawNetwork(objNode, objEdge){
       },
       style: cytoscape.stylesheet()
         .selector('node')
-          .css({
+          .style({
             'content': 'data(nodename)',
             'background-color':'#B3B3B3',
             'text-valign': 'bottom',
@@ -276,99 +276,109 @@ function drawNetwork(objNode, objEdge){
             'pie-10-background-size': 'mapData(pie10, 0, 10, 0, 100)'
           })
         .selector('node[nodelabel = "Phenotype"]')
-          .css({
+          .style({
             'shape':'octagon'
           })
         .selector('node[nodelabel = "Compound"]')
-          .css({
+          .style({
             'shape':'ellipse'
           })
         .selector('node[nodelabel = "Dna"]')
-          .css({
+          .style({
             'shape':'pentagon'
           })
         .selector('node[nodelabel = "Gene"]')
-          .css({
+          .style({
             'shape':'hexagon'
           })
         .selector('node[nodelabel = "Pathway"]')
-          .css({
+          .style({
             'shape':'diamond'
           })
         .selector('node[nodelabel = "Protein"]')
-          .css({
+          .style({
             'shape':'rectangle'
           })
         .selector('node[nodelabel = "Rna"]')
-          .css({
+          .style({
             'shape':'star'
           })
         .selector('edge')
-          .css({
+          .style({
             'width': 3
           }) 
         .selector('edge[type = "ANNOTATION"]')
-          .css({
+          .style({
             'line-color': '#8C8C8C',
             'target-arrow-color': '#8C8C8C'
           })
-          .selector('edge[type = "BIOCHEMICAL_REACTION"]')
-          .css({
+        .selector('edge[type = "BIOCHEMICAL_REACTION"]')
+          .style({
             'line-color': '#ff0000',
             'target-arrow-color': '#ff0000'
           })
-          .selector('edge[type = "CATALYSIS"]')
-          .css({
+        .selector('edge[type = "CATALYSIS"]')
+          .style({
             'line-color': '#4169E1',
             'target-arrow-color': '#4169E1'
           })
-          .selector('edge[type = "CONTROL"]')
-          .css({
+        .selector('edge[type = "CONTROL"]')
+          .style({
             'line-color': '#006400',
             'target-arrow-color': '#006400'
           })
-          .selector('edge[type = "CONVERSION"]')
-          .css({
+        .selector('edge[type = "CONVERSION"]')
+          .style({
             'line-color': '#FF00FF',
             'target-arrow-color': '#FF00FF'
           })
-          .selector('edge[type = "GENETIC_ASSOCIATION"]')
-          .css({
+        .selector('edge[type = "GENETIC_ASSOCIATION"]')
+          .style({
             'line-color': '#00BFFF',
             'target-arrow-color': '#00BFFF'
           })
-          .selector('edge[type = "MOLECULAR_BINDING"]')
-          .css({
+        .selector('edge[type = "MOLECULAR_BINDING"]')
+          .style({
             'line-color': '#51ED34',
             'target-arrow-color': '#51ED34'
           })
-          .selector('edge[type = "TANIMOTO_SIMILARITY"]')
-          .css({
+        .selector('edge[type = "TANIMOTO_SIMILARITY"]')
+          .style({
             'line-color': '#895238',
             'target-arrow-shape': 'none',
             'width': 'mapData(coef, 0, 1, 1, 10)'
           })
-          .selector('edge[type = "CORRELATION"]')
-          .css({
+        .selector('edge[type = "CORRELATION"]')
+          .style({
             'line-color': '#3f007d',
             'target-arrow-shape': 'none',
-            'width': 'mapData(coef, 0, 1, 1, 10)'
+            'width': function(ele){
+                var cf = Math.abs(ele.data('coef'));
+                return cf * 10
+            }
           })
-          .selector('edge[type = "PARTIAL_CORRELATION"]')
-          .css({
+        .selector('edge[type = "PARTIAL_CORRELATION"]')
+          .style({
             'line-color': '#f16913',
             'target-arrow-shape': 'none',
-            'width': 'mapData(coef, 0, 1, 1, 10)'
+            'width': function(ele){
+                var cf = Math.abs(ele.data('coef'));
+                return cf * 10
+            }
+          })
+        .selector('edge[direction = -1]')
+          .style({
+            'line-style': 'dotted'
           })
         .selector(':selected')
-          .css({
+          .style({
             'background-color': 'black',
             'line-color': 'black',
             'target-arrow-color': 'black',
             'source-arrow-color': 'black'
           })
         .selector('.faded')
-          .css({
+          .style({
             'opacity': 0.25,
             'text-opacity': 0
           })

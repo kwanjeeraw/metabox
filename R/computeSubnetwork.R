@@ -42,7 +42,7 @@ computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, f
         pv = pval[,2]
         names(pv) = pval[,1]
         pval = pv
-      }else{
+      }else{#format attribute names from gid to id
         merged = merge(nodelist, pval, by.x = colnames(nodelist)[2], by.y = colnames(pval)[1], all.y = TRUE)
         pv = merged[,ncol(nodelist)+1]
         names(pv) = merged$id

@@ -4,7 +4,7 @@
 \alias{computeEnrichment}
 \title{Perform enrichment analysis}
 \usage{
-computeEnrichment(edgelist, pval, fc, internalid, method, size, returnas)
+computeEnrichment(edgelist, pval, fc, method, size, returnas)
 }
 \arguments{
 \item{edgelist}{a two-column data frame of molecular entities and entity set collections.
@@ -15,8 +15,6 @@ with name attributes corresponding to the entities. See \code{\link{runGSA}} for
 
 \item{fc}{a numeric vector containing fold changes or sign information (positive or negative) of molecular entities
 with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
-
-\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
 
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 

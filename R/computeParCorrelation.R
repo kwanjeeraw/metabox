@@ -3,10 +3,11 @@
 #'The function wraps around the functions of \pkg{\link{qpgraph}}.
 #'Partial correlation coefficients, p-values and correlation directions are calculated.
 #'The partial correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
-#'@usage computeParCorrelation(x, xtype, coef, pval, alpha, threshold, matrix.completion, returnas)
+#'@usage computeParCorrelation(x, xtype, internalid, coef, pval, alpha, epsilon, matrix.completion, returnas)
 #'@param x a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
 #'Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
 #'@param xtype a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.
+#'@param internalid boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
 #'@param coef a numeric value specifying the minimum absolute partial correlation coefficient to be included in the output (from 0 to 1, default is 0.7).
 #'@param pval a numeric value specifying the maximum p-value to be included in the output (default is 0.05).
 #'@param alpha a numeric value specifying significance level of each test used in \code{\link{qpAvgNrr}}.
@@ -42,14 +43,14 @@
 #'#library(qpgraph)
 #'#library(snow)
 #'#library(rlecuyer)
-#'#datNorm = read.csv("~/Documents/grinn_sample/lung_miyamoto/metAdj.txt",sep="\t",header=TRUE,row.names=1)
+#'#datNorm = read.csv("~/Documents/grinn_sample/lung_miyamoto/metAdj.txt",sep="\t",header=TRUE)
 #'#datNorm = datNorm[-1,] #exclude nodetype
 #'#dt = sapply(datNorm, function(x) as.numeric(as.character(x)))
 #'#nw = fetchPtCorrNetwork(datNorm=dt)
 #'@export
-computeParCorrelation <- function(x, xtype=NULL, coef=0.7, pval=0.05, alpha=0.05, epsilon=0.5, matrix.completion="IPF", returnas="dataframe") UseMethod("computeParCorrelation")
+computeParCorrelation <- function(x, xtype=NULL, internalid = TRUE, coef=0.7, pval=0.05, alpha=0.05, epsilon=0.5, matrix.completion="IPF", returnas="dataframe") UseMethod("computeParCorrelation")
 #'@export
-computeParCorrelation.default <- function (x, xtype=NULL, coef=0.7, pval=0.05, alpha=0.05, epsilon=0.5, matrix.completion="IPF", returnas="dataframe")
+computeParCorrelation.default <- function (x, xtype=NULL, internalid = TRUE, coef=0.7, pval=0.05, alpha=0.05, epsilon=0.5, matrix.completion="IPF", returnas="dataframe")
 {
   out <- tryCatch(
     {
@@ -57,6 +58,10 @@ computeParCorrelation.default <- function (x, xtype=NULL, coef=0.7, pval=0.05, a
       if (class(tmparg) == "try-error") {
         stop("argument 'matrix.completion' is not valid, choose one from the list: IPF,HTF")
       }
+    cat("Formating row.names of input data frame ...\n")
+    tmp = x[,2:ncol(x)]
+    row.names(tmp) = x[,1]
+    x = tmp
     cat("Computing partial correlation ...\n")
     nrr.estimates = qpgraph::qpAvgNrr(x, alpha=alpha)
     g = qpgraph::qpGraph(nrr.estimates, epsilon=epsilon)
@@ -78,13 +83,27 @@ computeParCorrelation.default <- function (x, xtype=NULL, coef=0.7, pval=0.05, a
     if(nrow(network)>0){
       network$type = "PARTIAL_CORRELATION"
       cat("Format and returning network nodes ...\n")
-      #format nodeList from edgeList
-      so = data.frame(id=network$source, gid=network$source, nodename=network$source, stringsAsFactors = FALSE)
-      so$nodelabel = if(!is.null(xtype)) Hmisc::capitalize(xtype)
-      ta = data.frame(id=network$target, gid=network$target, nodename=network$target, stringsAsFactors = FALSE)
-      ta$nodelabel = if(!is.null(xtype)) Hmisc::capitalize(xtype)
-      networknode = unique(rbind(so,ta))
-
+      if(!is.null(xtype)){#given xtype, search DB for nodes
+        nodelist = unique(c(network$source, network$target))
+        if(internalid){
+          nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="neo4jid") #query nodes
+          networknode = plyr::ldply(nodels, data.frame)
+        }else{
+          nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="grinnid") #query nodes by gid
+          networknode = plyr::ldply(nodels, data.frame)
+          #format edge
+          edgedf = merge(networknode[,1:2],network,by.x='gid',by.y='target')[,-1]
+          colnames(edgedf)[1] = "target"
+          edgedf = merge(networknode[,1:2],edgedf,by.x='gid',by.y='source')[,-1]
+          colnames(edgedf)[1] = "source"
+          network = edgedf
+        }
+      }else{#no xtype specified, return input
+        #format nodeList from edgeList
+        so = data.frame(id=network$source, gid=network$source, nodename=network$source, stringsAsFactors = FALSE)
+        ta = data.frame(id=network$target, gid=network$target, nodename=network$target, stringsAsFactors = FALSE)
+        networknode = unique(rbind(so,ta))
+      }
       ## output
       switch(returnas,
              dataframe = list(nodes = networknode, edges = network),
