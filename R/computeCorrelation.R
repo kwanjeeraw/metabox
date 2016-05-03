@@ -3,13 +3,14 @@
 #'The function wraps around \code{\link{corAndPvalue}} function of \pkg{\link{WGCNA}}.
 #'Correlation coefficients, p-values and correlation directions are calculated.
 #'The correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
-#'@usage computeCorrelation(x, y, xtype, ytype, coef, pval, method, returnas)
+#'@usage computeCorrelation(x, y, xtype, ytype, internalid, coef, pval, method, returnas)
 #'@param x a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
 #'Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
 #'@param y a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
 #'Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
 #'@param xtype a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.
 #'@param ytype a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.
+#'@param internalid boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
 #'@param coef a numeric value specifying the minimum absolute correlation coefficient to be included in the output (from 0 to 1, default is 0.7).
 #'@param pval a numeric value specifying the maximum p-value to be included in the output (default is 0.05).
 #'@param method a string specifying method to compute correlation. It can be one of pearson, kendall, spearman (default) see \code{\link{cor}}.
@@ -60,9 +61,9 @@
 #'dummyY <- mtcars[17:32,]
 #'#result <- computeCorrelation(x=dummyX, y=dummyY, coef=0.7, pval=1e-4, method="spearman", returnas="dataframe")
 #'@export
-computeCorrelation <- function(x, y=NULL, xtype=NULL, ytype=NULL, coef=0.7, pval=0.05, method="spearman", returnas="dataframe") UseMethod("computeCorrelation")
+computeCorrelation <- function(x, y=NULL, xtype=NULL, ytype=NULL, internalid = TRUE, coef=0.7, pval=0.05, method="spearman", returnas="dataframe") UseMethod("computeCorrelation")
 #'@export
-computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, coef=0.7, pval=0.05, method="spearman", returnas="dataframe"){
+computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, internalid = TRUE, coef=0.7, pval=0.05, method="spearman", returnas="dataframe"){
   out <- tryCatch(
     {
       tmparg <- try(method <- match.arg(tolower(method), c("pearson","kendall","spearman"), several.ok = FALSE), silent = TRUE)
@@ -70,6 +71,10 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, coef=0
         stop("argument 'method' is not valid, choose one from the list: pearson,kendall,spearman")
       }
       if(is.null(y)) {#Assign values to a square matrix
+        cat("Formating row.names of input data frame ...\n")
+        tmp = x[,2:ncol(x)]
+        row.names(tmp) = x[,1]
+        x = tmp
         cat("Computing correlation ...\n")
         rec = WGCNA::corAndPvalue(t(x), method=method)
         #format output
@@ -87,13 +92,27 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, coef=0
         if(nrow(network)>0){
           network$type = "CORRELATION"
           cat("Format and returning network nodes ...\n")
-          #format nodeList from edgeList
-          so = data.frame(id=network$source, gid=network$source, nodename=network$source, stringsAsFactors = FALSE)
-          so$nodelabel = if(!is.null(xtype)) Hmisc::capitalize(xtype)
-          ta = data.frame(id=network$target, gid=network$target, nodename=network$target, stringsAsFactors = FALSE)
-          ta$nodelabel= if(!is.null(xtype)) Hmisc::capitalize(xtype)
-          networknode = unique(rbind(so,ta))
-
+          if(!is.null(xtype)){#given xtype, search DB for nodes
+            nodelist = unique(c(network$source, network$target))
+            if(internalid){
+              nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="neo4jid") #query nodes
+              networknode = plyr::ldply(nodels, data.frame)
+            }else{
+              nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="grinnid") #query nodes by gid
+              networknode = plyr::ldply(nodels, data.frame)
+              #format edge
+              edgedf = merge(networknode[,1:2],network,by.x='gid',by.y='target')[,-1]
+              colnames(edgedf)[1] = "target"
+              edgedf = merge(networknode[,1:2],edgedf,by.x='gid',by.y='source')[,-1]
+              colnames(edgedf)[1] = "source"
+              network = edgedf
+            }
+          }else{#no xtype specified, return input
+            #format nodeList from edgeList
+            so = data.frame(id=network$source, gid=network$source, nodename=network$source, stringsAsFactors = FALSE)
+            ta = data.frame(id=network$target, gid=network$target, nodename=network$target, stringsAsFactors = FALSE)
+            networknode = unique(rbind(so,ta))
+          }
           ## output
           switch(returnas,
                  dataframe = list(nodes = networknode, edges = network),
@@ -107,6 +126,14 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, coef=0
                  json = list(nodes = "", edges = ""))
         }
       }else if(!is.null(y)) {
+        cat("Formating row.names of x input data frame ...\n")
+        tmp = x[,2:ncol(x)]
+        row.names(tmp) = x[,1]
+        x = tmp
+        cat("Formating row.names of y input data frame ...\n")
+        tmp = y[,2:ncol(y)]
+        row.names(tmp) = y[,1]
+        y = tmp
         cat("Computing correlation ...\n")
         rec = WGCNA::corAndPvalue(t(x), t(y), method=method)
         #format output
