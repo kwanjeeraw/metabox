@@ -1,6 +1,6 @@
 /**
  * Javascript client library for OpenCPU
- * Version 0.4.4
+ * Version 0.5.0
  * Depends: jQuery
  * Requires HTML5 FormData support for file uploads
  * http://github.com/jeroenooms/opencpu.js
@@ -11,6 +11,7 @@
  * ocpu.seturl("../R") //default, use for apps
  * ocpu.seturl("//public.opencpu.org/ocpu/library/mypackage/R") //CORS
  * ocpu.seturl("/ocpu/library/mypackage/R") //hardcode path
+ * ocpu.seturl("https://user:secret/my.server.com/ocpu/library/pkg/R") // basic auth
  */
 
 //Warning for the newbies
@@ -42,7 +43,11 @@ if(!window.jQuery) {
     };
 
     this.getFileURL = function(path){
-      return this.getLoc() + "files/" + path;
+      var new_url = document.createElement('a');
+      new_url.href = this.getLoc() + "files/" + path;
+      new_url.username = r_path.username;
+      new_url.password = r_path.password
+      return new_url.href;
     };
 
     this.getFile = function(path, success){
@@ -381,6 +386,32 @@ if(!window.jQuery) {
         r_cors = true;
         if (!('withCredentials' in new XMLHttpRequest())) {
           alert("This browser does not support CORS. Try using Firefox or Chrome.");
+        } else if(r_path.username && r_path.password) {
+          //should only do this for calls to opencpu maybe
+          var regex = new RegExp(r_path.host);
+          $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+              //only use auth for ajax requests to ocpu
+              if(regex.test(settings.url)){
+                //settings.username = r_path.username;
+                //settings.password = r_path.password;
+
+                /* take out user:pass from target url */
+                var target = document.createElement('a');
+                target.href = settings.url;
+                settings.url = target.protocol + "//" + target.host + target.pathname
+
+                /* set basic auth header */
+                settings.xhrFields = settings.xhrFields || {};
+                settings.xhrFields.withCredentials = true;
+                settings.crossDomain = true;
+                xhr.setRequestHeader("Authorization", "Basic " + btoa(r_path.username + ":" + r_path.password));
+
+                /* debug */
+                console.log("Authenticated request to: " + settings.url + " (" + r_path.username + ", " + r_path.password + ")")
+              }
+            }
+          });
         }
       }
 
@@ -394,9 +425,10 @@ if(!window.jQuery) {
         console.log("Setting path to local (non-CORS) server " + r_path.href);
       }
 
-      //we use trycatch because javascript will throw an error in case CORS is refused.
-      $.get(r_path.href, function(resdata){
+      //CORS disallows redirects.
+      return $.get(r_path.href + "/", function(resdata){
         console.log("Path updated. Available objects/functions:\n" + resdata);
+
       }).fail(function(xhr, textStatus, errorThrown){
         alert("Connection to OpenCPU failed:\n" + textStatus + "\n" + xhr.responseText + "\n" + errorThrown);
       });
