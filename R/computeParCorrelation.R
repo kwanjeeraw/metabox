@@ -86,27 +86,17 @@ computeParCorrelation.default <- function (x, xtype=NULL, internalid = TRUE, coe
       if(!is.null(xtype)){#given xtype, search DB for nodes
         nodelist = unique(c(network$source, network$target))
         if(internalid){
-          nodels = lapply(nodelist, function(x) fetchNode(txtinput=x, nodetype=xtype, searchby="neo4jid")) #query nodes
+          nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="neo4jid") #query nodes
+          networknode = plyr::ldply(nodels, data.frame)
         }else{
-          nodels = lapply(nodelist, function(x) fetchNode(txtinput=x, nodetype=xtype, searchby="grinnid")) #query nodes by gid
-        }
-        if(!is.null(unlist(nodels))){
-          networknode = plyr::ldply(nodels, data.frame)[,c(1:4,9)]
-          if(!internalid){
-            #format edge
-            edgedf = merge(networknode[,1:2],network,by.x='gid',by.y='target')[,-1]
-            colnames(edgedf)[1] = "target"
-            edgedf = merge(networknode[,1:2],edgedf,by.x='gid',by.y='source')[,-1]
-            colnames(edgedf)[1] = "source"
-            network = edgedf
-          }
-        }else{#found no node
-          #format nodeList from edgeList
-          so = data.frame(id=network$source, gid=network$source, nodename=network$source, stringsAsFactors = FALSE)
-          so$nodelabel = if(!is.null(xtype)) Hmisc::capitalize(xtype)
-          ta = data.frame(id=network$target, gid=network$target, nodename=network$target, stringsAsFactors = FALSE)
-          ta$nodelabel = if(!is.null(xtype)) Hmisc::capitalize(xtype)
-          networknode = unique(rbind(so,ta))
+          nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="grinnid") #query nodes by gid
+          networknode = plyr::ldply(nodels, data.frame)
+          #format edge
+          edgedf = merge(networknode[,1:2],network,by.x='gid',by.y='target')[,-1]
+          colnames(edgedf)[1] = "target"
+          edgedf = merge(networknode[,1:2],edgedf,by.x='gid',by.y='source')[,-1]
+          colnames(edgedf)[1] = "source"
+          network = edgedf
         }
       }else{#no xtype specified, return input
         #format nodeList from edgeList
