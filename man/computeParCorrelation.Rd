@@ -4,13 +4,15 @@
 \alias{computeParCorrelation}
 \title{Compute a partial correlation network}
 \usage{
-computeParCorrelation(x, xtype, coef, pval, alpha, threshold, matrix.completion, returnas)
+computeParCorrelation(x, xtype, internalid, coef, pval, alpha, epsilon, matrix.completion, returnas)
 }
 \arguments{
 \item{x}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
 Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.}
 
 \item{xtype}{a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.}
+
+\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
 
 \item{coef}{a numeric value specifying the minimum absolute partial correlation coefficient to be included in the output (from 0 to 1, default is 0.7).}
 
@@ -66,7 +68,7 @@ Castelo R. and Roverato A. (2009) Reverse engineering molecular regulatory netwo
 #library(qpgraph)
 #library(snow)
 #library(rlecuyer)
-#datNorm = read.csv("~/Documents/grinn_sample/lung_miyamoto/metAdj.txt",sep="\t",header=TRUE,row.names=1)
+#datNorm = read.csv("~/Documents/grinn_sample/lung_miyamoto/metAdj.txt",sep="\t",header=TRUE)
 #datNorm = datNorm[-1,] #exclude nodetype
 #dt = sapply(datNorm, function(x) as.numeric(as.character(x)))
 #nw = fetchPtCorrNetwork(datNorm=dt)
