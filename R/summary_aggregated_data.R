@@ -23,7 +23,7 @@
 #'
 ### Summarize dataset.
 summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
-                                    factor_name = NULL,repeated_factor_name = NULL,confounds = NULL,batch=NULL){
+                                    factor_name = NULL,repeated_factor_name = NULL,confound = NULL,batch=NULL){
   result <- list()
   if(is.null(e)|is.null(f)|is.null(p)){
     result[["warnings"]] = paste("Waiting Users To Upload",
