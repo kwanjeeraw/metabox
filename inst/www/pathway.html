@@ -105,9 +105,9 @@
                 });
               }else{
                 if (nodeTable != undefined) {
-                  nodeTable.destroy();
-                  edgeTable.destroy();
-                  ptwTable.destroy();
+                  nodeTable.clear().draw();
+                  edgeTable.clear().draw();
+                  ptwTable.clear().draw();
                 }
                 $('#nodes').empty();
                 $('#edges').empty();
@@ -166,7 +166,7 @@
                       <div class="form-group">
                         <label>Upload data:</label>
                         <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
-                        <p class="help-block">Tab-delimited input data contain pvalues and/or fold-changes</p>
+                        <p class="help-block">Tab-delimited input data contain p-values and/or fold-changes</p>
                       </div>
                     </div>
                     <div class="col-lg-6">

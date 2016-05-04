@@ -84,12 +84,18 @@
               robj = object;
               //Table output
               if (robj.edges.length > 0) {
+                if(nodeTable != undefined){
+                  nodeTable.destroy();
+                  edgeTable.destroy();
+                }
+                $('#nodes').empty();
+                $('#edges').empty();
                 nodeTable = drawTable('#nodes',robj.nodes);
                 edgeTable = drawTable('#edges',robj.edges);
               }else{
                 if (nodeTable != undefined) {
-                  nodeTable.destroy();
-                  edgeTable.destroy();
+                  nodeTable.clear().draw();
+                  edgeTable.clear().draw();
                 }
                 $('#nodes').empty();
                 $('#edges').empty();
