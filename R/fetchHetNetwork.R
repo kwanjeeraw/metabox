@@ -66,7 +66,8 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
   out <- tryCatch(
     {
       if (!is.character(pattern)) stop("argument 'pattern' must be a character vector")
-
+      if (length(from) == 0) from = NULL #reset empty list to NULL
+      if (length(to) == 0) to = NULL #reset empty list to NULL
       #construct query
       maxkw = 500 #maximum keywords
       doPar = FALSE
@@ -101,6 +102,8 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
           #paths = jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
         }else{
           cat("Split queries for more than 500 nodes ...\n")
+          require('doParallel')
+          doParallel::registerDoParallel(cores = 2)
           subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
           paths = foreach(i=1:length(subinp), .combine=c) %dopar% {
             qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
@@ -111,6 +114,8 @@ fetchHetNetwork.default <- function(from=NULL, to=NULL, pattern, returnas="dataf
         }
       }else{
         cat("Register parallel computing ...\nWarning: querying a large network will take long time. \n")
+        require('doParallel')
+        doParallel::registerDoParallel(cores = 2)
         path = foreach(i=1:length(from), .combine=rbind) %dopar% {
           foreach(j=1:length(to)) %dopar% {
             qstring = gsub("keyfrom", from[i], querystring)

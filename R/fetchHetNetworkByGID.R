@@ -66,7 +66,8 @@ fetchHetNetworkByGID.default <- function(from=NULL, to=NULL, pattern, returnas="
   out <- tryCatch(
     {
       if (!is.character(pattern)) stop("argument 'pattern' must be a character vector")
-
+      if (length(from) == 0) from = NULL #reset empty list to NULL
+      if (length(to) == 0) to = NULL #reset empty list to NULL
       #construct query
       maxkw = 500 #maximum keywords
       doPar = FALSE

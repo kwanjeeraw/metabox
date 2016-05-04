@@ -80,12 +80,17 @@
         session.getObject(function(object){
           robj = object;
           //Table output
-          if (nodeTable != undefined) {
-            nodeTable.destroy();
-          }
-          $('#nodes').empty();
           if (robj.length > 0) {
+            if(nodeTable != undefined){
+              nodeTable.destroy();
+            }
+            $('#nodes').empty();
             nodeTable = drawTable('#nodes',robj);
+          }else{
+            if (nodeTable != undefined) {
+              nodeTable.clear().draw();
+            }
+            $('#nodes').empty();
           }
         });//getObject    
         hideSpinner(loadSpinner);
@@ -164,7 +169,7 @@
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Input type:</label>
+                        <label>Entity type:</label>
                         <select id="nodetype" class="form-control">
                           <option value="compound" selected>compound</option>
                           <option value="protein">protein</option>

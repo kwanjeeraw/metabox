@@ -61,6 +61,12 @@
           robj = object;
           //Table output
           if (robj.edges.length > 0) {
+            if(nodeTable != undefined){
+              nodeTable.destroy();
+              edgeTable.destroy();
+            }
+            $('#nodes').empty();
+            $('#edges').empty();
             nodeTable = drawTable('#nodes',robj.nodes);
             edgeTable = drawTable('#edges',robj.edges);
           }else{
@@ -125,7 +131,7 @@
                   </div>
                   <div class="form-group">
                     <label>or Upload a file:</label>
-                    <input type='file' id="fileinput" name="fileinput" accept='text/plain' onchange='loadTxtFile(event)'>
+                    <input type='file' id="fileinput" name="fileinput" accept='text/plain' onchange='loadTxtFile(event,"#txtinput")'>
                     <p class="help-block">One column, separate each ID by a new line</p>
                   </div>
                   <div class="row">

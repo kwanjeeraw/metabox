@@ -42,43 +42,28 @@
   <script>
   $(function(){
     //global var
-    var inp_session;
     var compute_session;
-    var inputTable;
     var nodeTable;
     var edgeTable;
     var robj;
-    var cyImg;
-    //Overview output
-    $("#fileinput").change(function(){//load data
-      var fileinput = $("#fileinput")[0].files[0];
-      var req = ocpu.call("readInfile", {file:fileinput, header:true, sep:'\t'}, function(session){//calls R function: readInfile
-        inp_session = session;
-        session.getObject(function(object){
-          //Table output
-          if (inputTable != undefined) {
-             inputTable.destroy();
-             $('#inputdt').empty();
-           }
-          inputTable = drawTable('#inputdt',object);
-        });//getObject
-      }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
-    });//fileinput
+    var cyImg;    
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();
-      var xtype = ($("#xtype").val() == "null") ? null : $("#xtype").val();
+      var from = $("#from").val().trim().split(/\s+/g);     
+      if(from[0] == ''){from = null;}
+      var to = $("#to").val().trim().split(/\s+/g);
+      if(to[0] == ''){to = null;}
+      var pattern = $('#pattern').val();
       var internalid = $('#internalid').is(':checked');
-      var coef = Number($("#coef").val());
-      var pval = Number($("#pval").val());
-      var method = $("#method").val();
-      var req = ocpu.call("computeCorrelation",{x:inp_session, xtype:xtype, internalid:internalid, coef:coef, pval:pval, method:method}, function(session) {//calls R function: computeCorrelation
+      var callfn = "fetchHetNetwork";
+      if(!internalid){callfn = "fetchHetNetworkByGID";}
+      var req = ocpu.call(callfn,{from:from,to:to,pattern:pattern}, function(session) {//calls R function: fetchHetNetwork
         compute_session = session;
         session.getStdout(function(outtxt){
           $("#consolemsg").text(outtxt);
         });
         session.getObject(function(object){
           robj = object;
-console.log(robj);
           //Table output
           if(robj.edges.length > 0){
             if(nodeTable != undefined){
@@ -103,11 +88,12 @@ console.log(robj);
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
-    $("#clearBtn").click(function(){
-      if (inputTable != undefined) {
-        inputTable.clear().draw();
-      }
-    });//clearBtn
+    $("#addBtn").click(function () {
+      var selectedItem = $('input[name="cypher"]:checked').val();
+      $('#pattern').val(function(i, text) {
+          return text + selectedItem;
+      });
+    });//addBtn
     $("#downloadBtn").click(function(){
       exportNwZip(robj.nodes, robj.edges, cyImg.png());       
     });//downloadBtn
@@ -132,10 +118,10 @@ console.log(robj);
         <!-- Page Heading -->
         <div class="row">
           <div class="col-lg-12">
-            <h3>Compute weighted correlation network</h3>
+            <h3>Query heterogeneous network</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Compute the correlation network for quantified data, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+              <i class="fa fa-info-circle"></i> Query the heterogeneous network containing several relationship types from the database, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
             </div>
           </div>
         </div>
@@ -150,74 +136,89 @@ console.log(robj);
               <div id="args" class="panel-body collapse in">
                 <form role="form">
                   <div class="row">
+                    <div class="col-lg-8">
+                      <div class="form-group">
+                        <label for="from">From node:</label>
+                        <textarea class="form-control" id="from" name="from" rows="5"></textarea>
+                        <p class="help-block">Separate each ID by a new line or space e.g. 268332 217389 328500 335545 268655 2686, 282148 296126 311453 327332 293734</p>
+                      </div>
+                    </div>
                     <div class="col-lg-4">
                       <div class="form-group">
-                        <label>Upload data:</label>
-                        <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
-                        <p class="help-block">Tab-delimited input data</p>
-                      </div>
-                    </div>
-                    <div class="col-lg-2">
-                      <div class="form-group">
-                        <label>Entity type:</label>
-                        <select id="xtype" class="form-control">
-                          <option value="null">not select</option>
-                          <option value="compound" selected>compound</option>
-                          <option value="protein">protein</option>
-                          <option value="gene">gene</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-lg-6">
-                      <div class="form-group">
-                        <label>Use internal ids</label>
-                        <input id="internalid"  name="internalid" type="checkbox" value="true" checked="checked">
-                        <p class="help-block">Check whether input data use internal database ids</p>
+                        <label>or Upload a file:</label>
+                        <input type='file' id="frominput" name="frominput" accept='text/plain' onchange='loadTxtFile(event,"#from")'>
+                        <p class="help-block">One column, separate each ID by a new line</p>
                       </div>
                     </div>
                   </div>
                   <!-- /.row -->
                   <div class="row">
-                    <div class="col-lg-12">
-                      <ul class="nav nav-tabs">
-                        <li class="active"><a href="#dataOv" data-toggle="tab" data-value="DataOv">Input data</a></li>
-                        <li class="pull-right"><h5>Input overview</h5></li>
-                      </ul>
-                      <div class="tab-content">
-                        <div class="tab-pane active" data-value="DataOv" id="dataOv">
-                          <table id="inputdt" class="display" width="100%"></table>
-                        </div>
+                    <div class="col-lg-8">
+                      <div class="form-group">
+                        <label for="to">To node:</label>
+                        <textarea class="form-control" id="to" name="to" rows="5"></textarea>
+                        <p class="help-block">Separate each ID by a new line or space e.g. 0 1 2 3 10, 217153 217148 21714 217142</p>
                       </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label>or Upload a file:</label>
+                        <input type='file' id="toinput" name="toinput" accept='text/plain' onchange='loadTxtFile(event,"#to")'>
+                        <p class="help-block">One column, separate each ID by a new line</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                  <div class="form-group">
+                    <label>Use internal ids</label>
+                    <input id="internalid"  name="internalid" type="checkbox" value="true" checked="checked">
+                    <p class="help-block">Check whether input data use internal database ids</p>
+                  </div>
+                  <hr>
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div class="form-group">
+                        <label for="from">Pattern:</label>
+                        <textarea class="form-control" id="pattern" name="pattern" rows="5"></textarea>
+                        <p class="help-block">Type in relationship pattern or use options below to construct the pattern e.g. (:Gene)-[:CONVERSION]->(from:Protein)-[:CATALYSIS]->(to:Compound)</p>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-lg-2">From node: </label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(from:Compound)" checked>Compound</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(from:Protein)">Protein</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(from:Gene)">Gene</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(from:Pathway)">Pathway</label>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-lg-2">To node: </label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(to:Compound)">Compound</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(to:Protein)">Protein</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(to:Gene)">Gene</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(to:Pathway)">Pathway</label>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-lg-2">Intermediate node: </label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(:Compound)">Compound</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(:Protein)">Protein</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(:Gene)">Gene</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="(:Pathway)">Pathway</label>
+                      </div>
+                      <div class="form-group">
+                        <label class="col-lg-2">Relationship: </label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:ANNOTATION]->">ANNOTATION</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:BIOCHEMICAL_REACTION]->">BIOCHEMICAL_REACTION</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:CATALYSIS]->">CATALYSIS</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:CONTROL]->">CONTROL</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:CONVERSION]->">CONVERSION</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:GENETIC_ASSOCIATION]->">GENETIC_ASSOCIATION</label>
+                        <br><label class="radio-inline"><input type="radio" name="cypher" value="-[:MOLECULAR_BINDING]->">MOLECULAR_BINDING</label>
+                      </div>
+                      <div class="col-lg-2"><button id="addBtn" type="button" class="btn btn-info">Add</button></div>
                     </div>
                   </div>
                   <!-- /.row -->
                   <hr>
-                  <div class="row">
-                    <div class="col-lg-4">
-                      <div class="form-group">
-                        <label for="coef">Minimum correlation coefficient:</label>
-                        <input id="coef" name="coef" type="number" class="form-control" value="0.7" min="0.1" max="1" step="0.05">
-                      </div>
-                    </div>
-                    <div class="col-lg-4">
-                      <div class="form-group">
-                        <label for="pval">Maximum p-value:</label>
-                        <input id="pval" name="pval" type="number" class="form-control" value="0.05" min="0" max="1" step="0.01">
-                      </div>
-                    </div>
-                    <div class="col-lg-4">
-                      <div class="form-group">
-                        <label>Method:</label>
-                        <select id="method" class="form-control">
-                          <option value="spearman" selected>spearman</option>
-                          <option value="pearson">pearson</option>
-                          <option value="kendall">kendall</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- /.row -->
-                  <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
+                  <button id="computeBtn" type="button" class="btn btn-primary">Query</button>
                   <button id="clearBtn" type="reset" class="btn btn-default">Clear</button>
                 </form>
               </div>
@@ -241,7 +242,7 @@ console.log(robj);
                 <table id="nodes" class="display" width="100%"></table>
               </div>
               <div class="tab-pane" data-value="Edge" id="edge">
-                  <table id="edges" class="display" width="100%"></table>
+                <table id="edges" class="display" width="100%"></table>
               </div>
             </div>
           </div>
@@ -292,7 +293,7 @@ console.log(robj);
           <div class="modal-dialog"><div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4>Computing network...</h4>
+              <h4>Querying network...</h4>
             </div>
             <div class="modal-body"><div style="height:200px">
               <span id="loading_spinner" style="position: absolute;display: block;top: 50%;left: 50%;"></span>

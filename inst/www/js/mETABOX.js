@@ -34,13 +34,14 @@ function JSONToTabConvertor(JSONData,ShowHeader) {
 }
 
 //@function load one column text file and pass to textarea
-function loadTxtFile(event) {
+//@param id id element
+function loadTxtFile(event,id) {
   var input = event.target;
   var reader = new FileReader();
   reader.onload = function(){
     var text = reader.result;
-    $("#txtinput").val("");//clear textarea
-    $("#txtinput").val(text);//assign value to textarea
+    $(id).val("");//clear textarea
+    $(id).val(text);//assign value to textarea
   };
   reader.readAsText(input.files[0]);
 };
