@@ -2,19 +2,19 @@
 #'@description summarize aggregated data.
 #' Summarize the information that is important for mETABOX statistical analysis, e.g. factor_name, repeated.factor_name, etc.
 #'@usage
-#'summary_aggregated_data(aggregated_data, factor.name, repeated.factor.name)
+#'summary_aggregated_data(aggregated_data, factor_name, repeated.factor_name)
 #'@param aggregated_data an list with three dataframes named as "expression", "feature" and "phenotype". Or simply a object returned from
 #'load_aggregated_data().
-#'@param factor.name The factor names that are related to the study design.
-#'factor.name must be one of the column name of the "phenotype" dataframe. Although the default is NULL, it shouldn't be NULL for mETABOX
+#'@param factor_name The factor names that are related to the study design.
+#'factor_name must be one of the column name of the "phenotype" dataframe. Although the default is NULL, it shouldn't be NULL for mETABOX
 #'statistical analysis.
-#'@param repeated.factor.name The repeated factor name indicates which factor is repeated measure. Must be one of the factor.name.
+#'@param repeated.factor_name The repeated factor name indicates which factor is repeated measure. Must be one of the factor_name.
 #'If NULL means that it is independed study design.
 #'@details
 #'
 #'@return
 #'a list. If the input aggregated_data is not standard, then it returns a warning message telling user to upload needed file.
-#'dataset(list), factor.name(vector of string), repeated.factor.name(vector of string), confound(vector which is a variable),
+#'dataset(list), factor_name(vector of string), repeated.factor_name(vector of string), confound(vector which is a variable),
 #'batch(vector which is a variable of factor)
 #'@author Sili Fan \email{fansili2013@gmail.com}
 #'@seealso
@@ -22,7 +22,8 @@
 #'@export
 #'
 ### Summarize dataset.
-summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL, factor.name = NULL,repeated.factor.name = NULL){
+summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
+                                    factor_name = NULL,repeated_factor_name = NULL,confounds = NULL,batch=NULL){
   result <- list()
   if(is.null(e)|is.null(f)|is.null(p)){
     result[["warnings"]] = paste("Waiting Users To Upload",
@@ -44,27 +45,24 @@ summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL, factor.name = NULL,rep
 
     if(is.null(result[["warnings"]])){#If there is no warnings so we can proceed.
 
-      if(length(factor.name)==0){
-        factor.index = sapply(p,function(x){# guess which columns are experimental factors.
-          length(unique(x))
-        })
-        factor.name = colnames(p)[factor.index < nrow(p)/10 & factor.index > 1]#!!!
-      }else{
-        factor.name = factor.name
-      }
 
-      confounds = NULL
-      repeated.factor.name = repeated.factor.name
-      batch = NULL
+
       result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
-      result[["factor.name"]] = factor.name
-      result[["repeated.factor.name"]] = repeated.factor.name
-      result[["confound"]] = confounds
-      result[["batch"]] = batch
+      result[["factor_name"]] = ifelse(is.null(factor_name),"none",factor_name)
+      result[["repeated_factor_name"]] = ifelse(is.null(repeated_factor_name),"none",repeated_factor_name)
+      result[["confound"]] = ifelse(is.null(confound),"none",confound)
+      result[["batch"]] = ifelse(is.null(batch),"none",batch)
     }
   }
   return(result)
 }
 
 
-
+# if(length(factor_name)==0){
+#   factor.index = sapply(p,function(x){# guess which columns are experimental factors.
+#     length(unique(x))
+#   })
+#   factor_name = colnames(p)[factor.index < nrow(p)/10 & factor.index > 1]#!!!
+# }else{
+#   factor_name = factor_name
+# }

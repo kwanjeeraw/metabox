@@ -4,22 +4,22 @@
 \alias{summary_aggregated_data}
 \title{summarize aggregated data.}
 \usage{
-summary_aggregated_data(aggregated_data, factor.name, repeated.factor.name)
+summary_aggregated_data(aggregated_data, factor_name, repeated.factor_name)
 }
 \arguments{
-\item{factor.name}{The factor names that are related to the study design.
-factor.name must be one of the column name of the "phenotype" dataframe. Although the default is NULL, it shouldn't be NULL for mETABOX
+\item{factor_name}{The factor names that are related to the study design.
+factor_name must be one of the column name of the "phenotype" dataframe. Although the default is NULL, it shouldn't be NULL for mETABOX
 statistical analysis.}
-
-\item{repeated.factor.name}{The repeated factor name indicates which factor is repeated measure. Must be one of the factor.name.
-If NULL means that it is independed study design.}
 
 \item{aggregated_data}{an list with three dataframes named as "expression", "feature" and "phenotype". Or simply a object returned from
 load_aggregated_data().}
+
+\item{repeated.factor_name}{The repeated factor name indicates which factor is repeated measure. Must be one of the factor_name.
+If NULL means that it is independed study design.}
 }
 \value{
 a list. If the input aggregated_data is not standard, then it returns a warning message telling user to upload needed file.
-dataset(list), factor.name(vector of string), repeated.factor.name(vector of string), confound(vector which is a variable),
+dataset(list), factor_name(vector of string), repeated.factor_name(vector of string), confound(vector which is a variable),
 batch(vector which is a variable of factor)
 }
 \description{
