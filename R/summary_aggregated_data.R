@@ -48,6 +48,9 @@ summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
 
 
       result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
+      result[["colnames_p"]] = colnames(p)
+
+
       result[["factor_name"]] = ifelse(is.null(factor_name),"none",factor_name)
       result[["repeated_factor_name"]] = ifelse(is.null(repeated_factor_name),"none",repeated_factor_name)
       result[["confound"]] = ifelse(is.null(confound),"none",confound)
