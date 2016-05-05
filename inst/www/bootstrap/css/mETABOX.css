@@ -1,6 +1,13 @@
 #cy {
-    height:650px;
+    height:500px;
     width:100%;
+}
+#wc {
+    height:500px;
+    width:100%;
+}
+hr.dash {
+    border-top: 1px dashed #8c8b8b;
 }
 .navbar-inverse {
     background-color: #FFF;
