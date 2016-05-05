@@ -22,7 +22,7 @@ guess_factor = function(p=NULL){
       })
   guess_factor_name = colnames(p)[factor.index < nrow(p)/10 & factor.index > 1]#!!!
 
-  result = list(options=p,guess_factor_name=guess_factor_name)
+  result = list(options=colnames(p),guess_factor_name=guess_factor_name)
   return(result)
 }
 
