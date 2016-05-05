@@ -98,6 +98,8 @@ fetchHetNetworkByGID.default <- function(from=NULL, to=NULL, pattern, returnas="
           #paths = jsonlite::fromJSON(unlist(curlRequest.json(cypher=qstring), recursive = FALSE))$data
         }else{
           cat("Split queries for more than 500 nodes ...\n")
+          require('doParallel')
+          doParallel::registerDoParallel(cores = 2)
           subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
           paths = foreach(i=1:length(subinp), .combine=c) %dopar% {
             qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
@@ -108,6 +110,8 @@ fetchHetNetworkByGID.default <- function(from=NULL, to=NULL, pattern, returnas="
         }
       }else{
         cat("Register parallel computing ...\nWarning: querying a large network will take long time. \n")
+        require('doParallel')
+        doParallel::registerDoParallel(cores = 2)
         path = foreach(i=1:length(from), .combine=rbind) %dopar% {
           foreach(j=1:length(to)) %dopar% {
             qstring = gsub("keyfrom", from[i], querystring)
