@@ -45,6 +45,7 @@
     var compute_session;
     var nodeTable;
     var edgeTable;
+    var cloudTable;
     var robj;
     var cyImg;    
     $("#computeBtn").click(function(){
@@ -94,6 +95,32 @@
           return text + selectedItem;
       });
     });//addBtn
+    $("#cloudBtn").click(function(){
+      var loadSpinner = showSpinner();
+      var req = ocpu.call("computeNwWordCloud", {edgelist:robj.edges, nodelist:robj.nodes}, function(cld_session) {
+        cld_session.getStdout(function(outtxt){
+          $("#consolemsgwc").text(outtxt);
+        });
+        cld_session.getObject(function(cld_object){
+          //Table output
+          if (cld_object.wordcloud.length > 0) {
+            if(cloudTable != undefined){
+              cloudTable.destroy();
+            }
+            $('#wordcld').empty();
+            cloudTable = drawTable('#wordcld',cld_object.wordcloud);
+          }else{
+            if (cloudTable != undefined) {
+              cloudTable.clear().draw();
+            }
+            $('#wordcld').empty();
+          }
+          //Wordcloud output
+          $("#wc").rplot("plotWordCloud", {wordtable:cld_object.wordcloud})
+        });//getObject
+        hideSpinner(loadSpinner);
+      }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
+    });//cloudBtn
     $("#downloadBtn").click(function(){
       exportNwZip(robj.nodes, robj.edges, cyImg.png());       
     });//downloadBtn
@@ -228,6 +255,7 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
+            <h4>Network</h4><hr>
             <ul class="nav nav-tabs">
               <li class="active"><a href="#console" data-toggle="tab" data-value="Console">Console</a></li>
               <li><a href="#node" data-toggle="tab" data-value="Node">Node</a></li>
@@ -248,25 +276,12 @@
           </div>
         </div>
         <!-- /.row -->
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="caption">
-              <hr>
-              <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-              <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
-              <button id="ptwBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> PathwayEnrichment</button>
-              <button id="meshBtn" type="button" class="btn btn-primary"><i class="fa fa-spinner"></i> MeSHEnrichment</button>
-              <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
-            </div>
-          </div>
-        </div>
-        <!-- /.row -->
-        <br>
+        <hr>
         <div class="row">
           <div class="col-lg-12">
             <div class="panel panel-info">
               <div class="panel-heading">
-                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#">Network</a></h3>
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#network">Network</a></h3>
               </div>
               <div id="network" class="panel-body collapse in">
                 <div id="cy"></div>
@@ -288,12 +303,56 @@
           </div>
         </div>
         <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
+            <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
+            <button id="ptwBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> PathwayEnrichment</button>
+            <button id="meshBtn" type="button" class="btn btn-primary"><i class="fa fa-spinner"></i> MeSHEnrichment</button>
+            <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
+          </div>
+        </div>
+        <!-- /.row -->
+        <hr class="dash">
+        <div class="row">
+          <div class="col-lg-12">
+            <h5>WordCloud</h5><hr>
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#consolewc" data-toggle="tab" data-value="Consolewc">Console</a></li>
+              <li><a href="#wordcl" data-toggle="tab" data-value="Wordcl">WordCloud</a></li>
+              <li class="pull-right"><h5>Summary</h5></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" data-value="Consolewc" id="consolewc">
+                <pre id="consolemsgwc" class="pre-scrollable"></pre>
+              </div>
+              <div class="tab-pane" data-value="Wordcl" id="wordcl">
+                <table id="wordcld" class="display" width="100%"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <hr>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="panel panel-warning">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#wordcloud" href="#wordcloud">WordCloud</a></h3>
+              </div>
+              <div id="wordcloud" class="panel-body collapse in">
+                <div id="wc"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
         <!-- notify box -->
         <div id="notifyBox" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
           <div class="modal-dialog"><div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4>Querying network...</h4>
+              <h4>Computing ...</h4>
             </div>
             <div class="modal-body"><div style="height:200px">
               <span id="loading_spinner" style="position: absolute;display: block;top: 50%;left: 50%;"></span>
