@@ -89,6 +89,7 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
         }
       }
       if(tolower(annotation) == 'pathway'){#pathway enrichment
+        cat("Querying database ...\n")
         if(internalid){
           annols = apply(nodelist, 1, function(x) fetchNetwork(to=x["id"], fromtype="pathway", totype = x["nodelabel"], reltype = "ANNOTATION")) #query annotation pairs
         }else{
@@ -103,9 +104,9 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
           era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
         }
         else{
-          nodelist = list()
-          edgelist = list()
-          era = list()
+          nodelist = data.frame()
+          edgelist = data.frame()
+          era = data.frame()
         }
       }else if(tolower(method) == 'mesh'){#mesh enrichment
         stop('Under development')
@@ -117,7 +118,7 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
     error=function(e) {
       message(e)
       cat("\nError: RETURN no data ..\n")
-      list(nodes=list(), edges=list(), enrichment=list())
+      list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame())
     })
   return(out)
 }
