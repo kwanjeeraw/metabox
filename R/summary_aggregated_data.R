@@ -48,7 +48,6 @@ summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
 
 
       result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
-      result[["colnames_p"]] = colnames(p)
 
 
       result[["factor_name"]] = ifelse(is.null(factor_name),"none",factor_name)
@@ -61,11 +60,4 @@ summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
 }
 
 
-# if(length(factor_name)==0){
-#   factor.index = sapply(p,function(x){# guess which columns are experimental factors.
-#     length(unique(x))
-#   })
-#   factor_name = colnames(p)[factor.index < nrow(p)/10 & factor.index > 1]#!!!
-# }else{
-#   factor_name = factor_name
-# }
+
