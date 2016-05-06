@@ -49,7 +49,6 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   colnames(pData) = gsub("([_])|[[:punct:]]", "_", colnames(pData))
 
   result <- list(expression = eData, feature = fData, phenotype = pData)
-
   writeLines("sucess!","messages.txt")
   return(result)
 }
