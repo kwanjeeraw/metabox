@@ -42,6 +42,12 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   eData <- sapply(eData, as.numeric)
   colnames(eData) = rownames(pData); rownames(eData) = fData[,1]
   eData <- data.frame(t(eData),stringsAsFactors = F)
+
+  # remove any unwanted character in columns of eData, fData and pData to _.
+  colnames(e) = gsub("([_])|[[:punct:]]", "_", colnames(e))
+  colnames(f) = gsub("([_])|[[:punct:]]", "_", colnames(f))
+  colnames(p) = gsub("([_])|[[:punct:]]", "_", colnames(p))
+
   result <- list(expression = eData, feature = fData, phenotype = pData)
 
   writeLines("sucess!","messages.txt")
