@@ -108,8 +108,24 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
           edgelist = data.frame()
           era = data.frame()
         }
-      }else if(tolower(method) == 'mesh'){#mesh enrichment
-        stop('Under development')
+      }else if(tolower(annotation) == 'mesh'){#mesh enrichment
+        cat("Connecting PubChem ...\n")
+        annols = apply(nodelist, 1, function(x) callMesh(pcid=x["gid"])) #query pubchem annotation pairs
+        if(!is.null(unlist(annols))){
+          annonws = combineNetworks(annols) #combine annotation pairs
+          annopair = merge(annonws$edges,nodelist, by.x='target', by.y='gid')[,2:3] #change gid to id
+          colnames(annopair) = c('source','target')
+          era = computeEnrichment(edgelist = annopair[,2:1], pval = pval, fc = fc, method = method, size=size, returnas="dataframe") #compute enrichment
+          era = era[order(era$`p adj (non-dir_)`),]
+          era$rank = seq(1:nrow(era))
+          era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
+          era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
+        }
+        else{
+          nodelist = data.frame()
+          edgelist = data.frame()
+          era = data.frame()
+        }
       }else{
         stop('Unknown annotation')
       }

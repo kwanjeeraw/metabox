@@ -42,7 +42,7 @@ computeNwWordCloud.default <- function (edgelist, nodelist, annotation="pathway"
       if (class(tmparg) == "try-error") {
         stop("argument 'annotation' is not valid, choose one from the list: pathway,mesh")
       }
-      if(tolower(annotation) == 'pathway'){#pathway enrichment
+      if(tolower(annotation) == 'pathway'){#pathway wordcloud
         cat("Querying database ...\n")
         if(internalid){
           annols = apply(nodelist, 1, function(x) fetchNetwork(to=x["id"], fromtype="pathway", totype = x["nodelabel"], reltype = "ANNOTATION")) #query annotation pairs
@@ -58,8 +58,18 @@ computeNwWordCloud.default <- function (edgelist, nodelist, annotation="pathway"
           edgelist = data.frame()
           wc = data.frame()
         }
-      }else if(tolower(method) == 'mesh'){#mesh enrichment
-        stop('Under development')
+      }else if(tolower(annotation) == 'mesh'){#mesh wordcloud
+        cat("Connecting PubChem ...\n")
+        annols = apply(nodelist, 1, function(x) callMesh(pcid=x["gid"])) #query annotation pairs
+        if(!is.null(unlist(annols))){
+          annonws = combineNetworks(annols) #combine annotation pairs
+          wc = callWordCloud(edgelist = annonws$edges, nodelist = annonws$nodes) #compute wordcloud
+        }
+        else{
+          nodelist = data.frame()
+          edgelist = data.frame()
+          wc = data.frame()
+        }
       }else{
         stop('Unknown annotation')
       }
