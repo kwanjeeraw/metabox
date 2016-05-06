@@ -51,10 +51,10 @@ summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
       result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
 
 
-      result[["factor_name"]] = ifelse(is.null(factor_name),"none",strsplit(factor_name, sep))
-      result[["repeated_factor_name"]] = ifelse(is.null(repeated_factor_name),"none",strsplit(repeated_factor_name, sep))
-      result[["confound"]] = ifelse(is.null(confound),"none",strsplit(confound, sep))
-      result[["batch"]] = ifelse(is.null(batch),"none",strsplit(batch, sep))
+      result[["factor_name"]] = ifelse(is.null(factor_name),"none",strsplit(factor_name, sep))[[1]]
+      result[["repeated_factor_name"]] = ifelse(is.null(repeated_factor_name),"none",strsplit(repeated_factor_name, sep))[[1]]
+      result[["confound"]] = ifelse(is.null(confound),"none",strsplit(confound, sep))[[1]]
+      result[["batch"]] = ifelse(is.null(batch),"none",strsplit(batch, sep))[[1]]
     }
   }
   return(result)
