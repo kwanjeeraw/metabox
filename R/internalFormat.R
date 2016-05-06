@@ -59,3 +59,10 @@ formatNode.LIST = function(x,y,z){
     nout = nout[,c(1:4,9)]
   }
 }
+
+formatMesh = function(x){
+  #don't want root, itself, mesh = Supplementary Records
+  if(unlist(x$ParentID) != "root" && x$Information$Name != "Supplementary Records" && !is.null(x$Information$ChildID)){
+    data.frame(id=x$Information$HNID, gid=x$Information$HNID, nodename=x$Information$Name, nodelabel="Mesh", nodexref=x$Information$HNID, stringsAsFactors = FALSE)
+  }
+}
