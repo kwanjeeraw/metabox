@@ -23,7 +23,8 @@
 #'
 ### Summarize dataset.
 summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
-                                    factor_name = NULL,repeated_factor_name = NULL,confound = NULL,batch=NULL){
+                                    factor_name = NULL,repeated_factor_name = NULL,confound = NULL,batch=NULL,
+                                    sep = ","){
   result <- list()
   if(is.null(e)|is.null(f)|is.null(p)){
     result[["warnings"]] = paste("Waiting Users To Upload",
@@ -50,10 +51,10 @@ summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
       result[["dataset"]] = list("expression" = e, "feature" = f, "phenotype" = p)
 
 
-      result[["factor_name"]] = ifelse(is.null(factor_name),"none",factor_name)
-      result[["repeated_factor_name"]] = ifelse(is.null(repeated_factor_name),"none",repeated_factor_name)
-      result[["confound"]] = ifelse(is.null(confound),"none",confound)
-      result[["batch"]] = ifelse(is.null(batch),"none",batch)
+      result[["factor_name"]] = ifelse(is.null(factor_name),"none",strsplit(factor_name, sep))
+      result[["repeated_factor_name"]] = ifelse(is.null(repeated_factor_name),"none",strsplit(repeated_factor_name, sep))
+      result[["confound"]] = ifelse(is.null(confound),"none",strsplit(confound, sep))
+      result[["batch"]] = ifelse(is.null(batch),"none",strsplit(batch, sep))
     }
   }
   return(result)
