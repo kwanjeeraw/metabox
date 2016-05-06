@@ -43,6 +43,7 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   colnames(eData) = rownames(pData); rownames(eData) = fData[,1]
   eData <- data.frame(t(eData),stringsAsFactors = F)
 
+
   # remove any unwanted character in columns of eData, fData and pData to _.
   colnames(eData) = gsub("([_])|[[:punct:]]", "_", colnames(eData))
   colnames(fData) = gsub("([_])|[[:punct:]]", "_", colnames(fData))
