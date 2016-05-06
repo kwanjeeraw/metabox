@@ -1,6 +1,6 @@
 #'Compute wordcloud for a given annotation
 #'@description compute wordcloud for a given annotation retrieved from e.g. \code{\link{fetchNetwork}}.
-#'@param edgelist a data frame of edges
+#'@param edgelist a data frame of annotation pairs (e.g. source target = pathway compound)
 #'@param nodelist a data frame of nodes containin node information e.g. node id, node gid, node name, node xref.
 #'@seealso \code{\link{fetchNetwork}}, \code{\link{fetchHetNetwork}}, \pkg{\link{tm}}, \pkg{\link{wordcloud}}
 #'@return data frame of word frequency. Return empty data frame if error or found nothing.
