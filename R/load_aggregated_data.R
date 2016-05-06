@@ -47,7 +47,10 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   colnames(eData) = gsub("([_])|[[:punct:]]", "_", colnames(eData))
   colnames(fData) = gsub("([_])|[[:punct:]]", "_", colnames(fData))
   colnames(pData) = gsub("([_])|[[:punct:]]", "_", colnames(pData))
-
+  # remove all the NA. And replace NA with "NA" Otherwise DataTables will give error.datatables warning requested unknown parameter
+  eData[is.na(eData)]="NA"
+  fData[is.na(fData)]="NA"
+  pData[is.na(pData)]="NA"
   result <- list(expression = eData, feature = fData, phenotype = pData)
   writeLines("sucess!","messages.txt")
   return(result)
