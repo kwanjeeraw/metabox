@@ -44,9 +44,9 @@ load_aggregated_data = function(file, type,...){ # returns a expression data fra
   eData <- data.frame(t(eData),stringsAsFactors = F)
 
   # remove any unwanted character in columns of eData, fData and pData to _.
-  colnames(e) = gsub("([_])|[[:punct:]]", "_", colnames(e))
-  colnames(f) = gsub("([_])|[[:punct:]]", "_", colnames(f))
-  colnames(p) = gsub("([_])|[[:punct:]]", "_", colnames(p))
+  colnames(eData) = gsub("([_])|[[:punct:]]", "_", colnames(eData))
+  colnames(fData) = gsub("([_])|[[:punct:]]", "_", colnames(fData))
+  colnames(pData) = gsub("([_])|[[:punct:]]", "_", colnames(pData))
 
   result <- list(expression = eData, feature = fData, phenotype = pData)
 
