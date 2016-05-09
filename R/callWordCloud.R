@@ -21,8 +21,9 @@ callWordCloud.default <- function(edgelist, nodelist){
     dtm = tm::TermDocumentMatrix(docs)
     mt = as.matrix(dtm)
     v = sort(rowSums(mt), decreasing=TRUE)
-    df = data.frame(word = names(v), freq = v)
+    df = data.frame(word = toupper(names(v)), freq = v)
     wt = merge(nodelist, df, by.x='id', by.y='word')
+    wt$member = plyr::ddply(edgelist,c('source'),plyr::summarise,member=list(target))$member
     wt[order(wt$freq, decreasing = TRUE),]
   },
   error=function(e) {
