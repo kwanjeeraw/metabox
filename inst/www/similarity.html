@@ -48,6 +48,7 @@
     var edgeTable;
     var cloudTable;
     var robj;
+    var clobj;
     var cyImg;
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();    
@@ -92,6 +93,7 @@
           $("#consolemsgwc").text(outtxt);
         });
         cld_session.getObject(function(cld_object){
+          clobj = cld_object;
           //Table output
           if (cld_object.wordcloud.length > 0) {
             if(cloudTable != undefined){
@@ -120,6 +122,9 @@
     $("#enrBtn").click(function(){
       window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment    
     });//enrBtn
+    $("#downloadCld").click(function(){
+      exportTxtFile(clobj.wordcloud);     
+    });//downloadCld
   });
   </script>
 </head>
@@ -234,22 +239,24 @@
             <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
             <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
             <button id="enrBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> Enrichment</button>
-            <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
           </div>
         </div>
         <!-- /.row -->
         <hr class="dash">
         <div class="row">
-          <div class="col-lg-4"><h4>WordCloud</h4></div>
-          <div class="col-lg-8">
+          <div class="col-lg-4"><h4>WordCloud of network</h4></div>
+          <div class="col-lg-5">
             <form role="form">
               <div class="form-group">
                 <label>Select annotation: </label>
                 <label class="radio-inline"><input type="radio" name="annotation" value="pathway" checked>Pathway</label>
                 <label class="radio-inline"><input type="radio" name="annotation" value="mesh">Mesh</label>
-                <p class="help-block">Mesh annotation is available for Compound only.</p>
+                <p class="help-block">Mesh annotation is available for PubChem compounds only.</p>
               </div>
             </form>
+          </div>
+          <div class="col-lg-3">
+            <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
           </div>
         </div>
         <!-- /.row -->
@@ -269,6 +276,7 @@
                 <table id="wordcld" class="display" width="100%"></table>
               </div>
             </div>
+            <button id="downloadCld" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download table</button>
           </div>
         </div>
         <!-- /.row -->
