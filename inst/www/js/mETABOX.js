@@ -69,9 +69,11 @@ function exportNwZip(nodes, edges, img){
 function exportEnrichmentZip(nodes, edges, enrichment, img){
     var zip = new JSZip();
     zip.file("node.txt", JSONToTabConvertor(nodes,true))
-    zip.file("edge.txt", JSONToTabConvertor(edges,true))
-    zip.file("enrichment.txt", JSONToTabConvertor(enrichment,true));
-    zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
+    zip.file("annotationPair.txt", JSONToTabConvertor(edges,true))
+    zip.file("result.txt", JSONToTabConvertor(enrichment,true));
+    if (img != null) {
+        zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
+    }
     zip.generateAsync({type:"base64"})
     .then(function (content) {
       var a = document.createElement('a'); 
@@ -193,7 +195,7 @@ function formatNode(nodeArr) {
     var nodels = [];
     for (var i = 0; i < nodeArr.length; i++) {//format list of nodes for cytoscapeJS
       nodels.push({
-          data: nodeArr[i]
+        data: nodeArr[i]
       });
     }
     return nodels;
@@ -204,15 +206,15 @@ function formatNode(nodeArr) {
 function formatPieNode(nodeArr, enrichArr) {
     var nodels = [];
     for (var i = 0; i < nodeArr.length; i++) {//format list of nodes for cytoscapeJS
-      nodels.push({
-          data: nodeArr[i]
-      }); 
-      Object.keys(enrichArr).forEach(function(idx) {
-        if(enrichArr[idx].member.indexOf(nodeArr[i].id)!= -1){
-            var pie = "pie" + enrichArr[idx].rank;
-            nodels[i].data[pie] = 1; 
-        }
-      }); 
+        nodels.push({
+            data: nodeArr[i]
+        }); 
+        Object.keys(enrichArr).forEach(function(idx) {
+          if(enrichArr[idx].member.indexOf(nodeArr[i].id)!= -1){
+              var pie = "pie" + enrichArr[idx].rank;
+              nodels[i].data[pie] = 1; 
+          }
+        });
     }  
     return nodels;
 }
@@ -231,7 +233,7 @@ function formatEdge(edgeArr) {
 
 //@function draw cytoscapeJS network
 //@param objNode, objEdge array of json objects accepted by cytoscapeJS [{data:{id:'id',name:'name'}}]
-function drawNetwork(objNode, objEdge){
+function drawNetwork(objNode, objEdge, lyout = "cose"){
     var cy = cytoscape({//initialize cytoscapeJS
       container: document.getElementById('cy'),
       boxSelectionEnabled: false,
@@ -241,7 +243,7 @@ function drawNetwork(objNode, objEdge){
         edges: objEdge
       },
       layout: {
-        name: 'cose',
+        name: lyout,
         padding: 10
       },
       style: cytoscape.stylesheet()
