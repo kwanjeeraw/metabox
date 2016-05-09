@@ -30,7 +30,7 @@ with name attributes corresponding to the entities. See \code{\link{runGSA}} for
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
-list of nodes, edges and enrichment analysis result. The list contains the data frame of nodes, the data frame of edges and
+list of nodes, edges, enrichment analysis result and annotation pairs. The list contains the data frame of nodes, the data frame of edges and
 the data frame of enrichment analysis result with the following components:
 
 \code{rank} = rank sort by p adj

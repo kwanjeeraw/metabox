@@ -16,7 +16,7 @@
 #'@param method a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}
 #'@param size a numeric vector specifying the minimum and maximum number of members in each entity set collection to be used in the analysis. Default is c(3,500).
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@return list of nodes, edges and enrichment analysis result. The list contains the data frame of nodes, the data frame of edges and
+#'@return list of nodes, edges, enrichment analysis result and annotation pairs. The list contains the data frame of nodes, the data frame of edges and
 #'the data frame of enrichment analysis result with the following components:
 #'
 #'\code{rank} = rank sort by p adj
@@ -94,10 +94,10 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
           era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
-          list(nodes=nodelist, edges=edgelist, enrichment=era) #output
+          list(nodes=nodelist, edges=edgelist, enrichment=era, pairs=annonws$edges) #output
         }
         else{#no annotation found
-          list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame()) #output
+          list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame(), pairs=data.frame()) #output
         }
       }else if(tolower(annotation) == 'mesh'){#mesh enrichment
         cat("Connecting PubChem ...\n")
@@ -112,19 +112,19 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
           era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
-          list(nodes=nodelist, edges=edgelist, enrichment=era) #output
+          list(nodes=nodelist, edges=edgelist, enrichment=era, pairs=annopair) #output
         }
         else{#no annotation found
-          list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame()) #output
+          list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame(), pairs=data.frame()) #output
         }
       }else{
         cat('Error: No database installed, returning no data ..\n')
-        list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame()) #output
+        list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame(), pairs=data.frame()) #output
       }
     },error=function(e) {
       message(e)
       cat("\nError: RETURN no data ..\n")
-      list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame()) #output
+      list(nodes=data.frame(), edges=data.frame(), enrichment=data.frame(), pairs=data.frame()) #output
     })
   return(out)
 }
