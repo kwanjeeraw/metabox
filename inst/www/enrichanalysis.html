@@ -90,22 +90,7 @@
             $('#pathways').empty();
             nodeTable = drawTable('#nodes',robj.nodes);
             edgeTable = drawTable('#edges',robj.edges);
-            ptwTable = $('#pathways').DataTable({
-              "createdRow": function( row, data, index ){//format row color
-                var bgc = ["#FF0000","#FFFFB3","#907FFF","#D56767","#54CCFF","#FDB462","#60DA3E","#F4B5D6","#FD49FF","#00715E"];
-                if ( data.rank < 11 ) {
-                  $('td', row).eq(0).css({
-                    'background-color': bgc[data.rank-1]
-                  });
-                }
-              },
-              "destroy": true,
-              "scrollX": true,
-              "scrollY": 400,
-              "scrollCollapse": true,
-              "data": robj.enrichment,
-              "columns": formatTableHeader(robj.enrichment[0])
-            });
+            ptwTable = drawPieTable('#pathways',robj.enrichment);
           }else{
             if (nodeTable != undefined) {
               nodeTable.clear().draw();
@@ -128,7 +113,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, cyImg.png());
+      exportEnrichmentZip(robj.nodes, null, robj.enrichment, robj.edges, cyImg.png());
     });//downloadBtn
   });
   </script>
