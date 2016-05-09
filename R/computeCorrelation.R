@@ -70,7 +70,7 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
       if (class(tmparg) == "try-error") {
         stop("argument 'method' is not valid, choose one from the list: pearson,kendall,spearman")
       }
-      if(is.null(y)) {#Assign values to a square matrix
+      if(is.null(y)) {#have one input, assign values to a square matrix
         cat("Formating row.names of input data frame ...\n")
         tmp = x[,2:ncol(x)]
         row.names(tmp) = x[,1]
@@ -89,10 +89,10 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
         network = network[abs(network$coef) > coef, ]
         network = network[network$pval < pval, ]
         cat("Format and returning network of size ",nrow(network)," ...\n")
-        if(nrow(network)>0){
+        if(nrow(network)>0){#pass cutoff
           network$type = "CORRELATION"
           cat("Format and returning network nodes ...\n")
-          if(!is.null(xtype)){#given xtype, search DB for nodes
+          if(!is.null(xtype) && foundDb()){#given xtype and have db, search db for node attributes
             nodelist = unique(c(network$source, network$target))
             if(internalid){
               nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="neo4jid") #query nodes
@@ -100,17 +100,18 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
             }else{
               nodels = lapply(nodelist, formatNode.LIST, y=xtype, z="grinnid") #query nodes by gid
               networknode = plyr::ldply(nodels, data.frame)
-              #format edge
-              edgedf = merge(networknode[,1:2],network,by.x='gid',by.y='target')[,-1]
-              colnames(edgedf)[1] = "target"
-              edgedf = merge(networknode[,1:2],edgedf,by.x='gid',by.y='source')[,-1]
-              colnames(edgedf)[1] = "source"
-              network = edgedf
+              #format edge, change gid to id, fix edge row order
+              s = dplyr::right_join(networknode[,1:2],network[,1:2],by=c('gid' = 'source'))
+              t = dplyr::right_join(networknode[,1:2],network[,1:2],by=c('gid' = 'target'))
+              network$source = s$id
+              network$target = t$id
             }
-          }else{#no xtype specified, return input
+          }else{#no xtype specified or no db installed, return original input
             #format nodeList from edgeList
             so = data.frame(id=network$source, gid=network$source, nodename=network$source, stringsAsFactors = FALSE)
+            so$nodelabel = if(!is.null(xtype)) Hmisc::capitalize(xtype)
             ta = data.frame(id=network$target, gid=network$target, nodename=network$target, stringsAsFactors = FALSE)
+            ta$nodelabel = if(!is.null(xtype)) Hmisc::capitalize(xtype)
             networknode = unique(rbind(so,ta))
           }
           ## output
@@ -119,13 +120,13 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
                  list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network, seq(nrow(network)))),
                  json = list(nodes = jsonlite::toJSON(networknode), edges = jsonlite::toJSON(network)),
                  stop("Error: incorrect 'returnas' type"))
-        }else{
+        }else{#not pass cutoff
           switch(returnas,
                  dataframe = list(nodes = data.frame(), edges = data.frame()),
                  list = list(nodes = list(), edges = list()),
                  json = list(nodes = "", edges = ""))
         }
-      }else if(!is.null(y)) {
+      }else if(!is.null(y)) {#have another data
         cat("Formating row.names of x input data frame ...\n")
         tmp = x[,2:ncol(x)]
         row.names(tmp) = x[,1]
@@ -144,7 +145,7 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
         network = network[abs(network$coef) > coef, ]
         network = network[network$pval < pval, ]
         cat("Format and returning network of size ",nrow(network)," ...\n")
-        if(nrow(network)>0){
+        if(nrow(network)>0){#pass cutoff
           network$type = "CORRELATION"
           cat("Format and returning network nodes ...\n")
           #format nodeList from edgeList
@@ -160,7 +161,7 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
                  list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network, seq(nrow(network)))),
                  json = list(nodes = jsonlite::toJSON(networknode), edges = jsonlite::toJSON(network)),
                  stop("Error: incorrect 'returnas' type"))
-        }else{
+        }else{#not pass cutoff
           switch(returnas,
                  dataframe = list(nodes = data.frame(), edges = data.frame()),
                  list = list(nodes = list(), edges = list()),

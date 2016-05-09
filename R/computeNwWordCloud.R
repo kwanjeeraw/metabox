@@ -6,10 +6,11 @@
 #'@param edgelist a data frame of edges contains at least source and target pairs
 #'@param nodelist a data frame of nodes contains node information e.g. node name, node xref.
 #'The first column is id. See \code{\link{fetchNetwork}} for the data frame structure.
-#'@param annotation a string specifying the type of annotations e.g. pathway and mesh.
+#'@param annotation a string specifying the type of annotations e.g. pathway and mesh. Mesh annotation is available for PubChem compounds only.
 #'@param internalid boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
+#'\code{internalid} has no effect on Mesh enrichment.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@return list of nodes, edges and wordCloud result. The list contains the data frame of nodes, the data frame of edges and
+#'@return list of nodes, edges and WordCloud result. The list contains the data frame of nodes, the data frame of edges and
 #'the data frame of wordCloud result with the following components:
 #'
 #'\code{id} = internal neo4j id
@@ -42,43 +43,43 @@ computeNwWordCloud.default <- function (edgelist, nodelist, annotation="pathway"
       if (class(tmparg) == "try-error") {
         stop("argument 'annotation' is not valid, choose one from the list: pathway,mesh")
       }
-      if(tolower(annotation) == 'pathway'){#pathway wordcloud
+      if(tolower(annotation) == 'pathway' && foundDb()){#pathway wordcloud
         cat("Querying database ...\n")
         if(internalid){
           annols = apply(nodelist, 1, function(x) fetchNetwork(to=x["id"], fromtype="pathway", totype = x["nodelabel"], reltype = "ANNOTATION")) #query annotation pairs
         }else{
           annols = apply(nodelist, 1, function(x) fetchNetworkByGID(to=x["gid"], fromtype="pathway", totype = x["nodelabel"], reltype = "ANNOTATION")) #query annotation pairs
         }
-        if(!is.null(unlist(annols))){
+        if(!is.null(unlist(annols))){#found annotation
           annonws = combineNetworks(annols) #combine annotation pairs
           wc = callWordCloud(edgelist = annonws$edges, nodelist = annonws$nodes) #compute wordcloud
+          list(nodes=nodelist, edges=edgelist, wordcloud=wc) #output
         }
-        else{
-          nodelist = data.frame()
-          edgelist = data.frame()
-          wc = data.frame()
+        else{#no annotation found
+          list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
         }
       }else if(tolower(annotation) == 'mesh'){#mesh wordcloud
         cat("Connecting PubChem ...\n")
         annols = apply(nodelist, 1, function(x) callMesh(pcid=x["gid"])) #query annotation pairs
-        if(!is.null(unlist(annols))){
+        if(!is.null(unlist(annols))){#found annotation
           annonws = combineNetworks(annols) #combine annotation pairs
-          wc = callWordCloud(edgelist = annonws$edges, nodelist = annonws$nodes) #compute wordcloud
+          #format edge, change gid to id, fix edge row order
+          annopair = dplyr::right_join(nodelist[,1:2],annonws$edges[,1:2],by=c('gid' = 'target'))[,c(3,1)]
+          colnames(annopair) = c('source','target')
+          wc = callWordCloud(edgelist = annopair, nodelist = annonws$nodes) #compute wordcloud
+          list(nodes=nodelist, edges=edgelist, wordcloud=wc) #output
         }
-        else{
-          nodelist = data.frame()
-          edgelist = data.frame()
-          wc = data.frame()
+        else{#no annotation found
+          list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
         }
       }else{
-        stop('Unknown annotation')
+        cat('Error: No database installed, returning no data ..\n')
+        list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
       }
-      list(nodes=nodelist, edges=edgelist, wordcloud=wc)
-    },
-    error=function(e) {
+    },error=function(e) {
       message(e)
       cat("\nError: RETURN no data ..\n")
-      list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame())
+      list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
     })
   return(out)
 }

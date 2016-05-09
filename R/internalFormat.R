@@ -53,7 +53,7 @@ formatId = function(x, y) {
 
 formatNode.LIST = function(x,y,z){
   nout = fetchNode(txtinput=x, nodetype=y, searchby=z)
-  if(nrow(nout)==0){
+  if(nrow(nout)==0){#not found will return original input
     nout = data.frame(id=x, gid=x, nodename=x, nodelabel=Hmisc::capitalize(y), nodexref='', stringsAsFactors = FALSE)
   }else{
     nout = nout[,c(1:4,9)]
@@ -63,6 +63,20 @@ formatNode.LIST = function(x,y,z){
 formatMesh = function(x){
   #don't want root, itself, mesh = Supplementary Records
   if(unlist(x$ParentID) != "root" && x$Information$Name != "Supplementary Records" && !is.null(x$Information$ChildID)){
-    data.frame(id=x$Information$HNID, gid=x$Information$HNID, nodename=x$Information$Name, nodelabel="Mesh", nodexref=x$Information$HNID, stringsAsFactors = FALSE)
+    mid = paste0('D',stringr::str_sub(x$Information$URL,-6)) #MeshTree = D
+    mout = merge(data.frame(id=mid, stringsAsFactors = FALSE),MESH,by.x='id',by.y='MeshId') #merge with MESH table for annotation information
+    if(nrow(mout)>0){
+      data.frame(id=mout$id, gid=mout$id, nodename=mout$MeshName, nodelabel="Mesh", nodexref=mout$id, stringsAsFactors = FALSE)
+    }
   }
+}
+
+foundDb = function(){#check if db exists
+  tryCatch({#query nodeList from nodedata, database required
+    node = curlRequest.TRANSACTION("MATCH (n) WHERE ID(n) = 0 RETURN n")
+    TRUE
+    #FALSE
+  }, error = function(err) {#catch error if there is no db
+    FALSE
+  })
 }

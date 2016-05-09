@@ -37,12 +37,12 @@ computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, f
     if (class(tmparg) == "try-error") {
       stop("argument 'method' is not valid, choose one from the list: bionet,frank")
     }
-    if (class(pval) == "data.frame") {#format pval dataframe input: 1st id, 2nd pval
-      if(internalid){#format attribute names
+    if (class(pval) == "data.frame") {
+      if(internalid){#format pval: 1st id, 2nd pval, ... ,use only 1st and 2nd column
         pv = pval[,2]
         names(pv) = pval[,1]
         pval = pv
-      }else{#format attribute names from gid to id
+      }else{#format pval: 1st gid, 2nd pval, ... ,use only 1st and 2nd column, change gid to id
         merged = merge(nodelist, pval, by.x = colnames(nodelist)[2], by.y = colnames(pval)[1], all.y = TRUE)
         pv = merged[,ncol(nodelist)+1]
         names(pv) = merged$id

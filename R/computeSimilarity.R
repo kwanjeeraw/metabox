@@ -56,32 +56,32 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
       network = data.frame(source = as.character(nNames[dstRows]), target = as.character(nNames[dstCols]), coef = tanmt[lower.tri(tanmt)], stringsAsFactors = FALSE)
       network = network[network$coef > coef, ]
       cat("Format and returning network of size ",nrow(network)," ...\n")
-      if(nrow(network)>0){
+      if(nrow(network)>0){#pass cutoff
         network$type = "TANIMOTO_SIMILARITY"
         cat("Format and returning network nodes ...\n")
         #format nodeList from edgeList
         so = data.frame(id=network$source, gid=network$source, nodename=network$source, nodelabel="Compound", stringsAsFactors = FALSE)
         ta = data.frame(id=network$target, gid=network$target, nodename=network$target, nodelabel="Compound", stringsAsFactors = FALSE)
         sota = unique(rbind(so,ta))
-        networknode = tryCatch({
-          nds = fetchNode(txtinput=sota$id, nodetype="compound", searchby="grinnid")
-          nds = nds[c('id','gid','nodename','nodelabel','nodexref')]
-          networknode = plyr::rbind.fill(nds,sota)
-          networknode = networknode[!duplicated(networknode$gid),]
-        }, error = function(err) {#catch error if there is no db
+        if(foundDb()){#have db
+          nodels = lapply(sota$id, formatNode.LIST, y="compound", z="grinnid") #query nodes by gid
+          networknode = plyr::ldply(nodels, data.frame)
+          #format edge, change gid to id, fix edge row order
+          s = dplyr::right_join(networknode[,1:2],network[,1:2],by=c('gid' = 'source'))
+          t = dplyr::right_join(networknode[,1:2],network[,1:2],by=c('gid' = 'target'))
+          network$source = s$id
+          network$target = t$id
+        }else{#no db
+          cat("No database installed, returning original input ...\n")
           networknode = sota
-        })
-        cat("Format and returning network edges ...\n")
-        network$source = lapply(network$source, FUN=formatId, y = networknode) #format edgelist
-        network$target = lapply(network$target, FUN=formatId, y = networknode) #format edgelist
-        network = as.data.frame(lapply(network, unlist), stringsAsFactors = FALSE)#convert df of list
+        }
         ## output
         switch(returnas,
                dataframe = list(nodes = networknode, edges = network),
                list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network, seq(nrow(network)))),
                json = list(nodes = jsonlite::toJSON(networknode), edges = jsonlite::toJSON(network)),
                stop("Error: incorrect 'returnas' type"))
-      }else{
+      }else{#not pass cutoff
         switch(returnas,
                dataframe = list(nodes = data.frame(), edges = data.frame()),
                list = list(nodes = list(), edges = list()),
