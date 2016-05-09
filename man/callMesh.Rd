@@ -11,6 +11,25 @@ callMesh(pcid)
 }
 \value{
 list of nodes and edges. The list contains the data frame of nodes or Mesh and the data frame of edges or annotation pair.
+list of nodes with the following components:
+
+\code{id} = mesh id
+
+\code{gid} = mesh id
+
+\code{nodename} = mesh name
+
+\code{nodelabel} = Mesh
+
+#'\code{nodexref} = mesh id
+edgelist with the following components:
+
+\code{source, target} = node
+
+\code{type} = ANNOTATION
+
+\code{datasource} = PUBCHEM
+
 Return empty list of data frame if error or found nothing.
 }
 \description{

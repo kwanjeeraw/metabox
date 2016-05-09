@@ -12,7 +12,7 @@ computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, internalid, method
 \item{nodelist}{a data frame of nodes contains node information e.g. node name, node xref.
 The first column is id. See \code{\link{fetchNetwork}} for the data frame structure.}
 
-\item{annotation}{a string specifying the type of annotations e.g. pathway and mesh.}
+\item{annotation}{a string specifying the type of annotations e.g. pathway and mesh. Mesh annotation is available for PubChem compounds only.}
 
 \item{pval}{a numeric vector containing the p-values of molecular entities, computed from statistical analysis,
 with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
@@ -20,7 +20,8 @@ with name attributes corresponding to the entities. See \code{\link{runGSA}} for
 \item{fc}{a numeric vector containing fold changes or sign information (positive or negative) of molecular entities
 with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
 
-\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
+\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
+\code{internalid} has no effect on Mesh enrichment.}
 
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 
@@ -31,6 +32,8 @@ with name attributes corresponding to the entities. See \code{\link{runGSA}} for
 \value{
 list of nodes, edges and enrichment analysis result. The list contains the data frame of nodes, the data frame of edges and
 the data frame of enrichment analysis result with the following components:
+
+\code{rank} = rank sort by p adj
 
 \code{id} = internal neo4j id
 
@@ -48,7 +51,7 @@ the data frame of enrichment analysis result with the following components:
 
 \code{p adj} = adjusted entity set p-values
 
-\code{member} = list of entities
+\code{member} = list of members of the entity set
 See \code{\link{runGSA}} for more details about directional classes. Return empty list if error or found nothing.
 }
 \description{

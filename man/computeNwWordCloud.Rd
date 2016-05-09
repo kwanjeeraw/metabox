@@ -12,14 +12,15 @@ computeNwWordCloud(edgelist, nodelist, annotation, internalid, returnas)
 \item{nodelist}{a data frame of nodes contains node information e.g. node name, node xref.
 The first column is id. See \code{\link{fetchNetwork}} for the data frame structure.}
 
-\item{annotation}{a string specifying the type of annotations e.g. pathway and mesh.}
+\item{annotation}{a string specifying the type of annotations e.g. pathway and mesh. Mesh annotation is available for PubChem compounds only.}
 
-\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
+\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
+\code{internalid} has no effect on Mesh enrichment.}
 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
-list of nodes, edges and wordCloud result. The list contains the data frame of nodes, the data frame of edges and
+list of nodes, edges and WordCloud result. The list contains the data frame of nodes, the data frame of edges and
 the data frame of wordCloud result with the following components:
 
 \code{id} = internal neo4j id
