@@ -47,6 +47,7 @@
     var nodeTable;
     var edgeTable;
     var ptwTable;
+    var annopairTable;
     var inputTable;
     var robj;
     var cyImg;
@@ -88,31 +89,19 @@
               if (robj.enrichment.length > 0) {
                 nodeTable = drawTable('#nodes',robj.nodes);
                 edgeTable = drawTable('#edges',robj.edges);
-                ptwTable = $('#pathways').DataTable({
-                  "createdRow": function( row, data, index ){//format row color
-                    var bgc = ["#FF0000","#FFFFB3","#907FFF","#D56767","#54CCFF","#FDB462","#60DA3E","#F4B5D6","#FD49FF","#00715E"];
-                    if ( data.rank < 11 ) {
-                      $('td', row).eq(0).css({
-                        'background-color': bgc[data.rank-1]
-                      });
-                    }
-                  },
-                  "destroy": true,
-                  "scrollX": true,
-                  "scrollY": 400,
-                  "scrollCollapse": true,
-                  "data": robj.enrichment,
-                  "columns": formatTableHeader(robj.enrichment[0])
-                });
+                ptwTable = drawPieTable('#pathways',robj.enrichment);
+                annopairTable = drawTable('#annopairs',robj.pairs);
               }else{
                 if (nodeTable != undefined) {
                   nodeTable.clear().draw();
                   edgeTable.clear().draw();
                   ptwTable.clear().draw();
+                  annopairTable.clear().draw();
                 }
                 $('#nodes').empty();
                 $('#edges').empty();
                 $('#pathways').empty();
+                $('#annopairs').empty();
               }
               //Network output
               cyImg = drawNetwork(formatPieNode(robj.nodes, robj.enrichment), formatEdge(robj.edges));
@@ -128,7 +117,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, cyImg.png());
+      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, robj.pairs, cyImg.png());
     });//downloadBtn
   });
   </script>
@@ -237,6 +226,7 @@
               <li><a href="#pathway" data-toggle="tab" data-value="Pathway">Enrichment</a></li>
               <li><a href="#node" data-toggle="tab" data-value="Node">Node</a></li>
               <li><a href="#edge" data-toggle="tab" data-value="Edge">Edge</a></li>
+              <li><a href="#annopair" data-toggle="tab" data-value="AnnotationPair">AnnotationPair</a></li>
               <li class="pull-right"><h5>Summary</h5></li>
             </ul>
             <div class="tab-content">
@@ -251,6 +241,9 @@
               </div>
               <div class="tab-pane" data-value="Edge" id="edge">
                 <table id="edges" class="display" width="100%"></table>
+              </div>
+              <div class="tab-pane" data-value="AnnotationPair" id="annopair">
+                  <table id="annopairs" class="display" width="100%"></table>
               </div>
             </div>
           </div>
