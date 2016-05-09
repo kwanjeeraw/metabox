@@ -20,8 +20,10 @@ The value can be neo4j ids or grinn ids, see \code{\link{convertId}} for how to 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
-list of nodes, edges and WordCloud result. The list contains the data frame of nodes, the data frame of edges and
+list of nodes, edges and WordCloud result. The list contains the data frame of nodes, the data frame of annotation pairs and
 the data frame of wordCloud result with the following components:
+
+\code{rank} = rank sort by freq
 
 \code{id} = internal neo4j id
 
@@ -34,6 +36,8 @@ the data frame of wordCloud result with the following components:
 \code{nodexref} = cross references
 
 \code{freq} = frequency of words
+
+\code{member} = list of members of the entity set
 }
 \description{
 compute WordCloud for the list of entities (e.g. compound, protein, gene).

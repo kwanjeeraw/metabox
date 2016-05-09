@@ -9,8 +9,10 @@
 #'@param internalid boolean value, whether txtinput are neo4j ids, see \code{\link{convertId}} for how to convert ids.
 #'\code{internalid} has no effect on Mesh enrichment.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@return list of nodes, edges and WordCloud result. The list contains the data frame of nodes, the data frame of edges and
+#'@return list of nodes, edges and WordCloud result. The list contains the data frame of nodes, the data frame of annotation pairs and
 #'the data frame of wordCloud result with the following components:
+#'
+#'\code{rank} = rank sort by freq
 #'
 #'\code{id} = internal neo4j id
 #'
@@ -23,6 +25,8 @@
 #'\code{nodexref} = cross references
 #'
 #'\code{freq} = frequency of words
+#'
+#'\code{member} = list of members of the entity set
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
 #'@seealso \pkg{\link{tm}}, \pkg{\link{wordcloud}}
@@ -58,6 +62,9 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
         if(!is.null(unlist(annols))){#found annotation
           annonws = combineNetworks(annols) #combine annotation pairs
           wc = callWordCloud(edgelist = annonws$edges, nodelist = annonws$nodes) #compute wordcloud
+          wc = wc[order(wc$freq, decreasing = TRUE),]
+          wc$rank = seq(1:nrow(wc))
+          wc = wc[,c(ncol(wc),1:(ncol(wc)-1))] #rearrange columns
           networknode = annonws$nodes[annonws$nodes$nodelabel != "Pathway", ] #not return pathway nodes
           list(nodes=networknode, edges=annonws$edges, wordcloud=wc) #output
         }
@@ -83,6 +90,9 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
             networknode = data.frame(id=txtinput, gid=txtinput, nodename=txtinput, nodelabel="Compound", nodexref='', stringsAsFactors = FALSE)
           }
           wc = callWordCloud(edgelist = annonws$edges, nodelist = annonws$nodes) #compute wordcloud
+          wc = wc[order(wc$freq, decreasing = TRUE),]
+          wc$rank = seq(1:nrow(wc))
+          wc = wc[,c(ncol(wc),1:(ncol(wc)-1))] #rearrange columns
           list(nodes=networknode, edges=annonws$edges, wordcloud=wc) #output
         }
         else{#no annotation found

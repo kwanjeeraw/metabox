@@ -10,8 +10,10 @@
 #'@param internalid boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
 #'\code{internalid} has no effect on Mesh enrichment.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@return list of nodes, edges and WordCloud result. The list contains the data frame of nodes, the data frame of edges and
+#'@return list of nodes, edges, WordCloud result and annotation pairs. The list contains the data frame of nodes, the data frame of edges and
 #'the data frame of wordCloud result with the following components:
+#'
+#'\code{rank} = rank sort by freq
 #'
 #'\code{id} = internal neo4j id
 #'
@@ -24,6 +26,8 @@
 #'\code{nodexref} = cross references
 #'
 #'\code{freq} = frequency of words
+#'
+#'\code{member} = list of members of the entity set
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
 #'@seealso \code{\link{fetchNetwork}}, \code{\link{fetchHetNetwork}}, \pkg{\link{tm}}, \pkg{\link{wordcloud}}
@@ -53,10 +57,13 @@ computeNwWordCloud.default <- function (edgelist, nodelist, annotation="pathway"
         if(!is.null(unlist(annols))){#found annotation
           annonws = combineNetworks(annols) #combine annotation pairs
           wc = callWordCloud(edgelist = annonws$edges, nodelist = annonws$nodes) #compute wordcloud
-          list(nodes=nodelist, edges=edgelist, wordcloud=wc) #output
+          wc = wc[order(wc$freq, decreasing = TRUE),]
+          wc$rank = seq(1:nrow(wc))
+          wc = wc[,c(ncol(wc),1:(ncol(wc)-1))] #rearrange columns
+          list(nodes=nodelist, edges=edgelist, wordcloud=wc, pairs=annonws$edges) #output
         }
         else{#no annotation found
-          list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
+          list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame(), pairs=data.frame()) #output
         }
       }else if(tolower(annotation) == 'mesh'){#mesh wordcloud
         cat("Connecting PubChem ...\n")
@@ -67,19 +74,22 @@ computeNwWordCloud.default <- function (edgelist, nodelist, annotation="pathway"
           annopair = dplyr::right_join(nodelist[,1:2],annonws$edges[,1:2],by=c('gid' = 'target'))[,c(3,1)]
           colnames(annopair) = c('source','target')
           wc = callWordCloud(edgelist = annopair, nodelist = annonws$nodes) #compute wordcloud
-          list(nodes=nodelist, edges=edgelist, wordcloud=wc) #output
+          wc = wc[order(wc$freq, decreasing = TRUE),]
+          wc$rank = seq(1:nrow(wc))
+          wc = wc[,c(ncol(wc),1:(ncol(wc)-1))] #rearrange columns
+          list(nodes=nodelist, edges=edgelist, wordcloud=wc, pairs=annonws$edges, pairs=annopair) #output
         }
         else{#no annotation found
-          list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
+          list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame(), pairs=data.frame()) #output
         }
       }else{
         cat('Error: No database installed, returning no data ..\n')
-        list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
+        list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame(), pairs=data.frame()) #output
       }
     },error=function(e) {
       message(e)
       cat("\nError: RETURN no data ..\n")
-      list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
+      list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame(), pairs=data.frame()) #output
     })
   return(out)
 }
