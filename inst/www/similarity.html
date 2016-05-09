@@ -47,6 +47,7 @@
     var nodeTable;
     var edgeTable;
     var cloudTable;
+    var annopairTable;
     var robj;
     var clobj;
     var cyImg;
@@ -98,17 +99,23 @@
           if (cld_object.wordcloud.length > 0) {
             if(cloudTable != undefined){
               cloudTable.destroy();
+              annopairTable.destroy();
             }
             $('#wordcld').empty();
-            cloudTable = drawTable('#wordcld',cld_object.wordcloud);
+            $('#annopairs').empty();
+            cloudTable = drawPieTable('#wordcld',cld_object.wordcloud);
+            annopairTable = drawTable('#annopairs',cld_object.pairs);
           }else{
             if (cloudTable != undefined) {
               cloudTable.clear().draw();
+              annopairTable.clear().draw();
             }
             $('#wordcld').empty();
+            $('#annopairs').empty();
           }
           //Wordcloud output
-          $("#wc").rplot("plotWordCloud", {wordtable:cld_object.wordcloud})
+          $("#wc").rplot("plotWordCloud", {wordtable:cld_object.wordcloud});
+          cyImg = drawNetwork(formatPieNode(robj.nodes, cld_object.wordcloud), formatEdge(robj.edges)); //update network
         });//getObject
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
@@ -123,7 +130,7 @@
       window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment    
     });//enrBtn
     $("#downloadCld").click(function(){
-      exportTxtFile(clobj.wordcloud);     
+      exportEnrichmentZip(clobj.nodes, null, clobj.wordcloud, clobj.pairs, null);
     });//downloadCld
   });
   </script>
@@ -266,6 +273,7 @@
             <ul class="nav nav-tabs">
               <li class="active"><a href="#consolewc" data-toggle="tab" data-value="Consolewc">Console</a></li>
               <li><a href="#wordcl" data-toggle="tab" data-value="Wordcl">WordCloud</a></li>
+              <li><a href="#annopair" data-toggle="tab" data-value="AnnotationPair">AnnotationPair</a></li>
               <li class="pull-right"><h5>Summary</h5></li>
             </ul>
             <div class="tab-content">
@@ -275,8 +283,11 @@
               <div class="tab-pane" data-value="Wordcl" id="wordcl">
                 <table id="wordcld" class="display" width="100%"></table>
               </div>
-            </div>
-            <button id="downloadCld" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download table</button>
+              <div class="tab-pane" data-value="AnnotationPair" id="annopair">
+                  <table id="annopairs" class="display" width="100%"></table>
+              </div>
+            </div><br>
+            <button id="downloadCld" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
           </div>
         </div>
         <!-- /.row -->
