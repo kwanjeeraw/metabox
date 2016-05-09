@@ -75,7 +75,7 @@
             $('#pathways').empty();
             nodeTable = drawTable('#nodes',robj.nodes);
             edgeTable = drawTable('#edges',robj.edges);
-            ptwTable = drawTable('#pathways',robj.wordcloud);
+            ptwTable = drawPieTable('#pathways',robj.wordcloud);
           }else{
             if (nodeTable != undefined) {
               nodeTable.clear().draw();
@@ -88,12 +88,13 @@
           }
           //Wordcloud output
           $("#wc").rplot("plotWordCloud", {wordtable:robj.wordcloud})
+          cyImg = drawNetwork(formatPieNode(robj.nodes, robj.wordcloud), formatEdge(""),'grid');
         });//getObject    
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, robj.edges, robj.wordcloud, null);       
+      exportEnrichmentZip(robj.nodes, null, robj.wordcloud, robj.edges, cyImg.png());
     });//downloadBtn
   });
   </script>
@@ -210,12 +211,12 @@
         <hr>
         <div class="row">
           <div class="col-lg-12">
-            <div class="panel panel-warning">
+            <div class="panel panel-info">
               <div class="panel-heading">
-                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#network">WordCloud</a></h3>
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#network">Network</a></h3>
               </div>
               <div id="network" class="panel-body collapse in">
-                <div id="wc"></div>
+                <div id="cy"></div>
               </div>
             </div>
           </div>
@@ -224,6 +225,19 @@
         <div class="row">
           <div class="col-lg-12">
             <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
+          </div>
+        </div><br>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="panel panel-warning">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#network">WordCloud</a></h3>
+              </div>
+              <div id="network" class="panel-body collapse in">
+                <div id="wc"></div>
+              </div>
+            </div>
           </div>
         </div>
         <!-- /.row -->
