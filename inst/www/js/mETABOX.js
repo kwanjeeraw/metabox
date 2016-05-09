@@ -51,8 +51,8 @@ function loadTxtFile(event,id) {
 //@param img cytoscapeJS png object
 function exportNwZip(nodes, edges, img){
     var zip = new JSZip();
-    zip.file("node.txt", JSONToTabConvertor(nodes,true))
-    zip.file("edge.txt", JSONToTabConvertor(edges,true))
+    zip.file("node.txt", JSONToTabConvertor(nodes,true));
+    zip.file("edge.txt", JSONToTabConvertor(edges,true));
     zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
     zip.generateAsync({type:"base64"})
     .then(function (content) {
@@ -66,14 +66,13 @@ function exportNwZip(nodes, edges, img){
 //@function export enrichment outputs as a zip file
 //@param nodes, edges, enrichment array of json objects
 //@param img cytoscapeJS png object
-function exportEnrichmentZip(nodes, edges, enrichment, img){
+function exportEnrichmentZip(nodes, edges, enrichment, pairs, img){
     var zip = new JSZip();
-    zip.file("node.txt", JSONToTabConvertor(nodes,true))
-    zip.file("annotationPair.txt", JSONToTabConvertor(edges,true))
+    zip.file("node.txt", JSONToTabConvertor(nodes,true));
+    if (edges != null) {zip.file("edge.txt", JSONToTabConvertor(edges,true));}
     zip.file("result.txt", JSONToTabConvertor(enrichment,true));
-    if (img != null) {
-        zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
-    }
+    zip.file("annotationPair.txt", JSONToTabConvertor(pairs,true));
+    if (img != null) {zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});}
     zip.generateAsync({type:"base64"})
     .then(function (content) {
       var a = document.createElement('a'); 
@@ -187,6 +186,29 @@ function drawTable(id, data) {
       "columns": formatTableHeader(data[0])
     });
     return dtTable;
+}
+
+//@function draw table with color code
+//@param id id element
+//@param dt array of json objects
+function drawPieTable(id, dt) {
+    var pieTable = $(id).DataTable({
+        "createdRow": function( row, data, index ){//format row color
+          var bgc = ["#FF0000","#FFFFB3","#907FFF","#D56767","#54CCFF","#FDB462","#60DA3E","#F4B5D6","#FD49FF","#00715E"];
+          if ( data.rank < 11 ) {
+            $('td', row).eq(0).css({
+              'background-color': bgc[data.rank-1]
+            });
+          }
+        },
+        "destroy": true,
+        "scrollX": true,
+        "scrollY": 400,
+        "scrollCollapse": true,
+        "data": dt,
+        "columns": formatTableHeader(dt[0])
+      });
+    return pieTable;
 }
 
 //@function format node for cytoscapeJS
