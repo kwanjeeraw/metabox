@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- Core CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="bootstrap/css/sb-admin.css" rel="stylesheet">
+  <link href="bootstrap/css/mETABOX.css" rel="stylesheet">
+  <!-- Custom Fonts -->
+  <link href="bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  <!-- Core JavaScript -->
+  <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+  <script type="text/javascript" src="js/opencpu-0.5.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/mETABOX.js"></script>
+  <!-- App JavaScript -->
+  <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>
+  <script type="text/javascript" src="js/jszip.min.js"></script>
+  <script type="text/javascript" src="js/spin.js"></script>
+  <!-- App CSS -->
+  <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
+  <!-- Load nav menu -->
+  <script> 
+  $(function(){
+    $("#includedNav").load("nav.html");  
+  });
+  </script>
+  <title>mETABOX</title>
+  <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
+  <!-- Embedded script calling R -->
+  <script>
+  $(function(){
+    //global var
+    var compute_session;
+    var nodeTable;
+    var edgeTable;
+    var ptwTable;
+    var cloudTable;
+    var robj;
+    var cyImg;    
+    $("#computeBtn").click(function(){
+      var loadSpinner = showSpinner();
+      var txtinput = $("#txtinput").val().trim().split(/\s+/g);     
+      if(txtinput[0] == ''){txtinput = null;}
+      var nodetype = $("#nodetype").val();
+      var annotation = $('input[name="annotation"]:checked').val();
+      var internalid = $('#internalid').is(':checked');
+      var req = ocpu.call("computeNodeWordCloud",{txtinput:txtinput, nodetype:nodetype, annotation:annotation, internalid:internalid}, function(session) {//calls R function: fetchHetNetwork
+        compute_session = session;
+        session.getStdout(function(outtxt){
+          $("#consolemsg").text(outtxt);
+        });
+        session.getObject(function(object){
+          robj = object;
+          //Table output
+          if(robj.edges.length > 0){
+            if(nodeTable != undefined){
+              nodeTable.destroy();
+              edgeTable.destroy();
+              ptwTable.destroy();
+            }
+            $('#nodes').empty();
+            $('#edges').empty();
+            $('#pathways').empty();
+            nodeTable = drawTable('#nodes',robj.nodes);
+            edgeTable = drawTable('#edges',robj.edges);
+            ptwTable = drawTable('#pathways',robj.wordcloud);
+          }else{
+            if (nodeTable != undefined) {
+              nodeTable.clear().draw();
+              edgeTable.clear().draw();
+              ptwTable.clear().draw();
+            }
+            $('#nodes').empty();
+            $('#edges').empty();
+            $('#pathways').empty();
+          }
+          //Wordcloud output
+          $("#wc").rplot("plotWordCloud", {wordtable:robj.wordcloud})
+        });//getObject    
+        hideSpinner(loadSpinner);
+      }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
+    });//computeBtn
+    $("#downloadBtn").click(function(){
+      exportEnrichmentZip(robj.nodes, robj.edges, robj.wordcloud, null);       
+    });//downloadBtn
+  });
+  </script>
+</head>
+
+<body>
+  <div id="wrapper">
+    <!-- Navigation -->       
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div id="includedNav"></div>
+    </nav>   
+    <div id="page-wrapper">
+      <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="row">
+          <div class="col-lg-12">
+            <h3>Compute WordCloud</h3>
+            <div class="alert alert-default alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+              <i class="fa fa-info-circle"></i> Compute WordCloud for the input, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <!-- Main content -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#args" href="#">Inputs</a></h3>
+              </div>
+              <div id="args" class="panel-body collapse in">
+                <form role="form">
+                  <div class="row">
+                    <div class="col-lg-8">
+                      <div class="form-group">
+                        <label for="txtinput">Entity IDs:</label>
+                        <textarea class="form-control" id="txtinput" name="txtinput" rows="5"></textarea>
+                        <p class="help-block">Separate each ID by a new line or space e.g. 268332 217389 328500 335545 268655 2686, 282148 296126 311453 327332 293734</p>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label>or Upload a file:</label>
+                        <input type='file' id="txtinputfile" name="txtinputfile" accept='text/plain' onchange='loadTxtFile(event,"#txtinput")'>
+                        <p class="help-block">One column, separate each ID by a new line</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                  <div class="row">
+                    <div class="col-lg-3">
+                      <div class="form-group">
+                        <label>Entity type:</label>
+                        <select id="nodetype" class="form-control">
+                          <option value="compound" selected>compound</option>
+                          <option value="protein">protein</option>
+                          <option value="gene">gene</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-lg-5">
+                      <div class="form-group">
+                        <label>Select annotation: </label>
+                        <label class="radio-inline"><input type="radio" name="annotation" value="pathway" checked>Pathway</label>
+                        <label class="radio-inline"><input type="radio" name="annotation" value="mesh">Mesh</label>
+                        <p class="help-block">Mesh annotation is available for Compound only.</p>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <div class="form-group">
+                        <label>Use internal ids</label>
+                        <input id="internalid"  name="internalid" type="checkbox" value="true" checked="checked">
+                        <p class="help-block">Check whether input data use internal database ids</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                  <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
+                  <button id="clearBtn" type="reset" class="btn btn-default">Clear</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <h4>WordCloud</h4><hr>
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#console" data-toggle="tab" data-value="Console">Console</a></li>
+              <li><a href="#pathway" data-toggle="tab" data-value="WordCloud">WordCloud</a></li>
+              <li><a href="#node" data-toggle="tab" data-value="Node">Node</a></li>
+              <li><a href="#edge" data-toggle="tab" data-value="Edge">AnnotationPair</a></li>
+              <li class="pull-right"><h5>Summary</h5></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" data-value="Console" id="console">
+                <pre id="consolemsg" class="pre-scrollable"></pre>
+              </div>
+              <div class="tab-pane" data-value="Pathway" id="pathway">
+                <table id="pathways" class="display" width="100%"></table>
+              </div>
+              <div class="tab-pane" data-value="Node" id="node">
+                <table id="nodes" class="display" width="100%"></table>
+              </div>
+              <div class="tab-pane" data-value="Edge" id="edge">
+                <table id="edges" class="display" width="100%"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <hr>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="panel panel-warning">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#network">WordCloud</a></h3>
+              </div>
+              <div id="network" class="panel-body collapse in">
+                <div id="wc"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
+          </div>
+        </div>
+        <!-- /.row -->
+        <!-- notify box -->
+        <div id="notifyBox" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+          <div class="modal-dialog"><div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4>Computing ...</h4>
+            </div>
+            <div class="modal-body"><div style="height:200px">
+              <span id="loading_spinner" style="position: absolute;display: block;top: 50%;left: 50%;"></span>
+            </div></div>
+          </div></div>
+        </div>
+        <!-- /.notify box -->
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+</body>
+</html>
