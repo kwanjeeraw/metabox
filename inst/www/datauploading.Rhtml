@@ -31,7 +31,6 @@
   <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>
   <script type="text/javascript" src="js/jszip.min.js"></script>
   <script type="text/javascript" src="js/spin.js"></script>
-
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <!-- Load nav menu -->
@@ -39,7 +38,6 @@
   $(function(){
     $("#includedNav").load("nav.html");
   });
-
 
   </script>
   <title>mETABOX.DataUploading</title>
@@ -61,11 +59,9 @@
       <div id="successdiv"></div>
       <div id="errordiv"></div>
       <p style="background-color:yellow;" id="demo"></p>
-
-            <h3>Data uploading and Data Modificatio!!!!!n</h3>
+            <h3>Data uploading and Data Modification</h3>
             <button type="button" id="TRY">Click Me!</button>
             <p>Users could upload their own data file and modify data set according to needs or simply use the defalt dataset.</p>
-
         </div>
         <div class="row col-lg-12">
           <div id = "uploadtype", class = "row col-lg-12">
@@ -120,30 +116,50 @@
           <div class="tab-content">
               <div id="data_summary_tag" class="tab-pane fade in active">
               <div id="waitingFiles"> <h3 id="data_summary_tag_heading">Waiting...</h3>
-                <span>Waiting Users To Upload <span id="show_e">Expression Dataset,</span><span id="show_f"> Feature Datasets,
-                </span><span id="show_p"> Phenotype Datasets.</span></span>
+                <span id="is_Waiting"></span>
               </div>
               <div id="FilesUploaded">
+
+                <div class="sidebar">
                 <h3>Experimental Design</h3>
-                <div style="display:inline-block"><h5>Factors:</h5></div><div id="factors" style="display:inline-block"></div><span>.</span>
+                <form id="FinishUploading"><fieldset>
+                  <div style="display:inline-block"><h5>Factors: </h5></div><div id="factors" style="display:inline-block"></div><span>.</span>
+                  <a id="Edit_ind_factor" href="#">Edit</a><br/>
+                  <div style="display:inline-block"><h5>Repeated Factors: </h5></div><div id="repeated_factors" style="display:inline-block"></div>
+                  <span>.</span>
+                  <a id="Edit_rep_factor" href="#">Edit</a><br/>
+                  <!--<input type="submit" value="Submit" onclick="submit_experimental_design"><br/>-->
+                    <button type="button" id="submit_experimental_design">Submit</button>
+                </fieldset></form>
+                    <button type="button" id="Continue">Continue</button>
+                </div>
+                <div class="content" style="display: none;" id="column_options">
+                  <div class="sidebar">
+                    <div id="option"></div>
+                  </div>
+                  <div class="content" id="column_options_data">
+                     <table id="pdata_option" width="100%" height="100%"></table>
+                  </div>
+                </div>
               </div>
-
-
               </div>
               <div id="feature_data_table_tag" class="tab-pane fade">
-                <h3>Menu 1</h3>
-                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                <h3>Feature Data</h3>
+                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                <table id="fdata" width="100%"></table>
               </div>
               <div id="phenotype_data_table_tag" class="tab-pane fade">
-                <h3>Menu 2</h3>
-                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                <h3>Phenotype Data</h3>
+                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                 <table id="pdata" width="100%"></table>
               </div>
+
               <div id="expression_data_table_tag" class="tab-pane fade">
-                <h3>Menu 3</h3>
+                <h3>Expression Data</h3>
                 <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                <table id="edata" width="100%"></table>
               </div>
             </div>
-          </div>
 
 
         <!-- modals -->
