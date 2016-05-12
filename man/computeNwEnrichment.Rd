@@ -45,13 +45,15 @@ the data frame of enrichment analysis result with the following components:
 
 \code{nodexref} = cross references
 
-\code{amount} = number of members in each entity set
-
 \code{p} = entity set p-values
 
 \code{p adj} = adjusted entity set p-values
 
-\code{member} = list of members of the entity set
+\code{no_of_entities} = number of input entities in each entity set
+
+\code{total} = total number of entities in each entity set from the database, not available for Mesh
+
+\code{member} = list of entity members of the entity set
 See \code{\link{runGSA}} for more details about directional classes. Return empty list if error or found nothing.
 }
 \description{

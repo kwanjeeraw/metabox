@@ -25,13 +25,15 @@
 #'
 #'\code{nodexref} = cross references
 #'
-#'\code{amount} = number of members in each entity set
-#'
 #'\code{p} = entity set p-values
 #'
 #'\code{p adj} = adjusted entity set p-values
 #'
-#'\code{member} = list of members of the entity set
+#'\code{no_of_entities} = number of input entities in each entity set
+#'
+#'\code{total} = total number of entities in each entity set from the database, not available for Mesh
+#'
+#'\code{member} = list of entity members of the entity set
 #'See \code{\link{runGSA}} for more details about directional classes. Return empty list if error or found nothing.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references Fisher R. (1932) Statistical methods for research workers. Oliver and Boyd, Edinburgh.
@@ -69,6 +71,7 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
       if (class(nodedata) != "data.frame"){
         stop("argument 'nodedata' is not valid, data frame is required.")
       }
+      require('dplyr')
       if(tolower(annotation) == 'pathway' && foundDb()){#pathway enrichment
         cat("Querying database ...\n")
         if(internalid){
@@ -92,9 +95,33 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
           }
           era = computeEnrichment(edgelist = annonws$edges[,2:1], pval = pval, fc = NULL, method = method, size=size, returnas="dataframe") #compute enrichment
           era = era[order(era$`p adj (non-dir_)`),]
+          era = era[ , !(colnames(era) == 'no_of_entities')] #hide sum columns
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
           era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
+          #count subtotal entities
+          tatt = dplyr::left_join(annonws$edges[,1:2],annonws$nodes,by=c('target'='id')) #get target attributes
+          subtotls = tatt %>% dplyr::group_by(source,nodelabel) %>% dplyr::tally() #count entities
+          subtot = plyr::ddply(subtotls,c('source'),plyr::summarise,no_of_entities=list(paste0(nodelabel,' (',n,')')))
+          era = dplyr::left_join(era, subtot, by=c('id'='source'))
+          #count total entities
+          ptwls = unique(era$id) #list of pathways
+          ntypels = unique(annonws$nodes$nodelabel)
+          ntypels = ntypels[ntypels!="Pathway"] #list of nodetype
+          cat("Querying pathway statistics ...\n")
+          ptwstat = lapply(ptwls, function(x) {
+            lapply(ntypels, function(y) {
+              qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',y,') where ID(from) = ',x,' RETURN toString(ID(from)), labels(to), count(to)')
+              tmp = as.data.frame(curlRequest(qstring), stringsAsFactors = FALSE)
+              colnames(tmp) = c('id','nodelabel','count')
+              tmp
+            })
+          })
+          ptwstat = plyr::ldply (unlist(ptwstat, recursive = F), data.frame) #get total number of annotated nodes of a pathway
+          ptwstat = ptwstat[order(ptwstat$nodelabel),]
+          tot = plyr::ddply(ptwstat,c('id'),plyr::summarise,total=list(paste0(nodelabel,' (',count,')')))
+          era = dplyr::left_join(era,tot,by=c('id'='id'))
+          era = era[c(1:(ncol(era)-3),(ncol(era)-1),ncol(era),(ncol(era)-2))] #rearrange columns
           networknode = annonws$nodes[annonws$nodes$nodelabel != "Pathway", ] #not return pathway nodes
           list(nodes=networknode, edges=annonws$edges, enrichment=era) #output
         }
@@ -127,7 +154,7 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
           era = era[order(era$`p adj (non-dir_)`),]
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
-          era = era[,c(ncol(era),1:(ncol(era)-1))] #rearrange columns
+          era = era[,c(ncol(era),1:(ncol(era)-5),(ncol(era)-3),(ncol(era)-2),(ncol(era)-4),(ncol(era)-1))] #rearrange columns
           list(nodes=networknode, edges=annonws$edges, enrichment=era) #output
         }
         else{#no annotation found
