@@ -48,6 +48,7 @@ computeEnrichment.default <- function (edgelist, pval, fc=NULL, method="reporter
     if (class(tmparg) == "try-error") {
       stop("argument 'method' is not valid, choose one from the list: reporter,fisher,median,mean,stouffer")
     }
+    cat("Computing enrichment ...\n")
     gs = piano::loadGSC(edgelist, type="data.frame")
     gsaRes = piano::runGSA(geneLevelStats=pval, directions=fc, gsc=gs, geneSetStat=method, gsSizeLim=size)
     resTab = piano::GSAsummaryTable(gsaRes)
@@ -58,10 +59,11 @@ computeEnrichment.default <- function (edgelist, pval, fc=NULL, method="reporter
     colnames(resTab) = gsub("Genes","amount",colnames(resTab))
     colnames(resTab) = gsub("Name","id",colnames(resTab))
     colnames(resTab) = gsub("\\.","_",colnames(resTab))
-    drops = c("Stat (non-dir_)","Stat (dist_dir_up)","Stat (dist_dir_dn)","Stat (mix_dir_up)","Stat (mix_dir_dn)")
+    colnames(resTab) = gsub("amount \\(tot\\)","no_of_entities",colnames(resTab))
+    drops = c("Stat (non-dir_)","Stat (dist_dir_up)","Stat (dist_dir_dn)","Stat (mix_dir_up)","Stat (mix_dir_dn)","amount (down)","amount (up)")
     resTab = resTab[ , !(colnames(resTab) %in% drops)] #hide stat columns
-    resTab = resTab[,c(1,ncol(resTab),2:(ncol(resTab)-1))] #rearrange columns
-    cat("Returning output of size ",nrow(resTab)," ...\n")
+    #resTab = resTab[,c(1,ncol(resTab),2:(ncol(resTab)-1))] #rearrange columns
+    cat("Returning enrichment of size ",nrow(resTab)," ...\n")
     if(nrow(resTab)>0){
       ## output
       switch(returnas,
