@@ -60,6 +60,7 @@ formatNode.LIST = function(x,y,z){
   }
 }
 
+#MESH contains Chemicals and Drugs Category tree (D) starting from level 3
 formatMesh = function(x){
   #don't want root, itself, mesh = Supplementary Records
   if(unlist(x$ParentID) != "root" && x$Information$Name != "Supplementary Records" && !is.null(x$Information$ChildID)){
