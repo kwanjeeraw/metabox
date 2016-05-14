@@ -10,7 +10,7 @@ plotWordCloud(wordtable)
 \item{wordtable}{data frame of word frequency}
 }
 \description{
-plot WordCloudread overriding wordcloud for GUI
+plot WordCloud by overriding wordcloud for using in opencpu app.
 }
 \examples{
 # plotWordCloud("wordtable")

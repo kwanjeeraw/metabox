@@ -7,11 +7,12 @@
 callMesh(pcid)
 }
 \arguments{
-\item{pcid}{pubchem ID}
+\item{pcid}{a string of PubChem CID}
 }
 \value{
-list of nodes and edges. The list contains the data frame of nodes or Mesh and the data frame of edges or annotation pair.
-list of nodes with the following components:
+list of data frame of nodes and data frame of edges with the following components:
+
+nodes:
 
 \code{id} = mesh id
 
@@ -22,7 +23,8 @@ list of nodes with the following components:
 \code{nodelabel} = Mesh
 
 #'\code{nodexref} = mesh id
-edgelist with the following components:
+
+edges:
 
 \code{source, target} = node
 
@@ -33,7 +35,7 @@ edgelist with the following components:
 Return empty list of data frame if error or found nothing.
 }
 \description{
-retrieve Mesh for a given pubchemID from PubChem
+retrieve Mesh terms for a given PubChem CID from PubChem
 }
 \examples{
 # mesh = callMesh(345)

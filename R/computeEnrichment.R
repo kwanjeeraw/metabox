@@ -1,28 +1,25 @@
 #'Perform enrichment analysis
-#'@description perform enrichment analysis by integrating the statistical values of molecular entities and the compound, protein or gene set collections.
-#'The function wraps around the main functions of \pkg{\link{piano}}.
+#'@description perform enrichment analysis from p-values of entities. The function wraps around the main functions of \pkg{\link{piano}}.
 #'@usage computeEnrichment(edgelist, pval, fc, method, size, returnas)
-#'@param edgelist a two-column data frame of molecular entities and entity set collections.
-#'The first column contains molecular entities and the second column contains entity set collections. See \code{\link{loadGSC}} for details.
-#'@param pval a numeric vector containing the p-values of molecular entities, computed from statistical analysis,
-#'with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.
-#'@param fc a numeric vector containing fold changes or sign information (positive or negative) of molecular entities
-#'with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.
+#'@param edgelist a two-column data frame of annotation pairs. The 1st column contains annotated entities and the 2nd column contains annotation terms. See \code{\link{loadGSC}} for details.
+#'@param pval a numeric vector of statistical values e.g. p-values. The name attributes must be identical to the names of entities. See \code{\link{runGSA}} for details.
+#'@param fc a numeric vector of fold changes or sign information (positive or negative) with name attributes identical to the names of entities. See \code{\link{runGSA}} for details. Default is NULL.
 #'@param method a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}
-#'@param size a numeric vector specifying the minimum and maximum number of members in each entity set collection to be used in the analysis. Default is c(3,500).
+#'@param size a numeric vector specifying the minimum and maximum number of members in each annotation term to be used in the analysis. Default is c(3,500).
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
 #'@return enrichment analysis result with the following components:
 #'
-#'\code{id} = id of entity set
+#'\code{id} = annotation id
 #'
-#'\code{amount} = number of members in each entity set
+#'\code{no_of_entities} = number of members in each annotation term
 #'
-#'\code{p} = entity set p-values
+#'\code{p} = raw p-values
 #'
-#'\code{p adj} = adjusted entity set p-values
+#'\code{p adj} = adjusted p-values
 #'
-#'\code{member} = list of entities
-#'See \code{\link{runGSA}} for more details about directional classes. Return empty list or data frame if error or found nothing.
+#'\code{member} = list of entity members of the annotation term
+#'
+#'Return empty list or data frame if error or found nothing.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references Fisher R. (1932) Statistical methods for research workers. Oliver and Boyd, Edinburgh.
 #'@references Stouffer S., Suchman E., Devinney L., Star S., and Williams R. (1949) The American soldier: adjustment during army life. Princeton University Press, Oxford, England.
@@ -31,13 +28,9 @@
 #'@references Väremo L., Nielsen J., and Nookaew I. (2013) Enriching the gene set analysis of genome-wide data by incorporating directionality of gene expression and combining statistical hypotheses and methods. Nucleic Acids Research, 41(8), pp. 4378-4391.
 #'@seealso \code{\link{loadGSC}}, \code{\link{runGSA}}, \code{\link{GSAsummaryTable}}
 #'@examples
-#'#kw <- c('G15729','G17561','G16015','G18145','G16708')
-#'#grinnNW <- fetchGrinnNetwork(txtInput=kw, from="metabolite", to="protein")
-#'#library(grinn)
-#'#data(dummyStat)
-#'#result <- fetchSubnetwork(statInput = dummyStat, nwInput = grinnNW)
-#'#library(igraph)
-#'#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
+#'#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
+#'#pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790), stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
+#'#result <- computeNwEnrichment(simnw$edges, simnw$nodes, annotation="mesh", pval, internalid = FALSE)
 #'@export
 computeEnrichment <- function(edgelist, pval, fc=NULL, method="reporter", size=c(3,500), returnas="dataframe") UseMethod("computeEnrichment")
 #'@export
@@ -52,7 +45,6 @@ computeEnrichment.default <- function (edgelist, pval, fc=NULL, method="reporter
     gs = piano::loadGSC(edgelist, type="data.frame")
     gsaRes = piano::runGSA(geneLevelStats=pval, directions=fc, gsc=gs, geneSetStat=method, gsSizeLim=size)
     resTab = piano::GSAsummaryTable(gsaRes)
-
     cat("Formatting output ...\n")
     resTab$member = lapply(resTab$Name, function(x) names(piano::geneSetSummary(gsaRes, geneSet=x)$geneLevelStats)) #get members
     #format colnames

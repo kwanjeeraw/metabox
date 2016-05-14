@@ -4,21 +4,19 @@
 \alias{curlRequest}
 \title{Execute query}
 \usage{
-curlRequest(param)
-}
-\arguments{
-\item{cypher}{a string of Cypher (default) or url a string of url}
+curlRequest(cypher)
 }
 \value{
 list or data frame. Return no data if found nothing.
 }
 \description{
-execute query using Cypher or url as an input. The function calls curlPerform from \pkg{RCurl} for sending HTTP request to the graph database.
+execute query using the function \code{\link{curlPerform}} from \pkg{RCurl} for sending HTTP request to the database.
 }
 \examples{
-# Query metabolites by database id
-#querystring <- "UNWIND ['MT-TF','MT-ND3'] AS x WITH x MATCH (node:Gene) WHERE node.name = x RETURN DISTINCT node"
-#result <- curlRequest(querystring)
+# Query by neo4j id
+#querystring <- "MATCH (n) WHERE ID(n) = 0 RETURN n"
+#result <- curlRequest.TRANSACTION(querystring)
+# Query by url
 #url <- "http://localhost:7474/db/data/node/306/relationships/out"
 #result <- curlRequest.URL(url)
 }

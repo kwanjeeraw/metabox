@@ -7,34 +7,40 @@
 callBionet(edgelist, nodelist, pval, fdr)
 }
 \arguments{
-\item{edgelist}{a data frame of edges}
+\item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
 
-\item{nodelist}{a data frame of nodes containin node information e.g. node name, node xref. Default is NULL.}
+\item{nodelist}{a data frame of nodes contains node attributes e.g. node id, node name, node xref. Default is NULL.}
 
-\item{pval}{a numeric vector of p-values with name attributes}
+\item{pval}{a numeric vector of p-values with name attributes identical to the names of network nodes.}
 
 \item{fdr}{a numeric value specifying false discovery rate. Default is 0.05.}
 }
 \value{
-list of nodes and edges. The list contains the data frame of nodes and the data frame of edges.
-Return empty list of data frame if error or found nothing.
+list of data frame of nodes and data frame of edges with the following components:
+
+nodes:
+
+\code{nodeAttributes} = node attributes provided
+
+\code{score} = node score: positive values = signal content and negative values = background noise
+
+edges:
+
+\code{source, target}
+
+\code{edgeAttributes} = edge attributes provided
+
+Return list of empty data frame if error or found nothing.
 }
 \description{
-compute a maximum scoring subnetwork or module by integrating omic data and the biological network.
-The function wraps around the main functions of \pkg{\link{BioNet}} including \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}.
-}
-\details{
-The method \code{bionet} encapsulates the main functions from \pkg{\link{BioNet}} to compute a functional module or significanly changed subnetworks.
-Those functions include: \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}.
+compute a maximum scoring subnetwork from p-values of the nodes of a network.
+The function wraps around the main steps of \pkg{\link{BioNet}} including \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}
+to compute a subnetwork.
 }
 \examples{
-#kw <- c('G15729','G17561','G16015','G18145','G16708')
-#grinnNW <- fetchGrinnNetwork(txtInput=kw, from="metabolite", to="protein")
-#library(grinn)
-#data(dummyStat)
-#result <- fetchSubnetwork(statInput = dummyStat, nwInput = grinnNW)
-#library(igraph)
-#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
+#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
+#pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790),stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
+#result <- computeSubnetwork(sim$edges,sim$nodes,pval=pval,internalid = F)
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

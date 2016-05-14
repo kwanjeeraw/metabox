@@ -1,28 +1,35 @@
 #'Compute a maximum scoring subnetwork
-#'@description compute a maximum scoring subnetwork or module by integrating omic data and the biological network.
-#'The function wraps around the main functions of \pkg{\link{BioNet}} including \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}.
+#'@description compute a maximum scoring subnetwork from p-values of the nodes of a network.
+#'The function wraps around the main steps of \pkg{\link{BioNet}} including \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}
+#'to compute a subnetwork.
 #'@usage callBionet(edgelist, nodelist, pval, fdr)
-#'@param edgelist a data frame of edges
-#'@param nodelist a data frame of nodes containin node information e.g. node name, node xref. Default is NULL.
-#'@param pval a numeric vector of p-values with name attributes
+#'@param edgelist a data frame of edges contains at least a source column (1st column) and a target column (2nd column).
+#'@param nodelist a data frame of nodes contains node attributes e.g. node id, node name, node xref. Default is NULL.
+#'@param pval a numeric vector of p-values with name attributes identical to the names of network nodes.
 #'@param fdr a numeric value specifying false discovery rate. Default is 0.05.
-#'@details
-#'The method \code{bionet} encapsulates the main functions from \pkg{\link{BioNet}} to compute a functional module or significanly changed subnetworks.
-#'Those functions include: \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}.
-#'@return list of nodes and edges. The list contains the data frame of nodes and the data frame of edges.
-#'Return empty list of data frame if error or found nothing.
+#'@return list of data frame of nodes and data frame of edges with the following components:
+#'
+#'nodes:
+#'
+#'\code{nodeAttributes} = node attributes provided
+#'
+#'\code{score} = node score: positive values = signal content and negative values = background noise
+#'
+#'edges:
+#'
+#'\code{source, target}
+#'
+#'\code{edgeAttributes} = edge attributes provided
+#'
+#'Return list of empty data frame if error or found nothing.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references Beisser D., Klau GW., Dandekar T., Müller T. and Dittrich MT. (2010) BioNet: an R-Package for the functional analysis of biological networks. Bioinformatics, 26(8):1129-30
 #'@references Dittrich MT., Klau GW., Rosenwald A., Dandekar T., Müller T. (2008) Identifying functional modules in protein-protein interaction networks: an integrated exact approach. Bioinformatics, 24(13):i223-31
 #'@seealso \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}
 #'@examples
-#'#kw <- c('G15729','G17561','G16015','G18145','G16708')
-#'#grinnNW <- fetchGrinnNetwork(txtInput=kw, from="metabolite", to="protein")
-#'#library(grinn)
-#'#data(dummyStat)
-#'#result <- fetchSubnetwork(statInput = dummyStat, nwInput = grinnNW)
-#'#library(igraph)
-#'#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
+#'#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
+#'#pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790),stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
+#'#result <- computeSubnetwork(sim$edges,sim$nodes,pval=pval,internalid = F)
 callBionet <- function (edgelist, nodelist, pval, fdr){
   out <- tryCatch(
   {
@@ -32,7 +39,6 @@ callBionet <- function (edgelist, nodelist, pval, fdr){
     scoredNw = BioNet::scoreNodes(network = grph, fb = fbModel, fdr = fdr)
     mdule = NULL #set default
     mdule = BioNet::runFastHeinz(network = grph, scores = scoredNw)
-
     if(length(igraph::E(mdule))>0){
       cat("Formatting subnetwork ...\n")
       ns = lapply(igraph::list.vertex.attributes(mdule),function(x) igraph::get.vertex.attribute(mdule,x))
@@ -51,8 +57,7 @@ callBionet <- function (edgelist, nodelist, pval, fdr){
       cat("Found 0 node and 0 edge...\n")
       list(nodes=data.frame(), edges=data.frame())
     }
-  },
-  error=function(e) {
+  },error=function(e) {
     message(e)
     cat("\nError: RETURN no network ..\n")
     list(nodes=data.frame(), edges=data.frame()) # Choose a return value in case of error

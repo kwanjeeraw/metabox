@@ -1,5 +1,5 @@
-#'Query relationship(s) with url
-#'@description retrieve relationship information from the graph database with url. The results include source node, target node, relationship type, dataSource and properties, if applicable.
+#'Query relationships with url
+#'@description retrieve relationship information from the database with url. The results include source node, target node, relationship type, dataSource and properties, if applicable.
 #'@usage fetchRelationship(url, returnas)
 #'@param url a string specifying relationship url.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
@@ -20,40 +20,40 @@
 #'\code{properties} = relationship properties
 #'
 #'Return empty list or data frame if error or found nothing.
-#'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
+#'@note curlRequest.TRANSACTION is used in other functions to improve speed.
+#'@author Kwanjeera W \email{kwanich@@ucdavis.edu
 #'@examples
 #'# Query genes by name
-#'#result <- fetchRelationship("http://localhost:7474/db/data/relationship/53")
-#'#result <- fetchRelationship("http://localhost:7474/db/data/node/306/relationships/out")
-#'#result <- fetchRelationship("http://localhost:7474/db/data/node/51/relationships/in")
+#'#result <- fetchRelationship("http://localhost:7474/db/data/relationship/0")
+#'#result <- fetchRelationship("http://localhost:7474/db/data/node/0/relationships/out")
+#'#result <- fetchRelationship("http://localhost:7474/db/data/node/0/relationships/in")
 #'
 fetchRelationship <- function(url, returnas="dataframe") UseMethod("fetchRelationship")
 #'
 fetchRelationship.default <- function(url, returnas="dataframe"){
   out <- tryCatch(
   {
+    require('doParallel')
+    doParallel::registerDoParallel(cores = 2)
     rel = curlRequest.URL(url)
     reldf = data.frame(t(sapply(rel,c)))
-    
     #cat("Format and returning relationship of size ",nrow(reldf)," ...\n")
     pathls = foreach(i=1:nrow(reldf), .combine=rbind) %dopar% {
       formatPathOutput(reldf[i,])
     }
-    
     ## output
     switch(returnas,
            dataframe = pathls,
            list = split(pathls, seq(nrow(pathls))),
            json = jsonlite::toJSON(pathls),
            stop("Error: incorrect 'returnas' type"))
-  },
-  error=function(e) {
+  },error=function(e) {
     message(e)
     cat("\nError: RETURN no relationship ..\n")
     switch(returnas,
            dataframe = data.frame(),
            list = list(),
            json = list())
-  })    
+  })
   return(out)
 }

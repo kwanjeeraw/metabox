@@ -1,7 +1,6 @@
 #'Start GUI
 #'@description start GUI as shiny app.
 #'@usage runGUI()
-#'@return shiny app
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@export
 runGUI<-function() UseMethod("runGUI")

@@ -1,7 +1,6 @@
 #'Get database location
 #'@description get database location of the current working envornment.
-#'By default the database lacation is http://grinn.genomecenter.ucdavis.edu:7474/db/data/cypher
-#'which is the human database.
+#'By default the database lacation is http://localhost:7474/db/data/cypher
 #'@usage getGraphDb()
 #'@return url of the database location.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}

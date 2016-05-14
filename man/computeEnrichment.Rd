@@ -7,47 +7,40 @@
 computeEnrichment(edgelist, pval, fc, method, size, returnas)
 }
 \arguments{
-\item{edgelist}{a two-column data frame of molecular entities and entity set collections.
-The first column contains molecular entities and the second column contains entity set collections. See \code{\link{loadGSC}} for details.}
+\item{edgelist}{a two-column data frame of annotation pairs. The 1st column contains annotated entities and the 2nd column contains annotation terms. See \code{\link{loadGSC}} for details.}
 
-\item{pval}{a numeric vector containing the p-values of molecular entities, computed from statistical analysis,
-with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
+\item{pval}{a numeric vector of statistical values e.g. p-values. The name attributes must be identical to the names of entities. See \code{\link{runGSA}} for details.}
 
-\item{fc}{a numeric vector containing fold changes or sign information (positive or negative) of molecular entities
-with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
+\item{fc}{a numeric vector of fold changes or sign information (positive or negative) with name attributes identical to the names of entities. See \code{\link{runGSA}} for details. Default is NULL.}
 
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 
-\item{size}{a numeric vector specifying the minimum and maximum number of members in each entity set collection to be used in the analysis. Default is c(3,500).}
+\item{size}{a numeric vector specifying the minimum and maximum number of members in each annotation term to be used in the analysis. Default is c(3,500).}
 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
 enrichment analysis result with the following components:
 
-\code{id} = id of entity set
+\code{id} = annotation id
 
-\code{amount} = number of members in each entity set
+\code{no_of_entities} = number of members in each annotation term
 
-\code{p} = entity set p-values
+\code{p} = raw p-values
 
-\code{p adj} = adjusted entity set p-values
+\code{p adj} = adjusted p-values
 
-\code{member} = list of entities
-See \code{\link{runGSA}} for more details about directional classes. Return empty list or data frame if error or found nothing.
+\code{member} = list of entity members of the annotation term
+
+Return empty list or data frame if error or found nothing.
 }
 \description{
-perform enrichment analysis by integrating the statistical values of molecular entities and the compound, protein or gene set collections.
-The function wraps around the main functions of \pkg{\link{piano}}.
+perform enrichment analysis from p-values of entities. The function wraps around the main functions of \pkg{\link{piano}}.
 }
 \examples{
-#kw <- c('G15729','G17561','G16015','G18145','G16708')
-#grinnNW <- fetchGrinnNetwork(txtInput=kw, from="metabolite", to="protein")
-#library(grinn)
-#data(dummyStat)
-#result <- fetchSubnetwork(statInput = dummyStat, nwInput = grinnNW)
-#library(igraph)
-#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
+#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
+#pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790), stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
+#result <- computeNwEnrichment(simnw$edges, simnw$nodes, annotation="mesh", pval, internalid = FALSE)
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

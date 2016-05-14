@@ -2,43 +2,49 @@
 % Please edit documentation in R/computeCorrelation.R
 \name{computeCorrelation}
 \alias{computeCorrelation}
-\title{Compute a weighted correlation network}
+\title{Compute weighted correlation network}
 \usage{
 computeCorrelation(x, y, xtype, ytype, internalid, coef, pval, method, returnas)
 }
 \arguments{
-\item{x}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
+\item{x}{a data frame of raw or quantified data e.g. gene expression data, metabolite intensities.
 Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.}
 
-\item{y}{a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
-Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.}
+\item{y}{a data frame of raw or quantified data e.g. gene expression data, metabolite intensities.
+Columns are samples and rows are molecular entities e.g. genes, proteins or compounds. See details.}
 
-\item{xtype}{a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.}
+\item{xtype}{a string specifying a node type (default = NULL). If provided and the database is installed, node attributes will be automatically retrieved from the database.
+For database query, the value can be one of compound, protein, gene, rna, dna.}
 
-\item{ytype}{a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.}
+\item{ytype}{a string specifying a node type (default = NULL).}
 
-\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.}
+\item{internalid}{a logical value indicating whether the network nodes are neo4j ids, if TRUE (default). See \code{\link{convertId}} for how to convert ids.
+It has no effect if \code{xtype} = NULL or there is no database installed.}
 
 \item{coef}{a numeric value specifying the minimum absolute correlation coefficient to be included in the output (from 0 to 1, default is 0.7).}
 
 \item{pval}{a numeric value specifying the maximum p-value to be included in the output (default is 0.05).}
 
-\item{method}{a string specifying method to compute correlation. It can be one of pearson, kendall, spearman (default) see \code{\link{cor}}.}
+\item{method}{a string specifying method for computing correlation. It can be one of pearson, kendall, spearman (default). See \code{\link{cor}} for details.}
 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
-list of nodes with the following components:
+list of network information with the following components:
 
-\code{id} = node id
+nodes:
 
-\code{gid} = node gid
+\code{id} = node id or node neo4j id
 
-\code{nodename} = node name
+\code{gid} = node id or node grinn id
 
-edgelist with the following components:
+\code{nodename} =  node id or node name
 
-\code{source, target} = node id
+\code{nodelabel} = node type if provided
+
+edges:
+
+\code{source, target} = node id or node neo4j id
 
 \code{coef} = correlation coefficient
 
@@ -48,34 +54,29 @@ edgelist with the following components:
 
 \code{type} = relationship type
 
-Return empty list or data frame if error or found nothing.
+Return empty list if error or found nothing.
 }
 \description{
-compute the correlation network for one or two omic data sets.
-The function wraps around \code{\link{corAndPvalue}} function of \pkg{\link{WGCNA}}.
-Correlation coefficients, p-values and correlation directions are calculated.
-The correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
+compute the correlation network of entities from one or two quantified data sets, see details.
 }
 \details{
-x and y are data frame in which columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
-If y is given, then the correlations between the molecular entities of x and of y are computed. Otherwise the correlations between molecular entities of x are computed.
-If grinn functions will be used further, we recommend using the grinn ids for entities, see \code{\link{convertId}}.
+The function wraps around \code{\link{corAndPvalue}} function of \pkg{\link{WGCNA}}. Correlation coefficients, p-values and correlation directions are calculated.
+The correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
+
+x and y are data frame in which columns are samples and rows are entities.
+If y is given, then the correlations between the x entities and y entities are computed. Otherwise the correlations between x entities are computed.
+}
+\note{
+If only one data set \code{x} is provided and the database is installed, node attributes will be automatically retrieved from the database. Otherwise node attributes will be the original input.
 }
 \examples{
-# Compute a correlation network of metabolites
-#dummy <- rbind(nodetype=rep("metabolite"),t(mtcars))
-#colnames(dummy) <- c('G1.1','G27967','G371','G4.1',paste0('G',sample(400:22000, 28)))
-#result <- fetchCorrNetwork(datNormX=dummy, datNormY=NULL, corrCoef=0.7, pval=1e-12, method="spearman", returnAs="tab")
-#library(igraph)
-#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
-# Compute a correlation network of metabolites and proteins
-#dummyX <- rbind(nodetype=rep("metabolite"),t(mtcars)[,1:16])
-#colnames(dummyX) <- c('G1.1','G27967','G371','G4.1',paste0('G',sample(400:22000, 12)))
-#dummyY <- rbind(nodetype=rep("protein"),t(mtcars)[,17:32])
-#colnames(dummyY) <- c('P28845','P08235','Q08AG9','P80365',paste0('P',sample(10000:80000, 12)))
-dummyX <- mtcars[1:16,]
-dummyY <- mtcars[17:32,]
-#result <- computeCorrelation(x=dummyX, y=dummyY, coef=0.7, pval=1e-4, method="spearman", returnas="dataframe")
+# Compute a correlation network from compound data
+#dt <- data.frame(id=seq(32), mtcars, row.names = NULL) #data frame of x
+#result <- computeCorrelation(x = dt, xtype = "compound", coef=0.9, pval = 1e-10)
+# Compute a correlation network from two data sets
+#dtX <- data.frame(id=seq(16), mtcars[1:16,], row.names = NULL) #data frame of x
+#dtY <- data.frame(id=seq(17,32), mtcars[17:32,], row.names = NULL) #data frame of x
+#result <- computeCorrelation(x=dtX, y=dtY, coef=0.9, pval = 1e-7)
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

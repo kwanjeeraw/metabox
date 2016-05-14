@@ -1,8 +1,9 @@
 #'Retrieve Mesh from PubChem
-#'@description retrieve Mesh for a given pubchemID from PubChem
-#'@param pcid pubchem ID
-#'@return list of nodes and edges. The list contains the data frame of nodes or Mesh and the data frame of edges or annotation pair.
-#'list of nodes with the following components:
+#'@description retrieve Mesh terms for a given PubChem CID from PubChem
+#'@param pcid a string of PubChem CID
+#'@return list of data frame of nodes and data frame of edges with the following components:
+#'
+#'nodes:
 #'
 #'\code{id} = mesh id
 #'
@@ -13,7 +14,8 @@
 #'\code{nodelabel} = Mesh
 #'
 #'#'\code{nodexref} = mesh id
-#'edgelist with the following components:
+#'
+#'edges:
 #'
 #'\code{source, target} = node
 #'
@@ -25,8 +27,7 @@
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@examples
 #'# mesh = callMesh(345)
-callMesh <- function(pcid) UseMethod("callMesh")
-callMesh.default <- function(pcid){
+callMesh <- function(pcid){
   out <- tryCatch(
     {
       cat("Retrieving Mesh from PubChem ...\n")

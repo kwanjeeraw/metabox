@@ -6,9 +6,6 @@
 \usage{
 runGUI()
 }
-\value{
-shiny app
-}
 \description{
 start GUI as shiny app.
 }

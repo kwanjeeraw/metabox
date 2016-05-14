@@ -1,31 +1,36 @@
-#'Compute a partial correlation network
-#'@description compute the partial correlation network for omic data.
-#'The function wraps around the functions of \pkg{\link{qpgraph}}.
-#'Partial correlation coefficients, p-values and correlation directions are calculated.
-#'The partial correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
+#'Compute partial correlation network
+#'@description compute the partial correlation network of entities from raw or quantified data, see details.
 #'@usage computeParCorrelation(x, xtype, internalid, coef, pval, alpha, epsilon, matrix.completion, returnas)
-#'@param x a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
-#'Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
-#'@param xtype a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.
-#'@param internalid boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
+#'@param x a data frame of raw or quantified data e.g. gene expression data, metabolite intensities.
+#'Columns are samples and rows are entities e.g. genes, proteins or compounds.
+#'@param xtype a string specifying a node type (default = NULL). If provided and the database is installed, node attributes will be automatically retrieved from the database.
+#'For database query, the value can be one of compound, protein, gene, rna, dna.
+#'@param internalid a logical value indicating whether the network nodes are neo4j ids, if TRUE (default). See \code{\link{convertId}} for how to convert ids.
+#'It has no effect if \code{xtype} = NULL or there is no database installed.
 #'@param coef a numeric value specifying the minimum absolute partial correlation coefficient to be included in the output (from 0 to 1, default is 0.7).
 #'@param pval a numeric value specifying the maximum p-value to be included in the output (default is 0.05).
 #'@param alpha a numeric value specifying significance level of each test used in \code{\link{qpAvgNrr}}.
 #'@param epsilon a numeric value specifying the maximum cutoff value of the non-rejection rate met by the edges that are included in the qp-graph, see \code{\link{qpGraph}}.
 #'@param matrix.completion a string specifying algorithm to employ in the matrix completion operations used in \code{\link{qpPAC}}
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@return
-#'list of nodes with the following components:
+#'@details The function wraps around the functions of \pkg{\link{qpgraph}}.
+#'Partial correlation coefficients, p-values and correlation directions are calculated.
+#'The partial correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
+#'@return list of network information with the following components:
 #'
-#'\code{id} = node id
+#'nodes:
 #'
-#'\code{gid} = node gid
+#'\code{id} = node id or node neo4j id
 #'
-#'\code{nodename} = node name
+#'\code{gid} = node id or node grinn id
 #'
-#'edgelist with the following components:
+#'\code{nodename} =  node id or node name
 #'
-#'\code{source, target} = node
+#'\code{nodelabel} = node type if provided
+#'
+#'edges:
+#'
+#'\code{source, target} = node id or node neo4j id
 #'
 #'\code{coef} = partial correlation coefficient
 #'
@@ -35,18 +40,15 @@
 #'
 #'\code{type} = relationship type
 #'
-#'Return empty list or data frame if error or found nothing.
+#'Return empty list if error or found nothing.
+#'@note If the database is installed, node attributes will be automatically retrieved from the database. Otherwise node attributes will be the original input.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references Castelo R. and Roverato A. (2006) A robust procedure for Gaussian graphical model search from microarray data with p larger than n. J. Mach. Learn. Res., 7:2621-2650.
 #'@references Castelo R. and Roverato A. (2009) Reverse engineering molecular regulatory networks from microarray data with qp-graphs. J Comput Biol, 16(2), pp. 213-27.
 #'@seealso \pkg{\link{qpgraph}}, \code{\link{qpAvgNrr}}, \code{\link{qpGraph}}, \code{\link{qpPAC}}
-#'#library(qpgraph)
-#'#library(snow)
-#'#library(rlecuyer)
-#'#datNorm = read.csv("~/Documents/grinn_sample/lung_miyamoto/metAdj.txt",sep="\t",header=TRUE)
-#'#datNorm = datNorm[-1,] #exclude nodetype
-#'#dt = sapply(datNorm, function(x) as.numeric(as.character(x)))
-#'#nw = fetchPtCorrNetwork(datNorm=dt)
+#'@examples
+#'#dt <- data.frame(id=row.names(mtcars), mtcars, row.names = NULL) #data frame of x
+#'#result <- computeParCorrelation(x = dt)
 #'@export
 computeParCorrelation <- function(x, xtype=NULL, internalid = TRUE, coef=0.7, pval=0.05, alpha=0.05, epsilon=0.5, matrix.completion="IPF", returnas="dataframe") UseMethod("computeParCorrelation")
 #'@export
@@ -116,8 +118,7 @@ computeParCorrelation.default <- function (x, xtype=NULL, internalid = TRUE, coe
                list = list(nodes = list(), edges = list()),
                json = list(nodes = "", edges = ""))
       }
-    },
-    error=function(e) {
+    },error=function(e) {
       message(e)
       cat("\nError: RETURN no network ..\n")
       switch(returnas,

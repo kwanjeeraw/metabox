@@ -1,18 +1,37 @@
-#'Compute wordcloud for a given annotation
-#'@description compute wordcloud for a given annotation retrieved from e.g. \code{\link{fetchNetwork}}.
-#'@param edgelist a data frame of annotation pairs (e.g. source target = pathway compound)
-#'@param nodelist a data frame of nodes containin node information e.g. node id, node gid, node name, node xref.
-#'@seealso \code{\link{fetchNetwork}}, \code{\link{fetchHetNetwork}}, \pkg{\link{tm}}, \pkg{\link{wordcloud}}
-#'@return data frame of word frequency. Return empty data frame if error or found nothing.
+#'Compute wordCloud
+#'@description compute wordCloud of given annotation pairs retrieved from e.g. \code{\link{fetchNetwork}}.
+#'@usage callWordCloud(edgelist, nodelist)
+#'@param edgelist a data frame of annotation pairs. A source column (1st column) contains annotation terms and a target column (2nd column) contains annotated entities.
+#'@param nodelist a data frame of node attributes e.g. node neo4j id, node grinn id, node name, node xref.
+#'@seealso \pkg{\link{tm}}, \pkg{\link{wordcloud}}
+#'@return data frame of wordcloud contains the following components:
+#'
+#'\code{rank} = rank sort by freq
+#'
+#'\code{id} = annotation id or annotation neo4j id
+#'
+#'\code{gid} = annotation id or annotation grinn id
+#'
+#'\code{nodename} = annotation name
+#'
+#'\code{nodelabel} = annotation type
+#'
+#'\code{nodexref} = cross references
+#'
+#'\code{freq} = frequency of the annotation term
+#'
+#'\code{member} = list of members of the annotation term
+#'
+#'Return empty data frame if error or found nothing.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
+#'@references http://www.sthda.com/english/wiki/text-mining-and-word-cloud-fundamentals-in-r-5-simple-steps-you-should-know
+#'@seealso \pkg{\link{tm}}
 #'@examples
-#'# pc = read.csv("~/Desktop/testGrinn/pubchemls.txt")
-#'# nw = fetchNetworkByGID(to=pc$GrinnID,fromtype = "pathway",totype = "compound",reltype = "annotation")
-#'# wd = callWordCloud(nw$edges,nw$nodes)
-#'# wordcloud::wordcloud(words = gsub(" - Mus musculus \\(mouse\\)","",wd$nodename), freq = wd$freq, scale=c(2,.1),min.freq = 1,max.words=50, random.order=FALSE, rot.per=0.5, colors=brewer.pal(8, "Dark2"))
-#'# barplot(wd$freq[1:10], las = 2, names.arg = gsub(" - Mus musculus \\(mouse\\)","",wd$nodename[1:10]), col ="lightblue", main ="Most frequent words", ylab = "Word frequencies")
-callWordCloud <- function(edgelist, nodelist) UseMethod("callWordCloud")
-callWordCloud.default <- function(edgelist, nodelist){
+#'#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
+#'#result <- computeNwWordCloud(simnw$edges, simnw$nodes, annotation="mesh", internalid=FALSE)
+#'#wordcloud::wordcloud(words = result$wordcloud$nodename, freq = result$wordcloud$freq, scale=c(2,.1),min.freq = 1,max.words=50, random.order=FALSE, rot.per=0.5, colors=RColorBrewer::brewer.pal(8, "Dark2"))
+#'#barplot(result$wordcloud$freq[1:10], las = 2, names.arg = result$wordcloud$nodename[1:10], col ="lightblue", main ="Most frequent words", ylab = "Word frequencies")
+callWordCloud <- function(edgelist, nodelist){
   out <- tryCatch(
   {
     cat("Computing wordCloud ...\n")

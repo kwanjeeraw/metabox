@@ -7,68 +7,65 @@
 computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, internalid, method, size, returnas)
 }
 \arguments{
-\item{edgelist}{a data frame of edges contains at least source and target pairs}
+\item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
 
-\item{nodelist}{a data frame of nodes contains node information e.g. node name, node xref.
-The first column is id. See \code{\link{fetchNetwork}} for the data frame structure.}
+\item{nodelist}{a data frame of nodes contains at least two columns of node attributes.
+1st column is id or neo4j id, 2nd column is id or grinn id. The 2nd column is used for Mesh annotation.}
 
-\item{annotation}{a string specifying the type of annotations e.g. pathway and mesh. Mesh annotation is available for PubChem compounds only.}
+\item{annotation}{a string specifying the annotation type e.g. pathway (default) and mesh. Pathway annotation requires the database.
+Mesh annotation doesn't require the database but it is available for PubChem compounds only.}
 
-\item{pval}{a numeric vector containing the p-values of molecular entities, computed from statistical analysis,
-with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
+\item{pval}{a numeric vector or a two-column data frame of statistical values e.g. p-values.
+If \code{pval} is a vector, the name attributes must be identical to the names of network nodes.
+If \code{pval} is a data frame, 1st column contains the network nodes and 2nd column contains statistical values.}
 
-\item{fc}{a numeric vector containing fold changes or sign information (positive or negative) of molecular entities
-with name attributes corresponding to the entities. See \code{\link{runGSA}} for details.}
+\item{fc}{a numeric vector of fold changes or sign information (positive or negative) with name attributes identical to the names of entities. Default is NULL.}
 
-\item{internalid}{boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
-\code{internalid} has no effect on Mesh enrichment.}
+\item{internalid}{a logical value indicating whether the network nodes are neo4j ids, if TRUE (default). If not, the network nodes are expected to be any ids.
+See details and see \code{\link{convertId}} for how to convert ids. It has no effect on Mesh annotation.}
 
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 
-\item{size}{a numeric vector specifying the minimum and maximum number of members in each entity set collection to be used in the analysis. Default is c(3,500).}
+\item{size}{a numeric vector specifying the minimum and maximum number of members in each annotation term to be used in the analysis. Default is c(3,500).}
 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
-list of nodes, edges, enrichment analysis result and annotation pairs. The list contains the data frame of nodes, the data frame of edges and
-the data frame of enrichment analysis result with the following components:
+list of data frame of nodes, edges, enrichment and pairs. The pairs data frame contains annotation pairs. The data frame of enrichment contains the following components:
 
 \code{rank} = rank sort by p adj
 
-\code{id} = internal neo4j id
+\code{id} = annotation id or annotation neo4j id
 
-\code{gid} = grinn id
+\code{gid} = annotation id or annotation grinn id
 
-\code{nodename} = name of entity set
+\code{nodename} = annotation name
 
 \code{nodelabel} = annotation type
 
 \code{nodexref} = cross references
 
-\code{p} = entity set p-values
+\code{p} = raw p-values
 
-\code{p adj} = adjusted entity set p-values
+\code{p adj} = adjusted p-values
 
-\code{no_of_entities} = number of input entities in each entity set
+\code{no_of_entities} = number of input entities in each annotation term
 
-\code{total} = total number of entities in each entity set from the database, not available for Mesh
+\code{total} = total number of entities in each annotation term from the database, the value is not available for Mesh
 
-\code{member} = list of entity members of the entity set
-See \code{\link{runGSA}} for more details about directional classes. Return empty list if error or found nothing.
+\code{member} = list of entity members of the annotation term
+
+Return list of empty data frame if error or found nothing.
 }
-\description{
-perform enrichment analysis on the input network by integrating the statistical values of molecular entities e.g. compound, protein or gene.
-The input network is generated from any function such as \code{\link{computeSimilarity}}, \code{\link{computeCorrelation}}, \code{\link{computeParCorrelation}}, \code{\link{computeSubnetwork}},
-\code{\link{fetchHetNetwork}} and \code{\link{fetchNetwork}}. The function wraps around \code{\link{computeEnrichment}} for enrichment analysis.
+\details{
+The database uses two id systems. The neo4j id is a numeric, internal id automatically generated by the database system.
+The grinn id (gid) is an id system of Grinn database that uses main ids of standard resources
+i.e. ENSEMBL for genes (e.g.ENSG00000139618), UniProt for proteins (e.g.P0C9J6), PubChem CID for compounds (e.g.5793), KEGG for pathways (e.g.hsa00010).
 }
 \examples{
-#kw <- c('G15729','G17561','G16015','G18145','G16708')
-#grinnNW <- fetchGrinnNetwork(txtInput=kw, from="metabolite", to="protein")
-#library(grinn)
-#data(dummyStat)
-#result <- fetchSubnetwork(statInput = dummyStat, nwInput = grinnNW)
-#library(igraph)
-#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
+#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
+#pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790), stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
+#result <- computeNwEnrichment(simnw$edges, simnw$nodes, annotation="mesh", pval, internalid = FALSE)
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

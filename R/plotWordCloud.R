@@ -1,5 +1,5 @@
 #'plot WordCloud
-#'@description plot WordCloudread overriding wordcloud for GUI
+#'@description plot WordCloud by overriding wordcloud for using in opencpu app.
 #'@usage plotWordCloud(wordtable)
 #'@param wordtable data frame of word frequency
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}

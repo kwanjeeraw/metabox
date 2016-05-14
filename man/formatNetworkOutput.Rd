@@ -2,16 +2,31 @@
 % Please edit documentation in R/formatNetworkOutput.R
 \name{formatNetworkOutput}
 \alias{formatNetworkOutput}
-\title{Format resulting network}
+\title{Format network}
 \usage{
 formatNetworkOutput(graph, returnas)
 }
 \arguments{
-\item{graph}{graph output from neo4j to be formatted}
+\item{graph}{list of paths containing network information to be formatted}
 }
 \value{
-relationship information with the following components:
-\code{source, target} = node internal id
+list of network information with the following components:
+
+nodes:
+
+\code{id} = node neo4j id
+
+\code{gid} = node grinn id
+
+\code{nodename} = node name
+
+\code{nodelabel} = node type
+
+\code{nodexref} = node cross references
+
+edges:
+
+\code{source, target} = node neo4j id
 
 \code{type} = relationship type
 
@@ -19,19 +34,23 @@ relationship information with the following components:
 
 \code{properties} = relationship properties
 
-Return empty list or data frame if error or found nothing.
+Return empty list if error or found nothing.
 }
 \description{
-format graph output from neo4j to data frame of network.
+format a network or graph output from the database to the data frame format.
+}
+\note{
+maximum no. of paths returned = 30000 paths
 }
 \examples{
-#cypher = "MATCH ptw = (from:Protein)-[:CONTROL]->(to:Gene) WHERE from.GID = 'P14859' RETURN DISTINCT ptw LIMIT 2"
-#nw = curlRequest.TRANSACTION(cypher=qstring)
+#cypher = "MATCH ptw = (from:Compound)-[:BIOCHEMICAL_REACTION]->(:Compound) WHERE ID(from) = 0 RETURN DISTINCT ptw LIMIT 2"
+#nw = curlRequest.TRANSACTION(cypher)
+#result = formatNetworkOutput.default(nw, returnas="dataframe")
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}
 }
 \seealso{
-\code{\link{fetchNetwork}}, \code{\link{fetchNetworks}}, \url{http://neo4j.com/docs/stable/rest-api-transactional.html}
+\code{\link{fetchNetwork}}, \code{\link{fetchHetNetwork}}, \code{\link{fetchNetworkByGID}}, \code{\link{fetchHetNetworkByGID}}, \url{http://neo4j.com/docs/stable/rest-api-transactional.html}
 }
 

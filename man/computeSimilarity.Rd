@@ -7,42 +7,44 @@
 computeSimilarity(txtinput, coef, returnas)
 }
 \arguments{
-\item{txtinput}{a character vector of PubChem CIDs given for structure similarity comparisons.}
+\item{txtinput}{a character vector of PubChem CIDs.}
 
 \item{coef}{a numeric value specifying the minimum Tanimoto similarity correlation coefficient to be included in the output (from 0 to 1, default is 0.7).}
 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
-list of nodes with the following components:
+list of network information with the following components:
 
-\code{id} = node internal neo4j id
+nodes:
 
-\code{gid} = node grinn id
+\code{id} = pubchem CID or node neo4j id
 
-\code{nodename} = node name
+\code{gid} = pubchem CID
+
+\code{nodename} = pubchem CID or node name
 
 \code{nodelabel} = node type
 
-edgelist with the following components:
+edges:
 
-\code{source, target} = node
+\code{source, target} = pubchem CID or node neo4j id
 
 \code{coef} = Tanimoto similarity coefficient
 
 \code{type} = relationship type
 
-Return empty list or data frame if error or found nothing.
+Return empty list if error or found nothing.
 }
 \description{
-compute Tanimoto similarity for compounds.
-The function wraps around the functions of \pkg{\link{metabomapr}} to compute Tanimoto distances of all given compounds using PubChem fingerprints.
+compute a network for compounds based on chemical structure similarity.
+The function wraps around the functions of \pkg{\link{metabomapr}} to compute Tanimoto distances between the given compounds using PubChem fingerprints.
+}
+\note{
+If the database is installed, node attributes will be automatically retrieved from the database. Otherwise node attributes will be the original input.
 }
 \examples{
-#datNorm = read.csv("~/Documents/grinn_sample/lung_miyamoto/metAdj.txt",sep="\\t",header=TRUE,row.names=1)
-#datNorm = datNorm[-1,] #exclude nodetype
-#dt = sapply(datNorm, function(x) as.numeric(as.character(x)))
-#nw = fetchPtCorrNetwork(datNorm=dt)
+#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

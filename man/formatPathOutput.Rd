@@ -2,12 +2,12 @@
 % Please edit documentation in R/formatPathOutput.R
 \name{formatPathOutput}
 \alias{formatPathOutput}
-\title{Format resulting relationships}
+\title{Format relationships}
 \usage{
 formatPathOutput(url)
 }
 \arguments{
-\item{url}{a string specifying relationship url where relationship information to need to be formatted}
+\item{url}{a string specifying relationship url to be formatted}
 }
 \value{
 relationship information with the following components:
@@ -29,10 +29,13 @@ relationship information with the following components:
 Return empty data frame if error or found nothing.
 }
 \description{
-perform curl request to get relationship information for \code{\link{fetchRelation}}.
+perform curl request to get relationship information for \code{\link{fetchRelationship}}.
+}
+\note{
+curlRequest.TRANSACTION is used in other functions to improve speed.
 }
 \examples{
-#url = "http://localhost:7474/db/data/node/306/relationships/out"
+#url = "http://localhost:7474/db/data/node/0/relationships/out"
 #result = curlRequest.URL(url)
 #df = data.frame(t(sapply(result,c)))
 #formatPathOutput(df)
@@ -41,6 +44,6 @@ perform curl request to get relationship information for \code{\link{fetchRelati
 Kwanjeera W \email{kwanich@ucdavis.edu}
 }
 \seealso{
-\code{\link{curlRequest}}, \code{\link{fetchRelation}}
+\code{\link{curlRequest}}, \code{\link{fetchRelationship}}
 }
 

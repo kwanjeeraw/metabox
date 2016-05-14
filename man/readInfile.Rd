@@ -6,8 +6,20 @@
 \usage{
 readInfile(file, header, sep, rowname)
 }
+\arguments{
+\item{file}{a string specifying name of the file}
+
+\item{header}{a logical value specifying whether the first line is the names of variables. Default = TRUE}
+
+\item{sep}{a string specifying a field separator character. Default = "\t"}
+
+\item{rowname}{a column number or column name specifying the column of the table that contains the row names.}
+}
+\value{
+data frame of the table
+}
 \description{
-read a file overriding read.csv for GUI
+read a file in table format by overriding read.csv for using in opencpu app.
 }
 \examples{
 # readInFile("location")
@@ -16,6 +28,6 @@ read a file overriding read.csv for GUI
 Kwanjeera W \email{kwanich@ucdavis.edu}
 }
 \seealso{
-\code{\link{read.csv}}
+\code{\link{read.table}}
 }
 

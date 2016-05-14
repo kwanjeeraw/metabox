@@ -2,7 +2,7 @@
 % Please edit documentation in R/fetchRelationship.R
 \name{fetchRelationship}
 \alias{fetchRelationship}
-\title{Query relationship(s) with url}
+\title{Query relationships with url}
 \usage{
 fetchRelationship(url, returnas)
 }
@@ -31,16 +31,16 @@ relationship information with the following components:
 Return empty list or data frame if error or found nothing.
 }
 \description{
-retrieve relationship information from the graph database with url. The results include source node, target node, relationship type, dataSource and properties, if applicable.
+retrieve relationship information from the database with url. The results include source node, target node, relationship type, dataSource and properties, if applicable.
+}
+\note{
+curlRequest.TRANSACTION is used in other functions to improve speed.
 }
 \examples{
 # Query genes by name
-#result <- fetchRelationship("http://localhost:7474/db/data/relationship/53")
-#result <- fetchRelationship("http://localhost:7474/db/data/node/306/relationships/out")
-#result <- fetchRelationship("http://localhost:7474/db/data/node/51/relationships/in")
+#result <- fetchRelationship("http://localhost:7474/db/data/relationship/0")
+#result <- fetchRelationship("http://localhost:7474/db/data/node/0/relationships/out")
+#result <- fetchRelationship("http://localhost:7474/db/data/node/0/relationships/in")
 
-}
-\author{
-Kwanjeera W \email{kwanich@ucdavis.edu}
 }
 

@@ -2,23 +2,26 @@
 % Please edit documentation in R/formatNodeOutput.R
 \name{formatNodeOutput}
 \alias{formatNodeOutput}
-\title{Format resulting nodes}
+\title{Format node information}
 \usage{
 formatNodeOutput(node, returnas)
 }
 \arguments{
-\item{node}{a row of data frame containing node information to be formatted}
+\item{node}{list of nodes containing node information or node attributes to be formatted}
 }
 \value{
-node information. Return empty data frame if error or found nothing.
+data frame of node information. Return no data frame if error or found nothing.
 }
 \description{
-format and return node information for \code{\link{fetchNode}}. Retrieve also node relationships as urls.
+format and return node information for \code{\link{fetchNode}}.
+}
+\note{
+maximum no. of nodes returned = 30000 nodes
 }
 \examples{
-#querystring="UNWIND ['G82952','G82949'] AS x WITH x MATCH (node:Pathway) WHERE node.GID = x RETURN DISTINCT node"
-#node = curlRequest(cypher=querystring)
-#formatNodeOutput(node[[1]])
+#querystring="UNWIND [0,1] AS x WITH x MATCH (node) WHERE ID(node) = x RETURN DISTINCT node"
+#node = curlRequest.TRANSACTION(cypher=querystring)
+#formatNodeOutput(node)
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

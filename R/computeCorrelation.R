@@ -1,35 +1,39 @@
-#'Compute a weighted correlation network
-#'@description compute the correlation network for one or two omic data sets.
-#'The function wraps around \code{\link{corAndPvalue}} function of \pkg{\link{WGCNA}}.
-#'Correlation coefficients, p-values and correlation directions are calculated.
-#'The correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
+#'Compute weighted correlation network
+#'@description compute the correlation network of entities from one or two quantified data sets, see details.
 #'@usage computeCorrelation(x, y, xtype, ytype, internalid, coef, pval, method, returnas)
-#'@param x a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
+#'@param x a data frame of raw or quantified data e.g. gene expression data, metabolite intensities.
 #'Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
-#'@param y a data frame of quantified omic data e.g. gene expression data, metabolite intensities.
-#'Columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
-#'@param xtype a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.
-#'@param ytype a string specifying the type of nodes (default = NULL). It can be one of compound, protein, gene, rna, dna.
-#'@param internalid boolean value, whether name attributes of pval are neo4j ids, see \code{\link{convertId}} for how to convert to neo4j ids.
+#'@param y a data frame of raw or quantified data e.g. gene expression data, metabolite intensities.
+#'Columns are samples and rows are molecular entities e.g. genes, proteins or compounds. See details.
+#'@param xtype a string specifying a node type (default = NULL). If provided and the database is installed, node attributes will be automatically retrieved from the database.
+#'For database query, the value can be one of compound, protein, gene, rna, dna.
+#'@param ytype a string specifying a node type (default = NULL).
+#'@param internalid a logical value indicating whether the network nodes are neo4j ids, if TRUE (default). See \code{\link{convertId}} for how to convert ids.
+#'It has no effect if \code{xtype} = NULL or there is no database installed.
 #'@param coef a numeric value specifying the minimum absolute correlation coefficient to be included in the output (from 0 to 1, default is 0.7).
 #'@param pval a numeric value specifying the maximum p-value to be included in the output (default is 0.05).
-#'@param method a string specifying method to compute correlation. It can be one of pearson, kendall, spearman (default) see \code{\link{cor}}.
+#'@param method a string specifying method for computing correlation. It can be one of pearson, kendall, spearman (default). See \code{\link{cor}} for details.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
-#'@details x and y are data frame in which columns are samples and rows are molecular entities e.g. genes, proteins or compounds.
-#'If y is given, then the correlations between the molecular entities of x and of y are computed. Otherwise the correlations between molecular entities of x are computed.
-#'If grinn functions will be used further, we recommend using the grinn ids for entities, see \code{\link{convertId}}.
-#'@return
-#'list of nodes with the following components:
+#'@details The function wraps around \code{\link{corAndPvalue}} function of \pkg{\link{WGCNA}}. Correlation coefficients, p-values and correlation directions are calculated.
+#'The correlation coefficients are continuous values between -1 (negative correlation) and 1 (positive correlation), with numbers close to 1 or -1, meaning very closely correlated.
 #'
-#'\code{id} = node id
+#'x and y are data frame in which columns are samples and rows are entities.
+#'If y is given, then the correlations between the x entities and y entities are computed. Otherwise the correlations between x entities are computed.
+#'@return list of network information with the following components:
 #'
-#'\code{gid} = node gid
+#'nodes:
 #'
-#'\code{nodename} = node name
+#'\code{id} = node id or node neo4j id
 #'
-#'edgelist with the following components:
+#'\code{gid} = node id or node grinn id
 #'
-#'\code{source, target} = node id
+#'\code{nodename} =  node id or node name
+#'
+#'\code{nodelabel} = node type if provided
+#'
+#'edges:
+#'
+#'\code{source, target} = node id or node neo4j id
 #'
 #'\code{coef} = correlation coefficient
 #'
@@ -39,27 +43,21 @@
 #'
 #'\code{type} = relationship type
 #'
-#'Return empty list or data frame if error or found nothing.
+#'Return empty list if error or found nothing.
+#'@note If only one data set \code{x} is provided and the database is installed, node attributes will be automatically retrieved from the database. Otherwise node attributes will be the original input.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references Langfelder P. and Horvath S. (2008) WGCNA: an R package for weighted correlation network analysis. BMC Bioinformatics, 9:559
 #'@references Dudoit S., Yang YH., Callow MJ. and Speed TP. (2002) Statistical methods for identifying differentially expressed genes in replicated cDNA microarray experiments, STATISTICA SINICA, 12:111
 #'@references Langfelder P. and Horvath S. Tutorials for the WGCNA package \url{http://labs.genetics.ucla.edu/horvath/CoexpressionNetwork/Rpackages/WGCNA/Tutorials/index.html}
 #'@seealso \code{\link{cor}}, \code{\link{corAndPvalue}}
 #'@examples
-#'# Compute a correlation network of metabolites
-#'#dummy <- rbind(nodetype=rep("metabolite"),t(mtcars))
-#'#colnames(dummy) <- c('G1.1','G27967','G371','G4.1',paste0('G',sample(400:22000, 28)))
-#'#result <- fetchCorrNetwork(datNormX=dummy, datNormY=NULL, corrCoef=0.7, pval=1e-12, method="spearman", returnAs="tab")
-#'#library(igraph)
-#'#plot(graph.data.frame(result$edges[,1:2], directed=FALSE))
-#'# Compute a correlation network of metabolites and proteins
-#'#dummyX <- rbind(nodetype=rep("metabolite"),t(mtcars)[,1:16])
-#'#colnames(dummyX) <- c('G1.1','G27967','G371','G4.1',paste0('G',sample(400:22000, 12)))
-#'#dummyY <- rbind(nodetype=rep("protein"),t(mtcars)[,17:32])
-#'#colnames(dummyY) <- c('P28845','P08235','Q08AG9','P80365',paste0('P',sample(10000:80000, 12)))
-#'dummyX <- mtcars[1:16,]
-#'dummyY <- mtcars[17:32,]
-#'#result <- computeCorrelation(x=dummyX, y=dummyY, coef=0.7, pval=1e-4, method="spearman", returnas="dataframe")
+#'# Compute a correlation network from compound data
+#'#dt <- data.frame(id=seq(32), mtcars, row.names = NULL) #data frame of x
+#'#result <- computeCorrelation(x = dt, xtype = "compound", coef=0.9, pval = 1e-10)
+#'# Compute a correlation network from two data sets
+#'#dtX <- data.frame(id=seq(16), mtcars[1:16,], row.names = NULL) #data frame of x
+#'#dtY <- data.frame(id=seq(17,32), mtcars[17:32,], row.names = NULL) #data frame of x
+#'#result <- computeCorrelation(x=dtX, y=dtY, coef=0.9, pval = 1e-7)
 #'@export
 computeCorrelation <- function(x, y=NULL, xtype=NULL, ytype=NULL, internalid = TRUE, coef=0.7, pval=0.05, method="spearman", returnas="dataframe") UseMethod("computeCorrelation")
 #'@export
