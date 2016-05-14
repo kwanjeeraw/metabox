@@ -12,14 +12,6 @@ nodeList <- list(
   regexCollection = "MATCH (node:label) WHERE ANY(y IN node.property WHERE lower(y) =~ lower(\'.*keyword.*\'))"
 )
 
-##list of Cypher to map ids
-idList <- list(
-  exactMatch = "MATCH (node:label) WHERE node.property = \'keyword\'",
-  exactCollection = "MATCH (node:label) WHERE ANY(y IN node.property WHERE y = \'keyword\')",
-  regexMatch = "MATCH (node:label) WHERE lower(node.property) =~ lower(\'.*keyword.*\')",
-  regexCollection = "MATCH (node:label) WHERE ANY(y IN node.property WHERE lower(y) =~ lower(\'.*keyword.*\'))"
-)
-
 ##list of Cypher to query from-[relationship]->to
 pathList <- list(
   from = "UNWIND keyword AS x WITH x MATCH ptw = (from:fromtype)-[r:reltype]->(to:totype) WHERE ID(from) = toInt(x) RETURN DISTINCT ptw",
@@ -47,9 +39,3 @@ pathsList_GID <- list(
   to = "UNWIND keyword AS x WITH x MATCH ptw = relpattern WHERE to.GID = x RETURN DISTINCT ptw",
   fromto = "MATCH ptw = relpattern WHERE from.GID = \'keyfrom\' AND to.GID = \'keyto\' RETURN DISTINCT ptw"
 )
-
-###for enrichment analysis
-#x = combGeneNetwork$edges[1:30,]
-#g = graph.edgelist(as.matrix(data.frame(from=unlist(x[,1]),to=unlist(x[,2]))),directed = FALSE)
-#g2 = cocitation(g)
-#g2[c(2,7,25),c(3,5,8,10)]
