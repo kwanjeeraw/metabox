@@ -69,6 +69,8 @@ fetchNetwork.default <- function(from=NULL, to=NULL, fromtype, totype, reltype, 
     if (class(tmparg) == "try-error") {
       stop("argument 'reltype' is not valid, choose one from the list: annotation,biochemical_reaction,catalysis,control,conversion,genetic_association,molecular_binding")
     }
+    require('doParallel') #load doParallel for opencpu
+    doParallel::registerDoParallel(cores = 2)
     #construct query
     maxkw = 500 #maximum keywords
     fromtype = Hmisc::capitalize(fromtype)

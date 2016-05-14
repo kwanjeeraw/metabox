@@ -39,6 +39,8 @@ fetchNode.default <- function(txtinput, nodetype, searchby="neo4jid", exactmatch
     if (class(tmparg) == "try-error") {
       stop("argument 'searchby' is not valid, choose one from the list: grinnid,name,synonyms,description,properties,xref,datasource")
     }
+    require('doParallel') #load doParallel for opencpu
+    doParallel::registerDoParallel(cores = 2)
     #construct query
     txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
     len = length(txtinput)
@@ -91,7 +93,7 @@ cat(qstring,"\n")
         curlRequest.TRANSACTION(cypher=qstring)
       }
     }
-    formatNodeOutput(nodes,returnas)
+  formatNodeOutput(nodes,returnas)
   },error = function(e) {
     message(e)
     cat("\nError: RETURN no node ..\n")
