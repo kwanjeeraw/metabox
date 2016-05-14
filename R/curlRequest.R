@@ -104,3 +104,42 @@ curlRequest.URL.DFrame <- function(url){
     result <- data.frame() #return empty if not found
   })
 }
+#transaction HTTP endpoint return graph format
+#note: execute multiple statements available in neo4j 2.3.3
+curlRequest.TRANSACTIONS <- function(listOfCypher){
+  h = RCurl::basicTextGatherer()
+  tryCatch({
+    url = paste0(nld,"transaction/commit")
+    #url = paste0("http://localhost:7474/db/data/","transaction/commit")
+    #body = paste0("{\"statements\":[{\"statement\":\"",cypher,"\",\"resultDataContents\":[\"graph\"]}]}")
+    body = paste0("{\"statements\":[",paste0(listOfCypher, collapse = ","),"]}")
+    RCurl::curlPerform(url=url,
+                       userpwd = neu,
+                       httpheader = c(Authorization = paste("Basic",RCurl::base64(neu)), 'Content-Type' = "application/json"),
+                       postfields=body,
+                       writefunction = h$update,
+                       verbose = FALSE
+    )
+    result <- jsonlite::fromJSON(h$value(), simplifyDataFrame=FALSE)$results
+  }, error = function(err) {
+    message(err)
+    result <- list() #return empty if not found
+  })
+}
+###testing fetchNode()
+# nodes = lapply(txtinput,function(x){
+#   qstring = gsub("keyword", x, querystring)
+#   cat(qstring,"\n")
+#   paste0("{\"statement\":\"",qstring,"\",\"resultDataContents\":[\"graph\"]}")
+# })
+# nodels = curlRequest.TRANSACTIONS(nodes)
+# attb = plyr::rbind.fill(lapply(nodels,function(x) {
+#   if(length(x$data) > 1){
+#     plyr::ldply(lapply(x$data, function(y){
+#       formatNode.TRANSACTION.ALL(y$graph$nodes)
+#     }),data.frame)
+#   }else{
+#     formatNode.TRANSACTION.ALL(x$data[[1]]$graph$nodes)
+#   }
+# }))
+###end testing

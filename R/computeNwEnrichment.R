@@ -117,7 +117,7 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
               tmp
             })
           })
-          ptwstat = plyr::ldply (unlist(ptwstat, recursive = F), data.frame) #get total number of annotated nodes of a pathway
+          ptwstat = plyr::ldply(unlist(ptwstat, recursive = F), data.frame) #get total number of annotated nodes of a pathway
           ptwstat = ptwstat[order(ptwstat$nodelabel),]
           tot = plyr::ddply(ptwstat,c('id'),plyr::summarise,total=list(paste0(nodelabel,' (',count,')')))
           era = dplyr::left_join(era,tot,by=c('id'='id'))
