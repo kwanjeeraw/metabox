@@ -1,4 +1,4 @@
-#internal function to format node and edge
+#format edge results from curlRequest.TRANSACTION(cypher)
 formatPath.TRANSACTION <- function(graph){
   out <- tryCatch(
     {
@@ -13,7 +13,7 @@ formatPath.TRANSACTION <- function(graph){
     })
   return(out)
 }
-
+#format node results from curlRequest.TRANSACTION(cypher)
 formatNode.TRANSACTION <- function(node){
   out <- tryCatch(
     {
@@ -27,7 +27,7 @@ formatNode.TRANSACTION <- function(node){
     })
   return(out)
 }
-
+#format node results from curlRequest.TRANSACTION(cypher), return all node properties
 formatNode.TRANSACTION.ALL <- function(node){
   out <- tryCatch(
     {
@@ -45,24 +45,19 @@ formatNode.TRANSACTION.ALL <- function(node){
     })
   return(out)
 }
-
-formatId = function(x, y) {
-  ind = which(y$gid == x)
-  x = ifelse(length(ind)>0,y$id[ind],x)
-}
-
+#get and format node properties
 formatNode.LIST = function(x,y,z){
   nout = fetchNode(txtinput=x, nodetype=y, searchby=z)
-  if(nrow(nout)==0){#not found will return original input
+  if(nrow(nout)==0){#not found node will return original input
     nout = data.frame(id=x, gid=x, nodename=x, nodelabel=Hmisc::capitalize(y), nodexref='', stringsAsFactors = FALSE)
   }else{
     nout = nout[,c(1:4,9)]
   }
 }
-
-#MESH contains Chemicals and Drugs Category tree (D) starting from level 3
+#format Mesh results from https://pubchem.ncbi.nlm.nih.gov/classification/cgi/classifications.fcgi
+#MESH object contains Chemicals and Drugs Category tree (D) starting from level 3 e.g. Amino Acids (D12.125)
 formatMesh = function(x){
-  #don't want root, itself, mesh = Supplementary Records
+  #don't want root, mesh = Supplementary Records, itself
   if(unlist(x$ParentID) != "root" && x$Information$Name != "Supplementary Records" && !is.null(x$Information$ChildID)){
     mid = paste0('D',stringr::str_sub(x$Information$URL,-6)) #MeshTree = D
     mout = merge(data.frame(id=mid, stringsAsFactors = FALSE),MESH,by.x='id',by.y='MeshId') #merge with MESH table for annotation information
@@ -71,13 +66,12 @@ formatMesh = function(x){
     }
   }
 }
-
-foundDb = function(){#check if db exists
+#check if the db exists
+foundDb = function(){
   tryCatch({#query nodeList from nodedata, database required
     node = curlRequest.TRANSACTION("MATCH (n) WHERE ID(n) = 0 RETURN n")
     TRUE
-    #FALSE
-  }, error = function(err) {#catch error if there is no db
+  }, error = function(err) {#catch error and return FALSE if there is no db
     FALSE
   })
 }
