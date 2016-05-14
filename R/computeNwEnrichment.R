@@ -112,7 +112,7 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
           ptwstat = lapply(ptwls, function(x) {
             lapply(ntypels, function(y) {
               qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',y,') where ID(from) = ',x,' RETURN toString(ID(from)), labels(to), count(to)')
-              tmp = as.data.frame(curlRequest(qstring), stringsAsFactors = FALSE)
+              tmp = as.data.frame(curlRequest.TRANSACTION.row(qstring), stringsAsFactors = FALSE)
               colnames(tmp) = c('id','nodelabel','count')
               tmp
             })

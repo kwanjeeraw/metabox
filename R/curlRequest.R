@@ -30,7 +30,7 @@ curlRequest <- function(cypher){
     result <- list() #return empty if not found
   })
 }
-#transaction HTTP endpoint
+#transaction HTTP endpoint return graph format
 #note: execute multiple statements available in neo4j 2.3.3
 curlRequest.TRANSACTION <- function(cypher){
   h = RCurl::basicTextGatherer()
@@ -38,6 +38,27 @@ curlRequest.TRANSACTION <- function(cypher){
     url = paste0(nld,"transaction/commit")
     #url = paste0("http://localhost:7474/db/data/","transaction/commit")
     body = paste0("{\"statements\":[{\"statement\":\"",cypher,"\",\"resultDataContents\":[\"graph\"]}]}")
+    RCurl::curlPerform(url=url,
+                       userpwd = neu,
+                       httpheader = c(Authorization = paste("Basic",RCurl::base64(neu)), 'Content-Type' = "application/json"),
+                       postfields=body,
+                       writefunction = h$update,
+                       verbose = FALSE
+    )
+    result <- jsonlite::fromJSON(h$value(), simplifyDataFrame=FALSE)$results[[1]]$data
+  }, error = function(err) {
+    message(err)
+    result <- list() #return empty if not found
+  })
+}
+#transaction HTTP endpoint return row format
+#note: execute multiple statements available in neo4j 2.3.3
+curlRequest.TRANSACTION.row <- function(cypher){
+  h = RCurl::basicTextGatherer()
+  tryCatch({
+    url = paste0(nld,"transaction/commit")
+    #url = paste0("http://localhost:7474/db/data/","transaction/commit")
+    body = paste0("{\"statements\":[{\"statement\":\"",cypher,"\",\"resultDataContents\":[\"row\"]}]}")
     RCurl::curlPerform(url=url,
                        userpwd = neu,
                        httpheader = c(Authorization = paste("Basic",RCurl::base64(neu)), 'Content-Type' = "application/json"),
