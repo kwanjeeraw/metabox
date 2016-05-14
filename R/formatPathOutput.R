@@ -26,8 +26,7 @@
 #'#result = curlRequest.URL(url)
 #'#df = data.frame(t(sapply(result,c)))
 #'#formatPathOutput(df)
-formatPathOutput <- function(url) UseMethod("formatPathOutput")
-formatPathOutput.default <- function(url){
+formatPathOutput <- function(url){
   out <- tryCatch(
     {
       path = curlRequest.URL(url)

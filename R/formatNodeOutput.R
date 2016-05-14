@@ -9,8 +9,7 @@
 #'#querystring="UNWIND [0,1] AS x WITH x MATCH (node) WHERE ID(node) = x RETURN DISTINCT node"
 #'#node = curlRequest.TRANSACTION(cypher=querystring)
 #'#formatNodeOutput(node)
-formatNodeOutput <- function(node, returnas) UseMethod("formatNodeOutput")
-formatNodeOutput.default <- function(node, returnas){
+formatNodeOutput <- function(node, returnas){
   attb = data.frame() #data frame of node attributes
   if(length(node) <= 30000){
     cat("Formating and returning approximately ", length(node),"nodes ...\n")
