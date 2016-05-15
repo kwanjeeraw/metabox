@@ -59,12 +59,14 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
           data.frame(txtinput[i], res, x[i,2:ncol(x)], stringsAsFactors = FALSE) #combine with the rest of input
         }
         colnames(nodes) = c("input","neo4jid","grinnid",colnames(x)[2:ncol(x)])
+        row.names(nodes) = NULL
       }else{#list input
         nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
           res = formatNode.LIST(txtinput[i],"Compound","name")[,1:2] #get input attributes: id and gid
           data.frame(txtinput[i], res, stringsAsFactors = FALSE)
         }
         colnames(nodes) = c("input","neo4jid","grinnid")
+        row.names(nodes) = NULL
       }
       cat("Format and returning output of size ",nrow(nodes)," ...\n")
       ## output
