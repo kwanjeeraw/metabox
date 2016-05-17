@@ -100,7 +100,7 @@ $(document).ready(function(){//wait untile the document is fully loaded.
 
     $("#TRY").click(function(){
       summary.getObject(function(obj){
-        $("#demo").text(obj.factor_name);
+        $("#demo").text(summary.loc);
       });
     });
  });

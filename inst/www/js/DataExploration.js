@@ -1,200 +1,121 @@
 $(document).ready(function(){
-
+  var selected=[];
 var data_temp = {};
+var PCA_score_plot = Plotly.d3.select('#tester')
+    .style({
+        width: 55 + '%',
+        height: 100 + '%'
+    }).node();
+var HIST_Plot = Plotly.d3.select("#hists")
+      .style({
+        width: 40 + "%",
+        height: 100 + "%"
+      }).node();
+var BOX_Plot = Plotly.d3.select("#boxplots")
+      .style({
+        width: 100 + "%",
+        height: 100 + "%"
+      }).node();
 var url = getURLVars('rsess')+"R/.val/json";
 $.ajax({
    url : url,
    type: 'GET',
    dataType: 'json',
    success: function (data) {
-      $.each(data.factor_name,function(i,val){
-        if(val){
-           $("<option>").text(val).appendTo("#color");
-        }
-      });
-data_temp = data;
-makeplot(data);
-   },error: function(){console.log("Ajax error: Cannot get data");}
+data_temp = data;//for #color on change.
+listSelector(data.factor_name,"#color");
+listSelector(data.phenotype_colnames,"#select_infor_needed");
+plotPCAScore(data);
+plotHIST(data);
+plotBOXPLOT(data);
+},error: function(){console.log("Ajax error: Cannot get data");}
  });
-
-
 $(document).on("change","#color",function(){
-//$("#demo").text(data_temp===undefined);
-makeplot(data_temp);
+plotPCAScore(data_temp);
+plotBOXPLOT(data_temp);
 });
-function makeplot(data){
+function listSelector(options,id){
+var selector = '';
+for(var i = 0;i<options.length;i++){
+   selector += "<option>" + options[i] + "</option>";
+}
+$(id).html(selector).selectpicker('refresh');;
+}
+function plotPCAScore(data){
+    var selection_temp;
+  if($("#select_infor_needed").val()===null){
+   selection_temp = data.factor_name;
+    }else{
+   selection_temp = $("#select_infor_needed").val();
+    }
         var rep=ocpu.call("test",{
         e:data.dataset.expression,
         p:data.dataset.phenotype,
         f:data.dataset.feature,
         color:$('#color').val(),
-        pie_options:"time"
+        sample_information_selection:"Sample_name,"+selection_temp.join(",")
       },function(session){
-
      session.getObject(function(obj){
-       $("#demo").text(obj.scatter);
-       if(obj.scatter.length===1){
-        var test = document.getElementById('tester');
-      Plotly.newPlot(test, eval(obj.pie[0]));
-       }
-      if(obj.pie.length===1){
-     var test2 = document.getElementById('tester2');
-      Plotly.newPlot(test2, eval(obj.scatter[0]));
-      }
-     });
+      Plotly.newPlot(PCA_score_plot, eval(obj.data[0]),JSON.parse(obj.layout[0]));
+PCA_score_plot.on('plotly_selected',function(eventData){
+  selected = [];
+  eventData.points.forEach(function(pt){
+    selected.push(pt.x);
+  });
+  plotHIST(data);
+  plotBOXPLOT(data);
+});});}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});}
 
-/*var data = [{
-  values: [19, 26, 55],
-  labels: ['Residential', 'Non-Residential', 'Utility'],
-  type: 'pie'
-}];
-
-var layout = {
-  height: 400,
-  width: 500
-};
-
-Plotly.newPlot('myDiv', data, layout);*/
-
-
-
-
-
-      }).fail(function(jqXHR){
-          errormsg(1 + jqXHR.responseText);
+function plotHIST(data){
+  var selection_temp;
+  if($("#select_infor_needed").val()===null){
+   selection_temp = data.factor_name;
+    }else{
+   selection_temp = $("#select_infor_needed").val();
+    }
+    //console.log("Sample_name,"+selection_temp.join(","));
+  var rep = ocpu.call("histo",{
+    p:data.dataset.phenotype,
+    e:data.dataset.expression,
+    sample_information_selection: selection_temp,
+    x:selected
+  },function(session){
+    session.getObject(function(obj){
+    Plotly.newPlot(HIST_Plot, eval(obj.data[0]),JSON.parse(obj.layout[0]));
+    });
+  }).fail(function(jqXHR){
+          errormsg(2 + jqXHR.responseText);
           });
 }
-/*test.on('plotly_selected', function(eventData) {
-  var values = [];
-  //var y = [];
 
-  var temp = [];
-  //for(var i = 0; i < N; i++) colors.push(color1Light);
-
-  //console.log(eventData.points);
-
-  eventData.points.forEach(function(pt) {
-    //x.push(pt.x);
-    //y.push(pt.y);
-    temp[pt.pointNumber] = true;
+function plotBOXPLOT(data){
+  var rep=ocpu.call("boxp",{
+    e:data.dataset.expression,
+    p:data.dataset.phenotype,
+    color:$('#color').val(),
+    selected:selected
+  },function(session){
+    session.getObject(function(obj){
+      Plotly.newPlot(BOX_Plot,eval(obj.data[0]),JSON.parse(obj.layout[0]));
+    });
+  }).fail(function(jqXHR){
+    errormsg(3 + jqXHR.responseText);
   });
- //values
-  Plotly.restyle(test2, {
-    values:values,
-    //xbins: {}
-  }, [0]);
-
-  //Plotly.restyle(test, 'marker.color', [colors], [0]);
-});*/
-
-
-/*var trace1 = {
-  y: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
-  mode: 'markers',
-  marker: {
-    size: 40,
-    color: ["red","blue","red", "blue","red" ,"blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue","red","blue"]
-  }
-};
-
-var data = [trace1];
-
-var layout = {
-  title: 'Scatter Plot with a Color Dimension'
-};
-
-Plotly.newPlot('myDiv2', data, layout);*/
-
-
-var graphDiv = document.getElementById('graph');
-var N = 1000;
-var color1 = '#7b3294';
-var color1Light = '#c2a5cf';
-var colorX = '#ffa7b5';
-var colorY = '#fdae61';
-
-function randomArray() {
-  var out = new Array(N);
-  for(var i = 0; i < N; i++) {
-    out[i] = Math.random();
-  }
-  return out;
 }
-var x = randomArray();
-var y = randomArray();
 
-Plotly.plot(graphDiv, [{
-  type: 'scatter',
-  mode: 'markers',
-  x: x,
-  y: y,
-  xaxis: 'x',
-  yaxis: 'y',
-  name: 'random data',
-  marker: {color: color1, size: 10}
-}, {
-  type: 'histogram',
-  x: x,
-  xaxis: 'x2',
-  yaxis: 'y2',
-  name: 'x coord dist.',
-  marker: {color: colorX}
-}, {
-  type: 'histogram',
-  x: y,
-  xaxis: 'x3',
-  yaxis: 'y3',
-  name: 'y coord dist.',
-  marker: {color: colorY}
-}], {
-  title: 'Lasso around the scatter points to see sub-distributions',
-  dragmode: 'lasso',
-  xaxis: {
-    zeroline: false,
-  },
-  yaxis: {
-    domain: [0.55, 1],
-  },
-  xaxis2: {
-    domain: [0, 0.45],
-    anchor: 'y2',
-  },
-  yaxis2: {
-    domain: [0, 0.45],
-    anchor: 'x2'
-  },
-  xaxis3: {
-    domain: [0.55, 1],
-    anchor: 'y3'
-  },
-  yaxis3: {
-    domain: [0, 0.45],
-    anchor: 'x3'
-  }
+$(document).on("change","#select_infor_needed",function(){
+plotHIST(data_temp);
+});
+$(document).on("click","#select_infor_needed",function(){
+plotHIST(data_temp);
 });
 
-graphDiv.on('plotly_selected', function(eventData) {
-  var x = [];
-  var y = [];
+window.onresize = function() {
+    Plotly.Plots.resize(PCA_score_plot);
+    Plotly.Plots.resize(HIST_Plot);
+    Plotly.Plots.resize(BOX_Plot);
+};
 
-  var colors = [];
-  for(var i = 0; i < N; i++) colors.push(color1Light);
-
-  console.log(eventData.points[0]);
-
-  eventData.points.forEach(function(pt) {
-    x.push(pt.x);
-    y.push(pt.y);
-    colors[pt.pointNumber] = color1;
-  });
-
-  Plotly.restyle(graphDiv, {
-    x: [x, y],
-    xbins: {}
-  }, [1, 2]);
-
-  Plotly.restyle(graphDiv, 'marker.color', [colors], [0]);
-});
 
 
 
