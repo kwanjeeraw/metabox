@@ -4,16 +4,17 @@
 \alias{deal_with_missing_value}
 \title{Deal with missing value.}
 \usage{
-deal_with_missing_value(data, missingvalueidx, method, tol.percent)
+deal_with_missing_value(e = NULL, f = NULL, p = NULL, missingvalueidx,
+  method, tol_percent = NULL)
 }
 \arguments{
-\item{data}{should be the e, where rows are samples and columns are compounds.}
+\item{e}{should be the e, where rows are samples and columns are compounds.}
 
 \item{missingvalueidx}{cells with which value in data are missing value}
 
 \item{method}{can be half minimum, minimum, mean, median, Random Forest, kNN, auto-select}
 
-\item{tol.percent}{above which percent of mising value, we ignore compounds}
+\item{tol_percent}{above which percent of mising value, we ignore compounds}
 }
 \description{
 Estimate or impute the missing values.

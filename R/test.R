@@ -12,47 +12,78 @@
 #'@examples
 #'@export
 
-test = function(e, f, p, color, pie_options=c("time","treatment_1")){
+test = function(e, f, p, color, sample_information_selection){
+    sample_information_selection = strsplit(sample_information_selection, ",")[[1]]
+    cols = gg_color_hue(length(unique(p[[color]])))
+    p$Sample_name = rownames(p)
+    e[is.na(e)] = 500
+    pca = prcomp(e, center = T, scale. = T)
+    score = pca$x
+    score = data.frame(score, p[sample_information_selection]);rownames(score) = rownames(e)
+variance = pca$sdev^2/sum(pca$sdev^2)
+    temp = by(score,p[[color]],FUN=function(x){
+      # x = score[p[[color]]==p[[color]][1],]
+      text.temp = x[sample_information_selection]
+      text.temp = apply(x[sample_information_selection],1,function(o){
+        paste(paste(sample_information_selection,o, sep=": "),collapse = "</br>")
+      })
+      ell.info <- cov.wt(cbind(x[,1], x[,2]))
+      eigen.info <- eigen(ell.info$cov)
+      lengths <- sqrt(eigen.info$values * 2 * qf(.95, 2, length(x[,1])-1))
+      d = rbind(ell.info$center + lengths[1] * eigen.info$vectors[,1],
+                ell.info$center - lengths[1] * eigen.info$vectors[,1],
+                ell.info$center + lengths[2] * eigen.info$vectors[,2],
+                ell.info$center - lengths[2] * eigen.info$vectors[,2])
+      r <- cluster::ellipsoidhull(d)
+      pred = predict(r)
+      list(list(x = x[,1], y = x[,2]
+           ,mode = 'markers',type='scatter'
+           ,name = x[[color]][1]
+           ,text = text.temp,marker=NULL
+           ),
+           list(x = pred[,1], y = pred[,2]
+                ,mode = 'lines',type='scatter'
+                ,name = x[[color]][1]
+                ,marker=NULL,showlegend=FALSE
+           ))
+    },simplify =F)
+    temp0 = range(score[,1]);range_x = temp0 + c(-0.1 * diff(temp0), 0.1 * diff(temp0))
+    temp0 = range(score[,2]);range_y = temp0 + c(-0.1 * diff(temp0), 0.1 * diff(temp0))
 
-  e[is.na(e)] = 500
-  pca = prcomp(e, center = T, scale. = T)
-  score = pca$x
-  score = data.frame(score, p);rownames(score) = rownames(data)
-  # plotly::plot_ly(data = score, x = PC1, y = PC2, mode = "markers",
-  # color = p[[color]])
-result_scatter = paste(by(score, p[[color]], FUN = function(x){
-  paste0("{x:[",paste(x[,1],collapse=","),"],y:[",paste(x[,2],collapse=","),"],mode:'markers',type:'scatter',name:'",x[[color]][1],"'}")
-}),collapse = ",")
-result_scatter = paste0(c("[",result_scatter,"]"), collapse = "")
-# now adding the pie chart! using p[,1]
-if(is.null(pie_options)){
-  result_pie = NULL
-}else{
-  temp_pie = sapply(p[pie_options], function(x){
-    table(x)
-  })
-  result_pie = paste(apply(temp_pie,2, function(x){
-    num = which(apply(temp_pie, 2,function(y){names(y)[1]%in%names(x)[1]}))
-    paste0("{values:[",
-           paste(round(x/sum(x)*100),collapse=","),"],labels:['",
-           paste(names(x),collapse="','"),"'],type:'pie',domain:{x:[",
-           paste(c((num-1)*.5, num*.5), collapse = ","),"]}}")
-  }),collapse=",")
-  result_pie = paste0(c("[",result_pie,"]"), collapse = "")
-  result_pie_layout = NULL
-}
+    result2 = list(paper_bgcolor = "rgba(0,0,0,0)",
+                   plot_bgcolor = "rgba(0,0,0,0)",
+                   title="PCA Score Plot",
+                   xaxis = list(
+                     title = paste0("PC 1 (",round(variance[1],4) * 100,"%)"),
+                     titlefont = list(
+                       family="Courier New, monospace",
+                       size = 18, color = "#7f7f7f"
+                     )
+                     # ,range = range_x
+                     ),
+                   yaxis=list(
+                     title = paste0("PC 2 (",round(variance[2],4) * 100,"%)"),
+                     titlefont = list(
+                       family="Courier New, monospace",
+                       size = 18, color = "#7f7f7f"
+                     )
+                     # ,range = range_y
+                   ),
+                   legend=list(
+                     xanchor="auto"
+                   )
+                   )
+    result = list()
+    for(i in 1:length(temp)){
+      result[[i]] = temp[[i]][[1]]
+      result[[i]]$marker =  list(color = cols[i])
+      result[[i+length(temp)]] = temp[[i]][[2]]
+      result[[i+length(temp)]]$marker =  list(color = cols[i])
+    }
 
-# [{values:[31,23,23,23],labels:['17hr','1hr','24hr','6hr'],type:'pie',domain:{x:[0,0.5]}}]
-
-
-# result = paste(c("[",result_scatter,",",result_pie,"]"),collapse = "")
-result_hist = NULL
-  return(
-    list(scatter = result_scatter, pie = result_pie, pie_layout = result_pie_layout,
-         hist = result_hist)
-    #"[{x:[1, 2, 3, 4, 5],y:[1, 2, 4, 8, 16]}]"
-  )
-
-  # plot(score$PC1, score$PC2)
-
+data = jsonlite::toJSON(result,auto_unbox=T)
+layout = jsonlite::toJSON(result2,auto_unbox=T)
+return(list(data = data, layout=layout
+            ,variance_explained = variance, range = list(range_x=range_x, range_y=range_x)
+            ))
 }

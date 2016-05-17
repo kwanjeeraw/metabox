@@ -55,6 +55,7 @@ summary_aggregated_data <- function(e=NULL,f=NULL,p=NULL,
       result[["repeated_factor_name"]] = ifelse(is.null(repeated_factor_name),"none",strsplit(repeated_factor_name, sep))[[1]]
       result[["confound"]] = ifelse(is.null(confound),"none",strsplit(confound, sep))[[1]]
       result[["batch"]] = ifelse(is.null(batch),"none",strsplit(batch, sep))[[1]]
+      result[["phenotype_colnames"]] = colnames(p)
     }
   }
   return(result)
