@@ -51,6 +51,7 @@
     var annopairTable;
     var robj;
     var clobj;
+    var fnobj;
     var cyImg;
     //Overview output
     $("#fileinput").change(function(){//load data
@@ -111,7 +112,7 @@
       }
     });//clearBtn
     $("#cloudBtn").click(function(){
-      var loadSpinner = showSpinner();
+      var loadSpinner = showSpinner(txt='** Updating Network and Ploting WordCloud ..');
       var annotation = $('input[name="annotation"]:checked').val();
       var req = ocpu.call("computeNwWordCloud", {edgelist:robj.edges, nodelist:robj.nodes, annotation:annotation}, function(cld_session) {
         cld_session.getStdout(function(outtxt){
@@ -138,12 +139,47 @@
             $('#annopairs').empty();
           }
           //Wordcloud output
+          fnobj = cld_object.wordcloud;
           $("#wc").rplot("plotWordCloud", {wordtable:cld_object.wordcloud});
-          cyImg = drawNetwork(formatPieNode(robj.nodes, cld_object.wordcloud), formatEdge(robj.edges)); //update network
+          cyImg = drawNetwork(formatPieNode(cld_object.nodes, cld_object.wordcloud), formatEdge(cld_object.edges)); //update network
         });//getObject
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
     });//cloudBtn
+    $("#overrepBtn").click(function(){
+      var loadSpinner = showSpinner(txt='** Updating Network ..');
+      var annotation = $('input[name="annotation"]:checked').val();
+      var req = ocpu.call("computeNwOverrep", {edgelist:robj.edges, nodelist:robj.nodes, annotation:annotation}, function(cld_session) {
+        cld_session.getStdout(function(outtxt){
+          $("#consolemsgwc").text(outtxt);
+        });
+        cld_session.getObject(function(cld_object){
+          clobj = cld_object;
+          //Table output
+          if (cld_object.overrepresentation.length > 0) {
+            if(cloudTable != undefined){
+              cloudTable.destroy();
+              annopairTable.destroy();
+            }
+            $('#wordcld').empty();
+            $('#annopairs').empty();
+            cloudTable = drawPieTable('#wordcld',cld_object.overrepresentation);
+            annopairTable = drawTable('#annopairs',cld_object.pairs);
+          }else{
+            if (cloudTable != undefined) {
+              cloudTable.clear().draw();
+              annopairTable.clear().draw();
+            }
+            $('#wordcld').empty();
+            $('#annopairs').empty();
+          }
+          //Network output
+          fnobj = cld_object.overrepresentation;
+          cyImg = drawNetwork(formatPieNode(cld_object.nodes, cld_object.overrepresentation), formatEdge(cld_object.edges)); //update network
+        });//getObject
+        hideSpinner(loadSpinner);
+      }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
+    });//overrepBtn
     $("#downloadBtn").click(function(){
       exportNwZip(robj.nodes, robj.edges, cyImg.png());       
     });//downloadBtn
@@ -154,7 +190,7 @@
       window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment    
     });//enrBtn
     $("#downloadCld").click(function(){
-      exportEnrichmentZip(clobj.nodes, null, clobj.wordcloud, clobj.pairs, null);
+      exportEnrichmentZip(robj.nodes, null, fnobj, clobj.pairs, null);
     });//downloadCld
   });
   </script>
@@ -324,8 +360,8 @@
         <!-- /.row -->
         <hr class="dash">
         <div class="row">
-          <div class="col-lg-4"><h4>WordCloud of network</h4></div>
-          <div class="col-lg-5">
+          <div class="col-lg-12"><h4>Function overview</h4></div>
+          <div class="col-lg-6">
             <form role="form">
               <div class="form-group">
                 <label>Select annotation: </label>
@@ -334,6 +370,9 @@
                 <p class="help-block">Mesh annotation is available for PubChem compounds only.</p>
               </div>
             </form>
+          </div>
+          <div class="col-lg-3">
+            <button id="overrepBtn" type="button" class="btn btn-danger"><i class="fa fa-users"></i> Overrepresentation</button>
           </div>
           <div class="col-lg-3">
             <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
@@ -345,7 +384,7 @@
           <div class="col-lg-12">
             <ul class="nav nav-tabs">
               <li class="active"><a href="#consolewc" data-toggle="tab" data-value="Consolewc">Console</a></li>
-              <li><a href="#wordcl" data-toggle="tab" data-value="Wordcl">WordCloud</a></li>
+              <li><a href="#wordcl" data-toggle="tab" data-value="Wordcl">Output</a></li>
               <li><a href="#annopair" data-toggle="tab" data-value="AnnotationPair">AnnotationPair</a></li>
               <li class="pull-right"><h5>Summary</h5></li>
             </ul>
@@ -385,6 +424,7 @@
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
               <h4>Computing ...</h4>
+              <span id="notifyTxt"></p>
             </div>
             <div class="modal-body"><div style="height:200px">
               <span id="loading_spinner" style="position: absolute;display: block;top: 50%;left: 50%;"></span>
