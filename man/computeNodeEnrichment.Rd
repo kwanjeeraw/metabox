@@ -4,7 +4,7 @@
 \alias{computeNodeEnrichment}
 \title{Perform enrichment analysis on the input entities}
 \usage{
-computeNodeEnrichment(nodedata, nodetype, annotation, internalid, method, size, returnas)
+computeNodeEnrichment(nodedata, nodetype, annotation, internalid, method, size)
 }
 \arguments{
 \item{nodedata}{a two-column data frame of entities and the statistical values. The 1st column is entities and the second is statistical values e.g. p-values.}
@@ -26,8 +26,6 @@ See details and see \code{\link{convertId}} for how to convert ids. It has no ef
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 
 \item{size}{a numeric vector specifying the minimum and maximum number of members in each annotation term to be used in the analysis. Default is c(3,500).}
-
-\item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
 list of data frame of nodes, edges and enrichment. The nodes data frame contains input attributes. The edges data frame contains annotation pairs.
@@ -49,11 +47,11 @@ list of data frame of nodes, edges, enrichment and pairs. The pairs data frame c
 
 \code{p} = raw p-values
 
-\code{p adj} = adjusted p-values
+\code{p_adj} = adjusted p-values
 
 \code{no_of_entities} = number of input entities in each annotation term
 
-\code{total} = total number of entities in each annotation term from the database, the value is not available for Mesh
+\code{annotation_size} = total number of entities in each annotation term from the database
 
 \code{member} = list of entity members of the annotation term
 

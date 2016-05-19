@@ -4,7 +4,7 @@
 \alias{computeNwEnrichment}
 \title{Perform enrichment analysis on the input network}
 \usage{
-computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, internalid, method, size, returnas)
+computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, internalid, method, size)
 }
 \arguments{
 \item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
@@ -27,8 +27,6 @@ See details and see \code{\link{convertId}} for how to convert ids. It has no ef
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 
 \item{size}{a numeric vector specifying the minimum and maximum number of members in each annotation term to be used in the analysis. Default is c(3,500).}
-
-\item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
 list of data frame of nodes, edges, enrichment and pairs. The pairs data frame contains annotation pairs. The data frame of enrichment contains the following components:
@@ -47,11 +45,11 @@ list of data frame of nodes, edges, enrichment and pairs. The pairs data frame c
 
 \code{p} = raw p-values
 
-\code{p adj} = adjusted p-values
+\code{p_adj} = adjusted p-values
 
 \code{no_of_entities} = number of input entities in each annotation term
 
-\code{total} = total number of entities in each annotation term from the database, the value is not available for Mesh
+\code{annotation_size} = total number of entities in each annotation term from the database
 
 \code{member} = list of entity members of the annotation term
 
@@ -63,9 +61,16 @@ The grinn id (gid) is an id system of Grinn database that uses main ids of stand
 i.e. ENSEMBL for genes (e.g.ENSG00000139618), UniProt for proteins (e.g.P0C9J6), PubChem CID for compounds (e.g.5793), KEGG for pathways (e.g.hsa00010).
 }
 \examples{
+# Compute enriched Mesh terms of the input network
 #simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
 #pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790), stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
 #result <- computeNwEnrichment(simnw$edges, simnw$nodes, annotation="mesh", pval, internalid = FALSE)
+# Compute enriched pathways of the input network (example for mouse database only!)
+#prt = c(217389,268332,268655,328500,335545, 282124, 266645, 356549, 269007, 284429, 334878)
+#cmp = c(0, 2, 1, 49180, 11429, 1774, 43936)
+#bionw <- fetchHetNetwork(from=prt, to=cmp, pattern="(from:Protein)-[:CATALYSIS]->(to:Compound)")
+#pval <- data.frame(nid=c(0, 2, 1, 49180, 11429, 1774, 43936,217389,268332,268655,328500,335545, 282124, 266645, 356549, 269007, 284429, 334878), stat=runif(18, 0, 0.06))
+#result <- computeNwEnrichment(bionw$edges, bionw$nodes, annotation="pathway", pval, size=c(1,100))
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}
