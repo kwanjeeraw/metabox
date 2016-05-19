@@ -22,7 +22,11 @@ nodes:
 
 \code{nodelabel} = Mesh
 
-#'\code{nodexref} = mesh id
+\code{nodexref} = mesh id
+
+\code{annotation_size} = total number of PubChem CIDs in each Mesh term
+
+\code{background_size} = total number of PubChem CIDs
 
 edges:
 

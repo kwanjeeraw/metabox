@@ -13,7 +13,11 @@
 #'
 #'\code{nodelabel} = Mesh
 #'
-#'#'\code{nodexref} = mesh id
+#'\code{nodexref} = mesh id
+#'
+#'\code{annotation_size} = total number of PubChem CIDs in each Mesh term
+#'
+#'\code{background_size} = total number of PubChem CIDs
 #'
 #'edges:
 #'
@@ -32,8 +36,9 @@ callMesh <- function(pcid){
     {
       cat("Retrieving Mesh from PubChem ...\n")
       url = paste0('https://pubchem.ncbi.nlm.nih.gov/classification/cgi/classifications.fcgi?format=json&hid=1&search_uid_type=cid&search_uid=',pcid,'&search_type=tree')
-      mesh = jsonlite::fromJSON(txt=url, simplifyVector = FALSE)$Hierarchies$Hierarchy[[1]]$Node
-      attb = unique(plyr::ldply(lapply(mesh,formatMesh), data.frame))
+      mesh = jsonlite::fromJSON(txt=url, simplifyVector = FALSE)$Hierarchies$Hierarchy[[1]]
+      attb = unique(plyr::ldply(lapply(mesh$Node,formatMesh), data.frame))
+      attb$background_size = mesh$Information$Counts[[2]]$Count #total no. of PubChem CIDs
       pair = unique(cbind(attb$id,pcid,"ANNOTATION","PUBCHEM"))
       colnames(pair) = c("source","target","type","datasource")
       pair = as.data.frame(pair,stringsAsFactors = FALSE)
