@@ -4,7 +4,7 @@
 \alias{computeNwWordCloud}
 \title{Compute wordCloud of the input network}
 \usage{
-computeNwWordCloud(edgelist, nodelist, annotation, internalid, returnas)
+computeNwWordCloud(edgelist, nodelist, annotation, internalid)
 }
 \arguments{
 \item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
@@ -17,8 +17,6 @@ Mesh annotation doesn't require the database but it is available for PubChem com
 
 \item{internalid}{a logical value indicating whether the network nodes are neo4j ids, if TRUE (default). If not, the network nodes are expected to be any ids.
 See details and see \code{\link{convertId}} for how to convert ids. It has no effect on Mesh annotation.}
-
-\item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
 list of data frame of nodes, edges, wordcloud and pairs. The pairs data frame contains annotation pairs. The data frame of wordcloud contains the following components:
@@ -35,7 +33,7 @@ list of data frame of nodes, edges, wordcloud and pairs. The pairs data frame co
 
 \code{nodexref} = cross references
 
-\code{freq} = frequency of the annotation term
+\code{freq} = frequency or number of input entities in each annotation term
 
 \code{member} = list of members of the annotation term
 

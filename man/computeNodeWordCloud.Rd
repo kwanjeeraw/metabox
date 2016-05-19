@@ -4,7 +4,7 @@
 \alias{computeNodeWordCloud}
 \title{Compute wordCloud of the input entities}
 \usage{
-computeNodeWordCloud(txtinput, nodetype, annotation, internalid, returnas)
+computeNodeWordCloud(txtinput, nodetype, annotation, internalid)
 }
 \arguments{
 \item{txtinput}{a character vector of entities e.g. c('pubchemId1', 'pubchemId2').
@@ -18,8 +18,6 @@ Mesh annotation doesn't require the database but it is available for PubChem com
 
 \item{internalid}{a logical value indicating whether \code{txtinput} is the neo4j id, if TRUE (default). If not, \code{txtinput} is expected to be the grinn id or PubChem CID.
 See details and see \code{\link{convertId}} for how to convert ids. It has no effect on Mesh annotation.}
-
-\item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
 \value{
 list of data frame of nodes, edges and wordcloud. The nodes data frame contains input attributes. The edges data frame contains annotation pairs.
@@ -37,7 +35,7 @@ The data frame of wordcloud contains the following components:
 
 \code{nodexref} = cross references
 
-\code{freq} = frequency of the annotation term
+\code{freq} = frequency or number of input entities in each annotation term
 
 \code{member} = list of members of the annotation term
 
