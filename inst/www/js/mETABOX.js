@@ -106,7 +106,8 @@ function formatCyJSON(network){
 }
 
 //@function load spinner
-function showSpinner(){
+//@param txt text message
+function showSpinner(txt=null){
     $('#notifyBox').modal('show');
     var opts = {
       lines: 10, // The number of lines to draw
@@ -127,6 +128,7 @@ function showSpinner(){
       left:'auto' // Left position relative to parent in px
     };
     var spinner = new Spinner(opts).spin(document.getElementById('loading_spinner'));//assign spinner to modal box
+    $("#notifyTxt").text(txt);
     return spinner;
 }
 
