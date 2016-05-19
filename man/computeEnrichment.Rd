@@ -28,7 +28,7 @@ enrichment analysis result with the following components:
 
 \code{p} = raw p-values
 
-\code{p adj} = adjusted p-values
+\code{p_adj} = adjusted p-values
 
 \code{member} = list of entity members of the annotation term
 

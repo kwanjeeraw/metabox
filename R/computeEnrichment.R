@@ -15,7 +15,7 @@
 #'
 #'\code{p} = raw p-values
 #'
-#'\code{p adj} = adjusted p-values
+#'\code{p_adj} = adjusted p-values
 #'
 #'\code{member} = list of entity members of the annotation term
 #'
@@ -54,6 +54,8 @@ computeEnrichment.default <- function (edgelist, pval, fc=NULL, method="reporter
     colnames(resTab) = gsub("amount \\(tot\\)","no_of_entities",colnames(resTab))
     drops = c("Stat (non-dir_)","Stat (dist_dir_up)","Stat (dist_dir_dn)","Stat (mix_dir_up)","Stat (mix_dir_dn)","amount (down)","amount (up)")
     resTab = resTab[ , !(colnames(resTab) %in% drops)] #hide stat columns
+    colnames(resTab) = gsub(" \\(non-dir_\\)","",colnames(resTab))
+    colnames(resTab) = gsub("p adj","p_adj",colnames(resTab))
     #resTab = resTab[,c(1,ncol(resTab),2:(ncol(resTab)-1))] #rearrange columns
     cat("Returning enrichment of size ",nrow(resTab)," ...\n")
     if(nrow(resTab)>0){
