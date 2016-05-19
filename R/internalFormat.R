@@ -62,7 +62,7 @@ formatMesh = function(x){
     mid = paste0('D',stringr::str_sub(x$Information$URL,-6)) #MeshTree = D
     mout = merge(data.frame(id=mid, stringsAsFactors = FALSE),MESH,by.x='id',by.y='MeshId') #merge with MESH table for annotation information
     if(nrow(mout)>0){
-      data.frame(id=mout$id, gid=mout$id, nodename=mout$MeshName, nodelabel="Mesh", nodexref=mout$id, stringsAsFactors = FALSE)
+      data.frame(id=mout$id, gid=mout$id, nodename=mout$MeshName, nodelabel="Mesh", nodexref=mout$id, annotation_size=x$Information$Counts[[2]]$Count, stringsAsFactors = FALSE)
     }
   }
 }
