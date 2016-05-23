@@ -77,6 +77,7 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
         stop("argument 'nodedata' is not valid, data frame is required.")
       }
       require('dplyr')#load dplyr for opencpu
+      nodetype = Hmisc::capitalize(nodetype)
       if(tolower(annotation) == 'pathway' && foundDb()){#pathway enrichment
         cat("Querying database ...\n")
         if(internalid){
