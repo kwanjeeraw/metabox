@@ -48,13 +48,14 @@
     var ptwTable;
     var cloudTable;
     var robj;
-    var cyImg;    
+    var cyImg;
+    var annotation;
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();
       var txtinput = $("#txtinput").val().trim().split(/\s+/g);     
       if(txtinput[0] == ''){txtinput = null;}
       var nodetype = $("#nodetype").val();
-      var annotation = $('input[name="annotation"]:checked').val();
+      annotation = $('input[name="annotation"]:checked').val();
       var internalid = $('#internalid').is(':checked');
       var req = ocpu.call("computeNodeOverrep",{txtinput:txtinput, nodetype:nodetype, annotation:annotation, internalid:internalid}, function(session) {//calls R function: fetchHetNetwork
         compute_session = session;
@@ -63,39 +64,32 @@
         });
         session.getObject(function(object){
           robj = object;
-console.log(robj);
           //Table output
-          if(robj.edges.length > 0){
-            if(nodeTable != undefined){
-              nodeTable.destroy();
-              edgeTable.destroy();
-              ptwTable.destroy();
-            }
-            $('#nodes').empty();
-            $('#edges').empty();
-            $('#pathways').empty();
-            nodeTable = drawTable('#nodes',robj.nodes);
-            edgeTable = drawTable('#edges',robj.edges);
-            ptwTable = drawPieTable('#pathways',robj.overrepresentation);
+          if(object.overrepresentation.length > 0){
+            clear3Table(ndtable=nodeTable, edtable=edgeTable, pwtable=ptwTable, nid='#nodes', eid='#edges', pid='#pathways', hasResult=true);
+            nodeTable = drawTable('#nodes',object.nodes);
+            edgeTable = drawTable('#edges',object.edges);
+            ptwTable = drawPieTable('#pathways',object.overrepresentation);
           }else{
-            if (nodeTable != undefined) {
-              nodeTable.clear().draw();
-              edgeTable.clear().draw();
-              ptwTable.clear().draw();
-            }
-            $('#nodes').empty();
-            $('#edges').empty();
-            $('#pathways').empty();
+            clear3Table(ndtable=nodeTable, edtable=edgeTable, pwtable=ptwTable, nid='#nodes', eid='#edges', pid='#pathways', hasResult=false);
           }
           //Network output
-          cyImg = drawNetwork(formatPieNode(robj.nodes, robj.overrepresentation), formatEdge(""),'grid');
+          cyImg = drawNetwork(formatPieNode(object.nodes, object.overrepresentation), formatEdge(""),'grid');
         });//getObject    
         hideSpinner(loadSpinner);
+        toggleMeshTree(annotation);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
     $("#downloadBtn").click(function(){
       exportEnrichmentZip(robj.nodes, null, robj.overrepresentation, robj.edges, cyImg.png());
     });//downloadBtn
+    $("#treeBtn").click(function(){
+      $('#d3tree').show();
+      var req = ocpu.call("createMeshTree",{meshtable:compute_session, fntype:"overrepresentation"}, function(session) {//calls R function: createMeshTree
+        var frameSrc = 'plottree.html?rsess='+session.getLoc();
+        $('iframe').attr("src",frameSrc);
+      }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
+    });//treeBtn
   });
   </script>
 </head>
@@ -183,7 +177,7 @@ console.log(robj);
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
-            <h4>Network</h4><hr>
+            <h4>Outputs</h4><hr>
             <ul class="nav nav-tabs">
               <li class="active"><a href="#console" data-toggle="tab" data-value="Console">Console</a></li>
               <li><a href="#pathway" data-toggle="tab" data-value="Overrepresentation">Overrepresentation</a></li>
@@ -224,7 +218,21 @@ console.log(robj);
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
+            <div id="d3tree" class="panel panel-danger">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#mtree" href="#mtree">Mesh tree</a></h3>
+              </div>
+              <div id="mtree" class="panel-body collapse in">
+                <iframe src="" frameborder="0" width="100%" height="100%" scrolling="auto"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
             <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
+            <button id="treeBtn" type="button" class="btn btn-default" disabled><i class="fa fa-sitemap"></i> Show Mesh tree</button>
           </div>
         </div>
         <!-- /.row -->

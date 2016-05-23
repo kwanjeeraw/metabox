@@ -6,6 +6,9 @@
     height:500px;
     width:100%;
 }
+#d3tree{
+    display: none;
+}
 hr.dash {
     border-top: 1px dashed #8c8b8b;
 }

@@ -52,6 +52,7 @@
     var robj;
     var cyImg;
     var url = getURLVars('rsess')+"R/.val/json";
+    var annotation;
     $.ajax({
       url: url,
       type: 'GET',
@@ -77,7 +78,7 @@
           var loadSpinner = showSpinner();    
           var internalid = $('#internalid').is(':checked');
           var method = $("#method").val();
-          var annotation = $('input[name="annotation"]:checked').val();
+          annotation = $('input[name="annotation"]:checked').val();
           var req = ocpu.call("computeNwEnrichment",{edgelist:data.edges, nodelist:data.nodes, annotation:annotation, internalid:internalid, pval:inp_session, method:method}, function(session) {//calls R function: computeNwEnrichment
             compute_session = session;
             session.getStdout(function(outtxt){
@@ -86,11 +87,21 @@
             session.getObject(function(object){
               robj = object;
               //Table output
-              if (robj.enrichment.length > 0) {
-                nodeTable = drawTable('#nodes',robj.nodes);
-                edgeTable = drawTable('#edges',robj.edges);
-                ptwTable = drawPieTable('#pathways',robj.enrichment);
-                annopairTable = drawTable('#annopairs',robj.pairs);
+              if (object.enrichment.length > 0) {
+                if(nodeTable != undefined){
+                  nodeTable.destroy();
+                  edgeTable.destroy();
+                  ptwTable.destroy();
+                  annopairTable.destroy();
+                }
+                $('#nodes').empty();
+                $('#edges').empty();
+                $('#pathways').empty();
+                $('#annopairs').empty();
+                nodeTable = drawTable('#nodes',object.nodes);
+                edgeTable = drawTable('#edges',object.edges);
+                ptwTable = drawPieTable('#pathways',object.enrichment);
+                annopairTable = drawTable('#annopairs',object.pairs);
               }else{
                 if (nodeTable != undefined) {
                   nodeTable.clear().draw();
@@ -104,9 +115,10 @@
                 $('#annopairs').empty();
               }
               //Network output
-              cyImg = drawNetwork(formatPieNode(robj.nodes, robj.enrichment), formatEdge(robj.edges));
+              cyImg = drawNetwork(formatPieNode(object.nodes, object.enrichment), formatEdge(object.edges));
             });//getObject    
             hideSpinner(loadSpinner);
+            toggleMeshTree(annotation);
           }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
         });//computeBtn
       }, error: function(){console.log("Ajax error: Cannot get data");}//success
@@ -119,6 +131,13 @@
     $("#downloadBtn").click(function(){
       exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, robj.pairs, cyImg.png());
     });//downloadBtn
+    $("#treeBtn").click(function(){
+      $('#d3tree').show();
+      var req = ocpu.call("createMeshTree",{meshtable:compute_session, fntype:"enrichment"}, function(session) {//calls R function: createMeshTree
+        var frameSrc = 'plottree.html?rsess='+session.getLoc();
+        $('iframe').attr("src",frameSrc);
+      }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
+    });//treeBtn
   });
   </script>
 </head>
@@ -278,7 +297,21 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
+            <div id="d3tree" class="panel panel-danger">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#mtree" href="#mtree">Mesh tree</a></h3>
+              </div>
+              <div id="mtree" class="panel-body collapse in">
+                <iframe src="" frameborder="0" width="100%" height="100%" scrolling="auto"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
             <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
+            <button id="treeBtn" type="button" class="btn btn-default" disabled><i class="fa fa-sitemap"></i> Show Mesh tree</button>
           </div>
         </div>
         <!-- /.row -->
