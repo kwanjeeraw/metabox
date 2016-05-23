@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- Core JavaScript -->
+  <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+  <script type="text/javascript" src="js/opencpu-0.5.js"></script>
+  <script type="text/javascript" src="js/mETABOX.js"></script>
+  <script type="text/javascript" src="js/d3Plots.js"></script>
+  <!-- App JavaScript -->
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <style>
+  p {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+  }
+  .node rect {
+    cursor: pointer;
+    fill: #fff;
+    fill-opacity: .5;
+    stroke: #B74C62;
+    stroke-width: 1px;
+  }
+  .node text {
+    font: 10px sans-serif;
+    pointer-events: none;
+  }
+  path.link {
+    fill: none;
+    stroke: #BE5E72;
+    stroke-width: 1.5px;
+  }
+  </style>
+  <!-- Embedded script calling R -->
+  <script>  
+  $(function(){ 
+    var url = getURLVars('rsess')+"R/.val/json";
+    drawTree(url);
+  });
+  </script>
+</head>
+<body>
+  <p>Mesh tree with list of associated PubChem CIDs</p>
+</body>
+</html>
