@@ -190,6 +190,69 @@ function drawTable(id, data) {
     return dtTable;
 }
 
+//@function clear 2 tables e.g. network tables
+//@param ndtable, edtable dataTable object
+//@param nid, eid table id
+//@param hasResult boolean if table contains results
+function clear2Table(ndtable, edtable, nid, eid, hasResult) {
+    if(hasResult){
+        if(ndtable != undefined){
+            ndtable.destroy();
+            edtable.destroy();
+        }
+    }else{
+        if (ndtable != undefined) {
+            ndtable.clear().draw();
+            edtable.clear().draw();
+        }    
+    }
+    $(nid).empty();
+    $(eid).empty();
+}
+
+//@function clear 3 tables e.g. enrichment tables
+//@param ndtable, edtable, pwtable dataTable object
+//@param nid, eid, pid table id
+//@param hasResult boolean if table contains results
+function clear3Table(ndtable, edtable, pwtable, nid, eid, pid, hasResult) {
+    if(hasResult){
+        if(ndtable != undefined){
+            ndtable.destroy();
+            edtable.destroy();
+            pwtable.destroy();
+        }
+    }else{
+        if (ndtable != undefined) {
+            ndtable.clear().draw();
+            edtable.clear().draw();
+            pwtable.clear().draw();
+        }    
+    }
+    $(nid).empty();
+    $(eid).empty();
+    $(pid).empty();
+}
+
+//@function clean functional analysis outputs
+function cleanFnOutputs() {
+    $('#consolemsgwc').empty();
+    $('#wordcld').empty();
+    $('#annopairs').empty();
+    $('#wdc').hide();
+    $('#d3tree').hide();
+}
+
+//@function toggle Mesh tree button and content
+//@param anno string of annotation type
+function toggleMeshTree(anno){
+    $('#d3tree').hide();
+    if (anno == "pathway") {
+      $('#treeBtn').prop('disabled', true);
+    }else{
+      $('#treeBtn').prop('disabled', false);
+    }
+}
+
 //@function draw table with color code
 //@param id id element
 //@param dt array of json objects
