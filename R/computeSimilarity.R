@@ -1,6 +1,6 @@
 #'Compute Tanimoto similarity network
 #'@description compute a network for compounds based on chemical structure similarity.
-#'The function wraps around the functions of \pkg{\link{metabomapr}} to compute Tanimoto distances between the given compounds using PubChem fingerprints.
+#'The function computes Tanimoto distances between the given compounds using PubChem fingerprints.
 #'@usage computeSimilarity(txtinput, coef, returnas)
 #'@param txtinput a character vector of PubChem CIDs.
 #'@param coef a numeric value specifying the minimum Tanimoto similarity correlation coefficient to be included in the output (from 0 to 1, default is 0.7).
@@ -29,6 +29,7 @@
 #'@note If the database is installed, node attributes will be automatically retrieved from the database. Otherwise node attributes will be the original input.
 #'@author Kwanjeera W \email{kwanich@@ucdavis.edu}
 #'@references Willett P., Barnard JM. and Downs GM. (1998) Chemical similarity searching. J. Chem. Inf. Comput. Sci., 38, 983–996.
+#'@references Barupal KD., et al. (2012) MetaMapp: mapping and visualizing metabolomic data by integrating information from biochemical pathways and chemical and mass spectral similarity. BMC Bioinformatics. 13:99.
 #'@references Grapov D., Wanichthanarak K. and Fiehn O. (2015) MetaMapR: pathway independent metabolomic network analysis incorporating unknowns. Bioinformatics. 31(16):2757-60.
 #'@references Cao Y., Charisi A., Cheng L., Jiang T. and Girke T. (2008) ChemmineR: a compound mining framework for R. Bioinformatics, 24(15), pp. 1733–1734.
 #'@references \url{ftp://ftp.ncbi.nih.gov/pubchem/specifications/pubchem_fingerprints.txt}
@@ -44,18 +45,10 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
     {
       txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
       cat("Computing Tanimoto similarity ...\n")
-      tanmt = metabomapr::CID_tanimoto(txtinput)
-      #format output
-      nRow = nrow(tanmt)
-      nNames = dimnames(tanmt)[[1]]
-      rowMat = matrix(c(1:nRow), nRow, nRow, byrow = TRUE)
-      colMat = matrix(c(1:nRow), nRow, nRow)
-      dstRows = as.dist(rowMat)
-      dstCols = as.dist(colMat)
-      network = data.frame(source = as.character(nNames[dstRows]), target = as.character(nNames[dstCols]), coef = tanmt[lower.tri(tanmt)], stringsAsFactors = FALSE)
-      network = network[network$coef > coef, ]
+      network = getChemSimNet(txtinput, cutoff = coef)
       cat("Format and returning network of size ",nrow(network)," ...\n")
       if(nrow(network)>0){#pass cutoff
+        network = data.frame(source = as.character(network[,1]), target = as.character(network[,2]), coef = as.numeric(network[,3]), stringsAsFactors = FALSE)
         network$type = "TANIMOTO_SIMILARITY"
         cat("Format and returning network nodes ...\n")
         #format nodeList from edgeList
@@ -81,6 +74,7 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
                json = list(nodes = jsonlite::toJSON(networknode), edges = jsonlite::toJSON(network)),
                stop("Error: incorrect 'returnas' type"))
       }else{#not pass cutoff
+        cat("Coef is too high, no network returned ...\n")
         switch(returnas,
                dataframe = list(nodes = data.frame(), edges = data.frame()),
                list = list(nodes = list(), edges = list()),
