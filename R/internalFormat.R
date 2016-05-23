@@ -55,7 +55,7 @@ formatNode.LIST = function(x,y,z){
   }
 }
 #format Mesh results from https://pubchem.ncbi.nlm.nih.gov/classification/cgi/classifications.fcgi
-#MESH object contains Chemicals and Drugs Category tree (D) starting from level 3 e.g. Amino Acids (D12.125)
+#MESH object contains Chemicals and Drugs Category tree (D) starting from level 2 e.g. Amino Acids (D12.125)
 formatMesh = function(x){
   #don't want root, mesh = Supplementary Records, itself
   if(unlist(x$ParentID) != "root" && x$Information$Name != "Supplementary Records" && !is.null(x$Information$ChildID)){
@@ -74,4 +74,28 @@ foundDb = function(){
   }, error = function(err) {#catch error and return FALSE if there is no db
     FALSE
   })
+}
+
+#convert MESH data frame to mesh tree
+#ex submesh = MESH[1:50,-4]
+#result = formatMeshTree(submesh)
+#jsonlite::toJSON(ToListExplicit(result, unname = TRUE), pretty = TRUE)
+formatMeshTree = function(mes){
+  require('data.tree')
+  mes = mes[order(mes$Tree),]
+  meshtree = Node$new("Chemicals and Drugs Category 2nd level")
+  for(i in 1:nrow(mes)){
+    if(nchar(mes$Tree[i])==7){#always create level 1
+      meshtree$AddChild(mes$Tree[i], MeshId=mes$MeshId[i], MeshName=mes$MeshName[i])
+    }else{
+      paindex = substr(mes$Tree[i], 1, nchar(mes$Tree[i])-4) #get parent index
+      panode = meshtree$FindNode(paindex) #get parent node
+      if(is.null(panode)){#if no parent node
+        meshtree$AddChild(mes$Tree[i], MeshId=mes$MeshId[i], MeshName=mes$MeshName[i])
+      }else{#if has parent node
+        meshtree$FindNode(paindex)$AddChild(mes$Tree[i], MeshId=mes$MeshId[i], MeshName=mes$MeshName[i])
+      }
+    }
+  }
+  meshtree
 }
