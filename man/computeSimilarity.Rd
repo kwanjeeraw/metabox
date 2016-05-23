@@ -38,7 +38,7 @@ Return empty list if error or found nothing.
 }
 \description{
 compute a network for compounds based on chemical structure similarity.
-The function wraps around the functions of \pkg{\link{metabomapr}} to compute Tanimoto distances between the given compounds using PubChem fingerprints.
+The function computes Tanimoto distances between the given compounds using PubChem fingerprints.
 }
 \note{
 If the database is installed, node attributes will be automatically retrieved from the database. Otherwise node attributes will be the original input.
@@ -51,6 +51,8 @@ Kwanjeera W \email{kwanich@ucdavis.edu}
 }
 \references{
 Willett P., Barnard JM. and Downs GM. (1998) Chemical similarity searching. J. Chem. Inf. Comput. Sci., 38, 983–996.
+
+Barupal KD., et al. (2012) MetaMapp: mapping and visualizing metabolomic data by integrating information from biochemical pathways and chemical and mass spectral similarity. BMC Bioinformatics. 13:99.
 
 Grapov D., Wanichthanarak K. and Fiehn O. (2015) MetaMapR: pathway independent metabolomic network analysis incorporating unknowns. Bioinformatics. 31(16):2757-60.
 

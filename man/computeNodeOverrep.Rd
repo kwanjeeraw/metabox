@@ -45,7 +45,7 @@ The data frame of overrepresentation contains the following components:
 
 \code{annotation_size} = total number of entities in each annotation term from the database
 
-\code{background_size} = total number of entities in the database
+\code{background_size} = total number of annotated entities in the database
 
 \code{member} = list of entity members of the annotation term
 
