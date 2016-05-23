@@ -1,6 +1,6 @@
 #overrepresentation analysis of pathways, one nodetype
 callHypergeo.pathway <- function(edgelist, nodelist, member, nodetype, inputsize){
-  qstring = paste0('MATCH (n:',nodetype,') RETURN count(n)')#get db stat
+  qstring = paste0('MATCH (:Pathway)-[r:ANNOTATION]->(n:',nodetype,') RETURN count(DISTINCT n)')#get db stat
   totEnt = as.data.frame(curlRequest.TRANSACTION.row(qstring), stringsAsFactors = FALSE)$row #total no. of entities in db
   resDF = foreach(i=1:nrow(edgelist), .combine=rbind) %dopar% {#overrepresentation analysis
     qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',nodetype,') where ID(from) = ',edgelist$id[i],' RETURN toString(ID(from)), labels(to), count(to)')

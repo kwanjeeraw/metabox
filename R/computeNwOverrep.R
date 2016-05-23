@@ -41,7 +41,7 @@
 #'
 #'\code{annotation_size} = total number of entities in each annotation term from the database
 #'
-#'\code{background_size} = total number of entities in the database
+#'\code{background_size} = total number of annotated entities in the database
 #'
 #'\code{member} = list of entity members of the annotation term
 #'
@@ -86,7 +86,7 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
             if(length(ntypels) > 1){#more than one node types
               cat("Performing overrepresentation analysis ...\n")
               ntypestat = foreach(i=1:length(ntypels), .combine=rbind) %dopar% {#get db stat
-                qstring = paste0('MATCH (n:',ntypels[i],') RETURN count(n)')#get db stat
+                qstring = paste0('MATCH (:Pathway)-[r:ANNOTATION]->(n:',ntypels[i],') RETURN count(DISTINCT n)')#get db stat
                 totEnt = data.frame(nl=ntypels[i], row=curlRequest.TRANSACTION.row(qstring), stringsAsFactors = FALSE) #total no. of entities
               }
               overDF = foreach(i=1:nrow(subanno), .combine=rbind) %dopar% {#overrepresentation analysis
