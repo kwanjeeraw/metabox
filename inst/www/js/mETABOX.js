@@ -339,10 +339,11 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
             'content': 'data(nodename)',
             'background-color':'#B3B3B3',
             'text-valign': 'bottom',
-            'color':'#515151',
+            'color':'#444444',
             'text-outline-color':'#FFFFFF',
             'text-outline-width':0.3,
             'font-size':14,
+            'font-weight':'bold',
             'pie-size': '90%',
             'pie-1-background-color': '#FF0000',
             'pie-1-background-size': 'mapData(pie1, 0, 10, 0, 100)',
@@ -404,43 +405,43 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
           })
         .selector('edge[type = "BIOCHEMICAL_REACTION"]')
           .style({
-            'line-color': '#ff0000',
-            'target-arrow-color': '#ff0000'
+            'line-color': '#ff3333',
+            'target-arrow-color': '#ff3333'
           })
         .selector('edge[type = "CATALYSIS"]')
           .style({
-            'line-color': '#4169E1',
-            'target-arrow-color': '#4169E1'
+            'line-color': '#577ae4',
+            'target-arrow-color': '#577ae4'
           })
         .selector('edge[type = "CONTROL"]')
           .style({
-            'line-color': '#006400',
-            'target-arrow-color': '#006400'
+            'line-color': '#00b100',
+            'target-arrow-color': '#00b100'
           })
         .selector('edge[type = "CONVERSION"]')
           .style({
-            'line-color': '#FF00FF',
-            'target-arrow-color': '#FF00FF'
+            'line-color': '#ff80ff',
+            'target-arrow-color': '#ff80ff'
           })
         .selector('edge[type = "GENETIC_ASSOCIATION"]')
           .style({
-            'line-color': '#00BFFF',
-            'target-arrow-color': '#00BFFF'
+            'line-color': '#1ac5ff',
+            'target-arrow-color': '#1ac5ff'
           })
         .selector('edge[type = "MOLECULAR_BINDING"]')
           .style({
-            'line-color': '#51ED34',
-            'target-arrow-color': '#51ED34'
+            'line-color': '#aeed34',
+            'target-arrow-color': '#aeed34'
           })
         .selector('edge[type = "TANIMOTO_SIMILARITY"]')
           .style({
-            'line-color': '#895238',
+            'line-color': '#ad6847',
             'target-arrow-shape': 'none',
             'width': 'mapData(coef, 0, 1, 1, 10)'
           })
         .selector('edge[type = "CORRELATION"]')
           .style({
-            'line-color': '#3f007d',
+            'line-color': '#b265ff',
             'target-arrow-shape': 'none',
             'width': function(ele){
                 var cf = Math.abs(ele.data('coef'));
@@ -449,7 +450,7 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
           })
         .selector('edge[type = "PARTIAL_CORRELATION"]')
           .style({
-            'line-color': '#f16913',
+            'line-color': '#dcc60e',
             'target-arrow-shape': 'none',
             'width': function(ele){
                 var cf = Math.abs(ele.data('coef'));
