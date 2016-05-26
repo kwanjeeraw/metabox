@@ -166,7 +166,7 @@
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
     });//overrepBtn  
     $("#downloadBtn").click(function(){
-      exportNwZip(robj.nodes, robj.edges, cyImg.png());       
+      exportNwZip(robj.nodes, robj.edges, cyImg.png({bg: '#ffffff', scale:5}));       
     });//downloadBtn
     $("#enrBtn").click(function(){
       window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment    

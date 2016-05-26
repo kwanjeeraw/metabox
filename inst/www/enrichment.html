@@ -129,7 +129,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, robj.pairs, cyImg.png());
+      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, robj.pairs, cyImg.png({bg: '#ffffff', scale:5}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();

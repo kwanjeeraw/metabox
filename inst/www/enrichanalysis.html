@@ -102,7 +102,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, null, robj.enrichment, robj.edges, cyImg.png());
+      exportEnrichmentZip(robj.nodes, null, robj.enrichment, robj.edges, cyImg.png({bg: '#ffffff', scale:5}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();
