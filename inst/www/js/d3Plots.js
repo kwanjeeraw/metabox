@@ -129,11 +129,7 @@ function drawTree(meshpath){
           .attr("dy", 3.5)
           .attr("dx", 5.5)
           .text(function(d) {
-            if (d.member[0].length<=25) {
-              lab = d.MeshName+": "+d.member[0];
-            }else{
-              lab = d.MeshName+": "+d.member[0].slice(0, 20)+" ...";
-            }
+            lab = d.MeshName+" ("+d.size+")";
             return lab;
           });
       // Transition nodes to their new position.
