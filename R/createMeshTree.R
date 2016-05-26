@@ -28,12 +28,12 @@ createMeshTree.default <- function(meshtable,fntype,toprank=50){
   meshtable = meshtable[1:ind,]#get top rank
   meshtable = merge(meshtable,MESH,by.x='id',by.y='MeshId')#get Tree info
   meshtable = meshtable[order(meshtable$Tree),]
-  meshtree = Node$new("Chemicals and Drugs Category 2nd level", MeshId="D", MeshName="Chemicals and Drugs Category", member="PubChem CIDs")
+  meshtree = Node$new("Chemicals and Drugs Category 2nd level", MeshId="D", MeshName="Chemicals and Drugs Category", member="PubChem CIDs", size=1)
   for(i in 1:nrow(meshtable)){#build mesh tree
     siz = switch(fntype,
                  wordcloud = meshtable$freq[i],
-                 overrepresentation = -log(meshtable$p_adj[i]),
-                 enrichment = -log(meshtable$p_adj[i])) #scale size
+                 overrepresentation = meshtable$p_adj[i],
+                 enrichment = meshtable$p_adj[i]) #scale size
     if(nchar(meshtable$Tree[i])==7){#always create level 1
       meshtree$AddChild(meshtable$Tree[i], MeshId=meshtable$id[i], MeshName=meshtable$MeshName[i], member=meshtable$member[i], size=siz)
     }else{#other levels
