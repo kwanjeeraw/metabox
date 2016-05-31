@@ -14,12 +14,14 @@ $(document).ready(function(){//wait untile the document is fully loaded.
            $(".expression_feature_phenotype").hide("fast");
          }
     });
+
     var e;
     var req=ocpu.call("summary_aggregated_data",{e:e,p:2,f:2},function(session){
       session.getObject(function(obj){
         $("#is_Waiting").text(obj.warnings);
       });
     });
+
     $("#FilesUploaded").hide();
     $("#waitingFiles").show();
     //var aggregated; //This is the session of list containing three data.frames ("expression","feature","phenotype")
