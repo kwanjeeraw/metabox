@@ -60,14 +60,16 @@ computeParCorrelation.default <- function (x, xtype=NULL, internalid = TRUE, coe
       if (class(tmparg) == "try-error") {
         stop("argument 'matrix.completion' is not valid, choose one from the list: IPF,HTF")
       }
+      gc()
       cat("Formating row.names of input data frame ...\n")
-      tmp = x[,2:ncol(x)]
+      #tmp = x[,2:ncol(x)]
+      tmp = as.data.frame(lapply(x[,-1], as.numeric))
       row.names(tmp) = x[,1]
       x = tmp
       cat("Computing partial correlation ...\n")
       nrr.estimates = qpgraph::qpAvgNrr(x, alpha=alpha)
       g = qpgraph::qpGraph(nrr.estimates, epsilon=epsilon)
-      pac.estimates = qpgraph::qpPAC(x, g=g@g, matrix.completion=matrix.completion)
+      pac.estimates = qpgraph::qpPAC(x, g=g@g, matrix.completion=matrix.completion, tol=1)
       #format output
       nRow = nrow(pac.estimates$R)
       nNames = dimnames(pac.estimates$R)[[1]]
