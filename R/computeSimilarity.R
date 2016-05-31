@@ -45,7 +45,17 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
     {
       txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
       cat("Computing Tanimoto similarity ...\n")
-      network = getChemSimNet(txtinput, cutoff = coef)
+#       tanmt = metabomapr::CID_tanimoto(txtinput)
+#       #format output
+#       nRow = nrow(tanmt)
+#       nNames = dimnames(tanmt)[[1]]
+#       rowMat = matrix(c(1:nRow), nRow, nRow, byrow = TRUE)
+#       colMat = matrix(c(1:nRow), nRow, nRow)
+#       dstRows = as.dist(rowMat)
+#       dstCols = as.dist(colMat)
+#       network = data.frame(source = as.character(nNames[dstRows]), target = as.character(nNames[dstCols]), coef = tanmt[lower.tri(tanmt)], stringsAsFactors = FALSE)
+#       network = network[network$coef > coef, ]
+        network = getChemSimNet(txtinput, cutoff = coef)
       cat("Format and returning network of size ",nrow(network)," ...\n")
       if(nrow(network)>0){#pass cutoff
         network = data.frame(source = as.character(network[,1]), target = as.character(network[,2]), coef = as.numeric(network[,3]), stringsAsFactors = FALSE)
@@ -74,7 +84,6 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
                json = list(nodes = jsonlite::toJSON(networknode), edges = jsonlite::toJSON(network)),
                stop("Error: incorrect 'returnas' type"))
       }else{#not pass cutoff
-        cat("Coef is too high, no network returned ...\n")
         switch(returnas,
                dataframe = list(nodes = data.frame(), edges = data.frame()),
                list = list(nodes = list(), edges = list()),
