@@ -192,6 +192,9 @@ function drawTree(meshpath){
       update(d);
     }
     function color(d) {
-      return d._children ? "#953C4E" : d.children ? "#CD8392" : "#EACBD2";
+        var cscale = chroma.scale(['yellow','red','#ce0000']).domain([0, 3, 6, 9]);
+        var sc = cscale(Math.abs(Math.log(d.size))).hex(); // #FF7F7F
+        //return d._children ? "#953C4E" : d.children ? "#CD8392" : "#EACBD2";
+        return d._children ? sc : d.children ? sc : sc;
     }
 }
