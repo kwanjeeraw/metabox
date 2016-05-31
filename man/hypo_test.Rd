@@ -4,8 +4,8 @@
 \alias{hypo_test}
 \title{hypothesis test}
 \usage{
-hypo_test(normalized_data, p, f, factor_name = NULL,
-  repeated_factor_name = NULL, confound = NULL)
+hypo_test(e, p, f, independent_factor_name = NULL,
+  repeated_factor_name = NULL, confound = NULL, equal_variance_anova = F)
 }
 \description{
 hypothesis test
