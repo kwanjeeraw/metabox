@@ -69,7 +69,7 @@ computeParCorrelation.default <- function (x, xtype=NULL, internalid = TRUE, coe
       cat("Computing partial correlation ...\n")
       nrr.estimates = qpgraph::qpAvgNrr(x, alpha=alpha)
       g = qpgraph::qpGraph(nrr.estimates, epsilon=epsilon)
-      pac.estimates = qpgraph::qpPAC(x, g=g@g, matrix.completion=matrix.completion, tol=1)
+      pac.estimates = qpgraph::qpPAC(x, g=g@g, matrix.completion=matrix.completion)
       #format output
       nRow = nrow(pac.estimates$R)
       nNames = dimnames(pac.estimates$R)[[1]]
