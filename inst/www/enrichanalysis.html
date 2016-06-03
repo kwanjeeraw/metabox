@@ -66,6 +66,18 @@
         });//getObject
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//fileinput
+    $("#exinput").click(function(){//load example data
+      $("#inpform")[0].reset();
+      $.get("../data/pval_24h/json", function(example){
+        inp_session = example;
+        //Table output
+        if (inputTable != undefined) {
+           inputTable.destroy();
+           $('#inputdt').empty();
+         }
+        inputTable = drawTable('#inputdt',example);
+      });//get example object
+    });//exinput
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();
       var nodetype = $("#nodetype").val();
@@ -142,13 +154,13 @@
                 <h3 class="panel-title"><a data-toggle="collapse" data-target="#args" href="#">Inputs</a></h3>
               </div>
               <div id="args" class="panel-body collapse in">
-                <form role="form">
+                <form id="inpform" role="form">
                   <div class="row">
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label>Upload data:</label>
                         <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
-                        <p class="help-block">Tab-delimited input data</p>
+                        <p class="help-block">Tab-delimited input data (Try with <a id="exinput" href="#" type="reset">example data</a>)</p>
                       </div>
                     </div>
                     <div class="col-lg-2">
