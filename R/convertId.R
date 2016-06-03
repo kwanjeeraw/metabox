@@ -62,7 +62,7 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
         row.names(nodes) = NULL
       }else{#list input
         nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
-          res = formatNode.LIST(txtinput[i],"Compound","name")[,1:2] #get input attributes: id and gid
+          res = formatNode.LIST(txtinput[i],y=nodetype,z=searchby)[,1:2] #get input attributes: id and gid
           data.frame(txtinput[i], res, stringsAsFactors = FALSE)
         }
         colnames(nodes) = c("input","neo4jid","grinnid")
