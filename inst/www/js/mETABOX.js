@@ -420,8 +420,8 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
           })
         .selector('edge[type = "CONVERSION"]')
           .style({
-            'line-color': '#ff80ff',
-            'target-arrow-color': '#ff80ff'
+            'line-color': '#ff9aff',
+            'target-arrow-color': '#ff9aff'
           })
         .selector('edge[type = "GENETIC_ASSOCIATION"]')
           .style({
@@ -430,8 +430,8 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
           })
         .selector('edge[type = "MOLECULAR_BINDING"]')
           .style({
-            'line-color': '#aeed34',
-            'target-arrow-color': '#aeed34'
+            'line-color': '#b7ef4b',
+            'target-arrow-color': '#b7ef4b'
           })
         .selector('edge[type = "TANIMOTO_SIMILARITY"]')
           .style({
@@ -441,7 +441,7 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
           })
         .selector('edge[type = "CORRELATION"]')
           .style({
-            'line-color': '#b265ff',
+            'line-color': '#A6A5F6',
             'target-arrow-shape': 'none',
             'width': function(ele){
                 var cf = Math.abs(ele.data('coef'));
@@ -450,7 +450,7 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
           })
         .selector('edge[type = "PARTIAL_CORRELATION"]')
           .style({
-            'line-color': '#dcc60e',
+            'line-color': '#f3e043',
             'target-arrow-shape': 'none',
             'width': function(ele){
                 var cf = Math.abs(ele.data('coef'));
