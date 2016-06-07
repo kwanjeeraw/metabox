@@ -52,6 +52,7 @@
     var clobj;
     var fnobj;
     var cyImg;
+    var legendImg; 
     var annotation;
     var fntype;
     $("#computeBtn").click(function(){
@@ -74,7 +75,7 @@
             clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=false);
           }
           //Network output    
-          cyImg = drawNetwork(formatNode(object.nodes), formatEdge(object.edges));
+          cyImg = drawNetwork(formatNode(object.nodes), formatEdge(object.edges),'cy');
           cleanFnOutputs();
         });//getObject    
         hideSpinner(loadSpinner);
@@ -101,7 +102,9 @@
           fnobj = cld_object.wordcloud;
           fntype = "wordcloud";
           $("#wc").rplot("plotWordCloud", {wordtable:cld_object.wordcloud});
-          cyImg = drawNetwork(formatPieNode(cld_object.nodes, cld_object.wordcloud), formatEdge(cld_object.edges)); //update network
+          var pienodes = formatPieNode(cld_object.nodes, cld_object.wordcloud);
+          cyImg = drawNetwork(pienodes[0], formatEdge(cld_object.edges),'cy');//update network
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
         });//getObject
         hideSpinner(loadSpinner);
         $('#wdc').show();
@@ -128,7 +131,9 @@
           //Network output
           fnobj = cld_object.overrepresentation;
           fntype = "overrepresentation";
-          cyImg = drawNetwork(formatPieNode(cld_object.nodes, cld_object.overrepresentation), formatEdge(cld_object.edges)); //update network
+          var pienodes = formatPieNode(cld_object.nodes, cld_object.overrepresentation);
+          cyImg = drawNetwork(pienodes[0], formatEdge(cld_object.edges),'cy');//update network
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
         });//getObject
         hideSpinner(loadSpinner);
         $('#wdc').hide();
@@ -145,7 +150,7 @@
       window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment    
     });//enrBtn
     $("#downloadOut").click(function(){
-      exportEnrichmentZip(robj.nodes, null, fnobj, clobj.pairs, null);
+      exportEnrichmentZip(robj.nodes, null, fnobj, clobj.pairs, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
     });//downloadOut
     $("#treeBtn").click(function(){
       $('#d3tree').show();
@@ -154,6 +159,7 @@
         $('iframe').attr("src",frameSrc);
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//treeBtn
+    $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
   });
   </script>
 </head>
@@ -245,6 +251,9 @@
               </div>
               <div id="network" class="panel-body collapse in">
                 <div id="cy"></div>
+                <div class="nwLegend"><span>Network legend</span></div><br>
+                <div><img src="image/legend.png"/></div>
+                <div id="legendCy"></div>
               </div>
             </div>
           </div>
@@ -252,28 +261,15 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Network legend</h3>
-              </div>
-              <div class="panel-body">
-                <img src="image/legend.png"/>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- /.row -->
-        <div class="row">
-          <div class="col-lg-12">
-            <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-            <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
-            <button id="enrBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> Enrichment</button>
+            <button id="downloadBtn" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Download network outputs"><i class="fa fa-download"></i> Download network</button>
+            <button id="subnetworkBtn" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Subnetwork page"><i class="fa fa-gears"></i> Subnetwork</button>
+            <button id="enrBtn" type="button" class="btn btn-info" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Enrichment page"><i class="fa fa-pie-chart"></i> Enrichment</button>
           </div>
         </div>
         <!-- /.row -->
         <hr class="dash">
         <div class="row">
-          <div class="col-lg-12"><h4>Function overview</h4></div>
+          <div class="col-lg-12"><h4>Function overview  <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Perform functional analysis<br> on the network nodes"></i></h4></div>
           <div class="col-lg-6">
             <form role="form">
               <div class="form-group">
@@ -285,10 +281,10 @@
             </form>
           </div>
           <div class="col-lg-3">
-            <button id="overrepBtn" type="button" class="btn btn-danger"><i class="fa fa-users"></i> Overrepresentation</button>
+            <button id="overrepBtn" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Perform overrepresentation analysis"><i class="fa fa-users"></i> Overrepresentation</button>
           </div>
           <div class="col-lg-3">
-            <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
+            <button id="cloudBtn" type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Generate WordCloud"><i class="fa fa-cloud"></i> WordCloud</button>
           </div>
         </div>
         <!-- /.row -->
@@ -344,7 +340,7 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
-            <button id="downloadOut" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
+            <button id="downloadOut" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" data-html="true" title="Download functional analysis outputs"><i class="fa fa-download"></i> Download output</button>
             <button id="treeBtn" type="button" class="btn btn-default" disabled><i class="fa fa-sitemap"></i> Show Mesh tree</button>
           </div>
         </div>

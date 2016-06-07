@@ -65,14 +65,15 @@ function exportNwZip(nodes, edges, img){
 
 //@function export enrichment outputs as a zip file
 //@param nodes, edges, enrichment array of json objects
-//@param img cytoscapeJS png object
-function exportEnrichmentZip(nodes, edges, enrichment, pairs, img){
+//@param img, nlegend cytoscapeJS png object
+function exportEnrichmentZip(nodes, edges, enrichment, pairs, img, nlegend){
     var zip = new JSZip();
     zip.file("node.txt", JSONToTabConvertor(nodes,true));
     if (edges != null) {zip.file("edge.txt", JSONToTabConvertor(edges,true));}
     zip.file("result.txt", JSONToTabConvertor(enrichment,true));
     zip.file("annotationPair.txt", JSONToTabConvertor(pairs,true));
     if (img != null) {zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});}
+    if (nlegend != null) {zip.file("nodeLegend.png", nlegend.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});}
     zip.generateAsync({type:"base64"})
     .then(function (content) {
       var a = document.createElement('a'); 
@@ -292,6 +293,7 @@ function formatNode(nodeArr) {
 //@param nodeArr, enrichArr array of json objects
 function formatPieNode(nodeArr, enrichArr) {
     var nodels = [];
+    var legendls = [];
     for (var i = 0; i < nodeArr.length; i++) {//format list of nodes for cytoscapeJS
         nodels.push({
             data: nodeArr[i]
@@ -302,8 +304,19 @@ function formatPieNode(nodeArr, enrichArr) {
               nodels[i].data[pie] = 1; 
           }
         });
-    }  
-    return nodels;
+    }
+    //format list of legends for cytoscapeJS
+    Object.keys(enrichArr).forEach(function(idx) {
+      if(enrichArr[idx].rank <= 10){
+        var legend = {id:enrichArr[idx].id,nodename:'#'+enrichArr[idx].rank+'_'+enrichArr[idx].nodename,nodelabel:"Legend"};
+        var pie = "pie" + enrichArr[idx].rank;
+        legend[pie] = 10;
+        legendls.push({
+            data: legend
+        });
+      }
+    });
+    return [nodels, legendls];
 }
 
 //@function format edge for cytoscapeJS
@@ -320,18 +333,21 @@ function formatEdge(edgeArr) {
 
 //@function draw cytoscapeJS network
 //@param objNode, objEdge array of json objects accepted by cytoscapeJS [{data:{id:'id',name:'name'}}]
-function drawNetwork(objNode, objEdge, lyout = "cose"){
+//@param pid panel id
+//@param lyout network layout
+function drawNetwork(objNode, objEdge, pid, lyout = "cose"){
     var cy = cytoscape({//initialize cytoscapeJS
-      container: document.getElementById('cy'),
-      boxSelectionEnabled: false,
-      autounselectify: true,
+      container: document.getElementById(pid),
+      boxSelectionEnabled: true,
+      autounselectify: false,
+      selectionType:'additive',
       elements: {
         nodes: objNode,
         edges: objEdge
       },
       layout: {
         name: lyout,
-        padding: 10
+        padding: 5
       },
       style: cytoscape.stylesheet()
         .selector('node')
@@ -342,7 +358,7 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
             'color':'#444444',
             'text-outline-color':'#FFFFFF',
             'text-outline-width':0.3,
-            'font-size':14,
+            'font-size':16,
             'font-weight':'bold',
             'pie-size': '90%',
             'pie-1-background-color': '#FF0000',
@@ -364,8 +380,14 @@ function drawNetwork(objNode, objEdge, lyout = "cose"){
             'pie-9-background-color': '#FD49FF',
             'pie-9-background-size': 'mapData(pie9, 0, 10, 0, 100)',
             'pie-10-background-color': '#00715E',
-            'pie-10-background-size': 'mapData(pie10, 0, 10, 0, 100)'
+            'pie-10-background-size': 'mapData(pie10, 0, 10, 0, 100)'           
           })
+        .selector('node[nodelabel = "Legend"]')
+          .style({
+            'shape':'rectangle',
+            'color':'#000',
+            'font-size':14
+          })  
         .selector('node[nodelabel = "Phenotype"]')
           .style({
             'shape':'octagon'

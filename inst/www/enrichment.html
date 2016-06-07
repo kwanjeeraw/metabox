@@ -51,6 +51,7 @@
     var inputTable;
     var robj;
     var cyImg;
+    var legendImg;    
     var url = getURLVars('rsess')+"R/.val/json";
     var annotation;
     $.ajax({
@@ -115,7 +116,9 @@
                 $('#annopairs').empty();
               }
               //Network output
-              cyImg = drawNetwork(formatPieNode(object.nodes, object.enrichment), formatEdge(object.edges));
+              var pienodes = formatPieNode(object.nodes, object.enrichment);
+              cyImg = drawNetwork(pienodes[0], formatEdge(object.edges),'cy');//update network
+              legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
             });//getObject    
             hideSpinner(loadSpinner);
             toggleMeshTree(annotation);
@@ -129,7 +132,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, robj.pairs, cyImg.png({bg: '#ffffff', scale:5}));
+      exportEnrichmentZip(robj.nodes, robj.edges, robj.enrichment, robj.pairs, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();
@@ -138,6 +141,7 @@
         $('iframe').attr("src",frameSrc);
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//treeBtn
+    $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
   });
   </script>
 </head>
@@ -209,7 +213,7 @@
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Select method:</label>
+                        <label>Select method:</label> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Method"></i>
                         <select id="method" class="form-control">
                           <option value="reporter" selected>reporter</option>
                           <option value="fisher">fisher</option>
@@ -277,19 +281,9 @@
               </div>
               <div id="network" class="panel-body collapse in">
                 <div id="cy"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- /.row -->
-        <div class="row">
-          <div class="col-lg-12">
-            <div class="panel panel-default">
-              <div class="panel-heading">
-                <h3 class="panel-title">Network legend</h3>
-              </div>
-              <div class="panel-body">
-                <img src="image/legend.png"/>
+                <div class="nwLegend"><span>Network legend</span></div><br>
+                <div><img src="image/legend.png"/></div>
+                <div id="legendCy"></div>
               </div>
             </div>
           </div>

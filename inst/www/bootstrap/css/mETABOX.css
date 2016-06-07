@@ -1,6 +1,8 @@
 #cy {
-    height:650px;
-    width:100%;
+    height:550px;
+}
+#legendCy {
+    height:200px;
 }
 #wc {
     height:500px;
@@ -8,6 +10,10 @@
 }
 #d3tree{
     display: none;
+}
+.nwLegend{
+    border-bottom: 1px dashed #8c8b8b;
+    font-weight: bold;
 }
 hr.dash {
     border-top: 1px dashed #8c8b8b;

@@ -49,6 +49,7 @@
     var cloudTable;
     var robj;
     var cyImg;
+    var legendImg;    
     var annotation;
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();
@@ -75,14 +76,16 @@
           }
           //Wordcloud output
           $("#wc").rplot("plotWordCloud", {wordtable:object.wordcloud})
-          cyImg = drawNetwork(formatPieNode(object.nodes, object.wordcloud), formatEdge(""),'grid');
+          var pienodes = formatPieNode(object.nodes, object.wordcloud);
+          cyImg = drawNetwork(pienodes[0], formatEdge(""),'cy','grid');
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
         });//getObject    
         hideSpinner(loadSpinner);
         toggleMeshTree(annotation);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, null, robj.wordcloud, robj.edges, cyImg.png({bg: '#ffffff', scale:5}));
+      exportEnrichmentZip(robj.nodes, null, robj.wordcloud, robj.edges, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();
@@ -212,6 +215,8 @@
               </div>
               <div id="network" class="panel-body collapse in">
                 <div id="cy"></div>
+                <div class="nwLegend"><span>Node legend</span></div>
+                <div id="legendCy"></div>
               </div>
             </div>
           </div>

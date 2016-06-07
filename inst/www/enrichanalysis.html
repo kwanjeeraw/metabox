@@ -50,6 +50,7 @@
     var inputTable;
     var robj;
     var cyImg;
+    var legendImg;
     var annotation;
     //Overview output
     $("#fileinput").change(function(){//load data
@@ -102,7 +103,9 @@
             
           }
           //Network output     
-          cyImg = drawNetwork(formatPieNode(object.nodes, object.enrichment), formatEdge(""), 'grid');
+          var pienodes = formatPieNode(object.nodes, object.enrichment);
+          cyImg = drawNetwork(pienodes[0], formatEdge(""),'cy','grid');
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
         });//getObject    
         hideSpinner(loadSpinner);
         toggleMeshTree(annotation);
@@ -114,7 +117,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, null, robj.enrichment, robj.edges, cyImg.png({bg: '#ffffff', scale:5}));
+      exportEnrichmentZip(robj.nodes, null, robj.enrichment, robj.edges, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();
@@ -123,6 +126,7 @@
         $('iframe').attr("src",frameSrc);
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//treeBtn
+    $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
   });
   </script>
 </head>
@@ -200,7 +204,7 @@
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label>Select method:</label>
+                        <label>Select method:</label> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Method"></i>
                         <select id="method" class="form-control">
                           <option value="reporter" selected>reporter</option>
                           <option value="fisher">fisher</option>
@@ -264,6 +268,8 @@
               </div>
               <div id="network" class="panel-body collapse in">
                 <div id="cy"></div>
+                <div class="nwLegend"><span>Node legend</span></div>
+                <div id="legendCy"></div>
               </div>
             </div>
           </div>

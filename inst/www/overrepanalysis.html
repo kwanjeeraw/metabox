@@ -41,6 +41,35 @@
   <!-- Embedded script calling R -->
   <script>
   $(function(){
+//    
+//
+//    nd = [
+//{ data: { id: 'xx',nodename:'legend2' }},
+//          
+//          {data:{gid:"1188",id:"108711",nodelabel:"Compound",nodename:"Xanthine1",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie1:1, pie2:1, pie3:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108712",nodelabel:"Compound",nodename:"Xanthine2",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie2:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108713",nodelabel:"Compound",nodename:"Xanthine3",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie3:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108714",nodelabel:"Compound",nodename:"Xanthine4",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie4:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108715",nodelabel:"Compound",nodename:"Xanthine5",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie5:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108716",nodelabel:"Compound",nodename:"Xanthine6",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie6:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108717",nodelabel:"Compound",nodename:"Xanthine7",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie7:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108718",nodelabel:"Compound",nodename:"Xanthine6",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie6:1,parent: 'xx'}},
+//{data:{gid:"1188",id:"108719",nodelabel:"Compound",nodename:"Xanthine7",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie7:1,parent: 'xx'}},
+//                    { data: { id: 'a',pie10:10,nodename:'pie10',nodelabel:'Legend'} },
+//      { data: { id: 'd', pie2:10,nodename:'pie2',nodelabel:'Legend'} },
+//      { data: { id: 'c', pie1:10,nodename:'pie1',nodelabel:'Legend'}},
+//      { data: { id: 'e', pie10:10,nodename:'pie10',nodelabel:'Legend'} },
+//      { data: { id: 'f', pie2:10,nodename:'pie2',nodelabel:'Legend'} },
+//      { data: { id: 'g', pie1:10,nodename:'pie1',nodelabel:'Legend'}}
+//
+//]
+//    ed=[
+//       { data: { id: 'ad', source: 'xx', target: 'b' } }
+//    ]
+//        drawNetwork(nd, ed,'cy','grid');
+//         drawNetwork(nd, ed,'legendCy','grid');
+////    
+//    ////
     //global var
     var compute_session;
     var nodeTable;
@@ -49,6 +78,7 @@
     var cloudTable;
     var robj;
     var cyImg;
+    var legendImg;
     var annotation;
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();
@@ -74,14 +104,16 @@
             clear3Table(ndtable=nodeTable, edtable=edgeTable, pwtable=ptwTable, nid='#nodes', eid='#edges', pid='#pathways', hasResult=false);
           }
           //Network output
-          cyImg = drawNetwork(formatPieNode(object.nodes, object.overrepresentation), formatEdge(""),'grid');
+          var pienodes = formatPieNode(object.nodes, object.overrepresentation);
+          cyImg = drawNetwork(pienodes[0], formatEdge(""),'cy','grid');
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
         });//getObject    
         hideSpinner(loadSpinner);
         toggleMeshTree(annotation);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, null, robj.overrepresentation, robj.edges, cyImg.png({bg: '#ffffff', scale:5}));
+      exportEnrichmentZip(robj.nodes, null, robj.overrepresentation, robj.edges, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();
@@ -211,6 +243,8 @@
               </div>
               <div id="network" class="panel-body collapse in">
                 <div id="cy"></div>
+                <div class="nwLegend"><span>Node legend</span></div>
+                <div id="legendCy"></div>
               </div>
             </div>
           </div>
