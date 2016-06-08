@@ -28,6 +28,7 @@
   <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>
   <script type="text/javascript" src="js/jszip.min.js"></script>
   <script type="text/javascript" src="js/spin.js"></script>
+  <script type="text/javascript" src='js/jquery.zoom.min.js'></script>
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <!-- Load nav menu -->
@@ -170,6 +171,8 @@
         $('iframe').attr("src",frameSrc);
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//treeBtn
+    $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
+    $('#dbschema').zoom();
   });
   </script>
 </head>
@@ -188,7 +191,7 @@
             <h3>Query heterogeneous network</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Query the heterogeneous network containing several relationship types from the database, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+              <i class="fa fa-info-circle"></i> Query the heterogeneous network containing several relationship types from the database, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
             </div>
           </div>
         </div>
@@ -249,39 +252,45 @@
                         <textarea class="form-control" id="pattern" name="pattern" rows="5"></textarea>
                         <p class="help-block">Type in relationship pattern or use the constructor below to define the relationship pattern e.g. (:Gene)-[:CONVERSION]->(from:Protein)-[:CATALYSIS]->(to:Compound)</p>
                       </div>
+                    </div>
+                    <div class="col-lg-8">
                       <div class="form-group">
-                        <label class="col-lg-2">From node: </label>
+                        <label class="col-lg-2">From node:</label><i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true" title="Type of From nodes"></i>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(from:Compound)" checked>Compound</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(from:Protein)">Protein</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(from:Gene)">Gene</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(from:Pathway)">Pathway</label>
                       </div>
                       <div class="form-group">
-                        <label class="col-lg-2">To node: </label>
+                        <label class="col-lg-2">To node:</label> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true" title="Type of To nodes"></i>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(to:Compound)">Compound</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(to:Protein)">Protein</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(to:Gene)">Gene</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(to:Pathway)">Pathway</label>
                       </div>
                       <div class="form-group">
-                        <label class="col-lg-2">Intermediate node: </label>
+                        <label class="col-lg-2">Other node:</label> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" data-html="true" title="Type of other nodes in the network"></i>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(:Compound)">Compound</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(:Protein)">Protein</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(:Gene)">Gene</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="(:Pathway)">Pathway</label>
                       </div>
                       <div class="form-group">
-                        <label class="col-lg-2">Relationship: </label>
+                        <label class="col-lg-2">Relationship:</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="-[:ANNOTATION]->">ANNOTATION</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="-[:BIOCHEMICAL_REACTION]->">BIOCHEMICAL_REACTION</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="-[:CATALYSIS]->">CATALYSIS</label>
-                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:CONTROL]->">CONTROL</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:CONTROL]->">CONTROL</label><br>
                         <label class="radio-inline"><input type="radio" name="cypher" value="-[:CONVERSION]->">CONVERSION</label>
                         <label class="radio-inline"><input type="radio" name="cypher" value="-[:GENETIC_ASSOCIATION]->">GENETIC_ASSOCIATION</label>
-                        <br><label class="radio-inline"><input type="radio" name="cypher" value="-[:MOLECULAR_BINDING]->">MOLECULAR_BINDING</label>
+                        <label class="radio-inline"><input type="radio" name="cypher" value="-[:MOLECULAR_BINDING]->">MOLECULAR_BINDING</label>
                       </div>
-                      <div class="col-lg-2"><button id="addBtn" type="button" class="btn btn-info">Add</button></div>
                     </div>
+                    <div class="col-lg-4">
+                      <span class='zoom' id='dbschema'><img src='image/dbschema.png' width=305></span>
+                      <p class='text-center'><b>Database schema</b></p>
+                    </div>
+                    <div class="col-lg-12"><button id="addBtn" type="button" class="btn btn-info">Add</button></div>
                   </div>
                   <!-- /.row -->
                   <hr>
@@ -335,15 +344,15 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
-            <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-            <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
-            <button id="enrBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> Enrichment</button>
+            <button id="downloadBtn" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Download network outputs"><i class="fa fa-download"></i> Download network</button>
+            <button id="subnetworkBtn" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Subnetwork page"><i class="fa fa-gears"></i> Subnetwork</button>
+            <button id="enrBtn" type="button" class="btn btn-info" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Enrichment page"><i class="fa fa-pie-chart"></i> Enrichment</button>
           </div>
         </div>
         <!-- /.row -->
         <hr class="dash">
         <div class="row">
-          <div class="col-lg-12"><h4>Function overview</h4></div>
+          <div class="col-lg-12"><h4>Function overview <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Perform functional analysis<br> on the network nodes"></i></h4></div>
           <div class="col-lg-6">
             <form role="form">
               <div class="form-group">
@@ -355,10 +364,10 @@
             </form>
           </div>
           <div class="col-lg-3">
-            <button id="overrepBtn" type="button" class="btn btn-danger"><i class="fa fa-users"></i> Overrepresentation</button>
+            <button id="overrepBtn" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Perform overrepresentation analysis"><i class="fa fa-users"></i> Overrepresentation</button>
           </div>
           <div class="col-lg-3">
-            <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
+            <button id="cloudBtn" type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Generate WordCloud"><i class="fa fa-cloud"></i> WordCloud</button>
           </div>
         </div>
         <!-- /.row -->
@@ -414,7 +423,7 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
-            <button id="downloadOut" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
+            <button id="downloadOut" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" data-html="true" title="Download functional analysis outputs"><i class="fa fa-download"></i> Download output</button>
             <button id="treeBtn" type="button" class="btn btn-default" disabled><i class="fa fa-sitemap"></i> Show Mesh tree</button>
           </div>
         </div>
