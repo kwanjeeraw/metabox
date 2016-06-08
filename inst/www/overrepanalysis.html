@@ -41,35 +41,6 @@
   <!-- Embedded script calling R -->
   <script>
   $(function(){
-//    
-//
-//    nd = [
-//{ data: { id: 'xx',nodename:'legend2' }},
-//          
-//          {data:{gid:"1188",id:"108711",nodelabel:"Compound",nodename:"Xanthine1",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie1:1, pie2:1, pie3:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108712",nodelabel:"Compound",nodename:"Xanthine2",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie2:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108713",nodelabel:"Compound",nodename:"Xanthine3",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie3:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108714",nodelabel:"Compound",nodename:"Xanthine4",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie4:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108715",nodelabel:"Compound",nodename:"Xanthine5",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie5:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108716",nodelabel:"Compound",nodename:"Xanthine6",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie6:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108717",nodelabel:"Compound",nodename:"Xanthine7",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie7:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108718",nodelabel:"Compound",nodename:"Xanthine6",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie6:1,parent: 'xx'}},
-//{data:{gid:"1188",id:"108719",nodelabel:"Compound",nodename:"Xanthine7",nodexref:"1188||HMDB00292||C00385||CHEBI:17712||DB02134||FDB001977||XANTHINE",pie7:1,parent: 'xx'}},
-//                    { data: { id: 'a',pie10:10,nodename:'pie10',nodelabel:'Legend'} },
-//      { data: { id: 'd', pie2:10,nodename:'pie2',nodelabel:'Legend'} },
-//      { data: { id: 'c', pie1:10,nodename:'pie1',nodelabel:'Legend'}},
-//      { data: { id: 'e', pie10:10,nodename:'pie10',nodelabel:'Legend'} },
-//      { data: { id: 'f', pie2:10,nodename:'pie2',nodelabel:'Legend'} },
-//      { data: { id: 'g', pie1:10,nodename:'pie1',nodelabel:'Legend'}}
-//
-//]
-//    ed=[
-//       { data: { id: 'ad', source: 'xx', target: 'b' } }
-//    ]
-//        drawNetwork(nd, ed,'cy','grid');
-//         drawNetwork(nd, ed,'legendCy','grid');
-////    
-//    ////
     //global var
     var compute_session;
     var nodeTable;
@@ -122,6 +93,7 @@
         $('iframe').attr("src",frameSrc);
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//treeBtn
+    $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
   });
   </script>
 </head>
@@ -140,7 +112,7 @@
             <h3>Overrepresentation analysis</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Perform overrepresentation analysis on the input entities, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+              <i class="fa fa-info-circle"></i> Perform overrepresentation analysis on the input entities, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
             </div>
           </div>
         </div>

@@ -194,6 +194,7 @@
         $('iframe').attr("src",frameSrc);
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//treeBtn
+    $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
   });
   </script>
 </head>
@@ -212,7 +213,7 @@
             <h3>Compute partial correlation network</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Compute the partial correlation network for quantified data, see <a href="http://kwanjeeraw.github.io/grinn/fetchgrinn.html" target="_blank" class="alert-link">here</a> argument details.
+              <i class="fa fa-info-circle"></i> Compute the partial correlation network for quantified data, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
             </div>
           </div>
         </div>
@@ -334,15 +335,15 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
-            <button id="downloadBtn" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download network</button>
-            <button id="subnetworkBtn" type="button" class="btn btn-success"><i class="fa fa-gears"></i> Subnetwork</button>
-            <button id="enrBtn" type="button" class="btn btn-info"><i class="fa fa-pie-chart"></i> Enrichment</button>
+            <button id="downloadBtn" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Download network outputs"><i class="fa fa-download"></i> Download network</button>
+            <button id="subnetworkBtn" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Subnetwork page"><i class="fa fa-gears"></i> Subnetwork</button>
+            <button id="enrBtn" type="button" class="btn btn-info" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Enrichment page"><i class="fa fa-pie-chart"></i> Enrichment</button>
           </div>
         </div>
         <!-- /.row -->
         <hr class="dash">
         <div class="row">
-          <div class="col-lg-12"><h4>Function overview</h4></div>
+          <div class="col-lg-12"><h4>Function overview <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Perform functional analysis<br> on the network nodes"></i></h4></div>
           <div class="col-lg-6">
             <form role="form">
               <div class="form-group">
@@ -354,10 +355,10 @@
             </form>
           </div>
           <div class="col-lg-3">
-            <button id="overrepBtn" type="button" class="btn btn-danger"><i class="fa fa-users"></i> Overrepresentation</button>
+            <button id="overrepBtn" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Perform overrepresentation analysis"><i class="fa fa-users"></i> Overrepresentation</button>
           </div>
           <div class="col-lg-3">
-            <button id="cloudBtn" type="button" class="btn btn-warning"><i class="fa fa-cloud"></i> WordCloud</button>
+            <button id="cloudBtn" type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Generate WordCloud"><i class="fa fa-cloud"></i> WordCloud</button>
           </div>
         </div>
         <!-- /.row -->
@@ -413,7 +414,7 @@
         <!-- /.row -->
         <div class="row">
           <div class="col-lg-12">
-            <button id="downloadOut" type="button" class="btn btn-default"><i class="fa fa-download"></i> Download output</button>
+            <button id="downloadOut" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" data-html="true" title="Download functional analysis outputs"><i class="fa fa-download"></i> Download output</button>
             <button id="treeBtn" type="button" class="btn btn-default" disabled><i class="fa fa-sitemap"></i> Show Mesh tree</button>
           </div>
         </div>
