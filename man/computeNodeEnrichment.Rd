@@ -33,7 +33,7 @@ The data frame of enrichment contains the following components:
 
 list of data frame of nodes, edges, enrichment and pairs. The pairs data frame contains annotation pairs. The data frame of enrichment contains the following components:
 
-\code{rank} = rank sort by p adj
+\code{rank} = rank sort by p
 
 \code{id} = annotation id or annotation neo4j id
 

@@ -22,7 +22,7 @@
 #'i.e. ENSEMBL for genes (e.g.ENSG00000139618), UniProt for proteins (e.g.P0C9J6), PubChem CID for compounds (e.g.5793), KEGG for pathways (e.g.hsa00010).
 #'@return list of data frame of nodes, edges, enrichment and pairs. The pairs data frame contains annotation pairs. The data frame of enrichment contains the following components:
 #'
-#'\code{rank} = rank sort by p adj
+#'\code{rank} = rank sort by p
 #'
 #'\code{id} = annotation id or annotation neo4j id
 #'
@@ -100,7 +100,7 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
             pval = pv
           }
           era = computeEnrichment(edgelist = annonws$edges[,2:1], pval = pval, fc = NULL, method = method, size=size, returnas="dataframe") #compute enrichment
-          era = era[order(era$p_adj),]
+          era = era[order(era$p),]
           era = era[ , !(colnames(era) == 'no_of_entities')] #hide sum columns
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes, era, by='id') #merge annotation attributes and enrichemt results
@@ -151,7 +151,7 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
           names(pv) = nodedata[,1]
           pval = pv
           era = computeEnrichment(edgelist = annonws$edges[,2:1], pval = pval, fc = NULL, method = method, size=size, returnas="dataframe") #compute enrichment
-          era = era[order(era$p_adj),]
+          era = era[order(era$p),]
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes[,1:6], era, by='id') #merge annotation attributes and enrichemt results
           era = era[,c(ncol(era),1:(ncol(era)-6),(ncol(era)-3),(ncol(era)-2),(ncol(era)-4),(ncol(era)-5),(ncol(era)-1))] #rearrange columns
