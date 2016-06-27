@@ -13,19 +13,26 @@
 #'load_aggregated_data(input$inputID,startRow=2)
 #'@export
 
-stat_Study_Design = function(DATA, between_factor, within_factor){
+stat_Study_Design = function(DATA, between_factor = NULL, within_factor = NULL){
   eData = DATA$expression
   fData = DATA$feature
   pData = DATA$phenotype
-  if(length(between_factor)==0){
-    Sample_Size = table(pData[,within_factor])
-  }else if(length(within_factor)==0){
-    Sample_Size = table(pData[,between_factor])
-  }else if((length(within_factor)+length(between_factor))<4){
-    Sample_Size = table(pData[,c(between_factor,within_factor)])
-  }else{
-    Sample_Size = "Too many factors you've selected. You can only select three factors in total."
+  if(length(within_factor) == 0){
+    within_factor = NULL
   }
+  if(length(between_factor) == 0){
+    between_factor = NULL
+  }
+
+  # if(!length(between_factor)==0){
+  #   Sample_Size = table(pData[,between_factor])
+  # }else if(!length(within_factor)==0){
+  #   Sample_Size = table(pData[,within_factor])
+  # }else if((length(within_factor)+length(between_factor))<4){
+    Sample_Size = table(pData[,c(between_factor,within_factor)])
+  # }else{
+  #   Sample_Size = "Too many factors you've selected. You can only select three factors in total."
+  # }
 
 
   result = Sample_Size

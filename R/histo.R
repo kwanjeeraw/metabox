@@ -20,7 +20,7 @@ histo = function(p,sample_information_selection,
   }
   if(length(x)>0){
     e[is.na(e)] = 500
-    pca = prcomp(e, center = T, scale. = T)
+    pca = prcomp(e, center = F, scale. = F)
     score = pca$x
     p = p[round(score[,1],4)%in%round(x,4),]
   }

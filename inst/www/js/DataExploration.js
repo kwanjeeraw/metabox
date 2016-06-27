@@ -41,6 +41,7 @@ for(var i = 0;i<options.length;i++){
 }
 $(id).html(selector).selectpicker('refresh');;
 }
+
 function plotPCAScore(data){
     var selection_temp;
   if($("#select_infor_needed").val()===null){

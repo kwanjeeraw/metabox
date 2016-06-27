@@ -28,10 +28,7 @@ stat_summary_data = function(DATA){
     why_not_able[i] = paste(ifelse(type_of_each_colum_pData[i]=="numeric","numeric",""),ifelse(pData_columns_num[i]>(nrow(eData)/3),"too_many_levels",""))
   }
 
-  # number_of_sample = nrow(pData)
-  # number_of_feature = nrow(fData)
-  # column_names_of_pData = colnames(pData)
-  # column_names_of_fData = colnames(fData)
+
 
   result = list(number_of_sample=nrow(pData),number_of_feature = nrow(fData),column_names_of_pData = colnames(pData),column_names_of_fData = colnames(fData),
                 ncol_of_p = ncol(pData), ncol_of_f = ncol(fData),

@@ -15,7 +15,7 @@
 stat_Donut_plot = function(e,f,p,p_column,selected_sample){
   #selected_sample is actually the score value of PCA.
   e = as.matrix(e)
-    pca = prcomp(e, center = T, scale. = T)
+    pca = prcomp(e, center = F, scale. = F)
     score = pca$x
     p_temp = p[round(score[,1],4)%in%round(selected_sample,4),]
 

@@ -27,7 +27,7 @@ boxp = function(e,p,color,selected = NULL){
   TIC = apply(e,1,sum)
   if(length(selected)>0){
     e[is.na(e)] = 500
-    pca = prcomp(e, center = T, scale. = T)
+    pca = prcomp(e, center = F, scale. = F)
     score = pca$x
     col[!round(score[,1],4)%in%round(selected,4)] = "#CDC1C5"
   }

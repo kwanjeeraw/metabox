@@ -12,6 +12,7 @@
 
   <!-- Core CSS -->
   <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bootstrap/css/sb-admin-2.css" rel="stylesheet">
   <link href="bootstrap/css/sb-admin.css" rel="stylesheet">
   <link href="bootstrap/css/morris.css" rel="stylesheet">
   <link href="bootstrap/css/mETABOX.css" rel="stylesheet">
@@ -33,15 +34,16 @@
     <!--<script src="bootstrap/js/bootstrap.js"></script>-->
   <!-- App JavaScript -->
   <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
-  <!--  <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>
-  <script type="text/javascript" src="js/spin.js"></script>-->
-  <script type="text/javascript" src="js/jszip.min.js"></script>
+  <!--  <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>-->
+  <script type="text/javascript" src="js/spin.js"></script>
+
   <script type="text/javascript" src="bootstrap/js/bootstrap-select.js"></script>
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <link href="bootstrap/css/bootstrap-select.min.css" rel="stylesheet" type="text/css">
 
   <script type="text/javascript" src="js/mETABOX.js"></script>
+    <script type="text/javascript" src="js/jszip.min.js"></script>
   <!-- Load nav menu
   <script>
   $(function(){
@@ -101,22 +103,37 @@
 <div class="row"><div class="col-lg-12">
   <h1 class = "page-header">Statistics</h1>
 </div></div>
+  <!--
+
+<div>
+  <select class="form-control" id="demotrigger">
+                                                <option>10</option>
+                                                <option>20</option>
+                                                <option>30</option>
+                                                <option>40</option>
+                                                <option>50</option>
+                                            </select>
+</div>
+
+<pre><code id="demo"></code></pre>-->
+
 <!--Upload Data-->
 <div class="row"><div class="col-lg-12">
+
   <div id="success"></div>
   <div class="panel-group">
   <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title">
-        <a data-toggle="collapse" href="#UploadData">Click To Upload Data</a>
+        <a data-toggle="collapse" href="#UploadData"><i class="fa fa-upload"></i> Upload Data</a>
       </h4>
     </div>
     <div id="UploadData" class="panel-collapse collapse  in" >
       <div class="panel-body">
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#UploadDataTab" data-toggle="tab">Upload Data</a>
+                                <li class="active"><a href="#UploadDataTab" data-toggle="tab">Data From User</a>
                                 </li>
-                                <li><a href="#UploadDataTabUseExample" data-toggle="tab">Use Example</a>
+                                <li><a href="#UploadDataTabUseExample" data-toggle="tab">Example Data</a>
                                 </li>
                             </ul>
                             <div class="tab-content">
@@ -162,10 +179,10 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-comments fa-5x"></i>
+                                    <i class="fa fa-comments"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div id = "Sample_times_Metabolites" class="huge"></div>
+                                    <div id = "Sample_times_Metabolites"  class="median"></div>
                                     <div>Study Design</div>
                                 </div>
                             </div>
@@ -176,10 +193,10 @@
           <li class="list-group-item">Number of Samples: <p style="float: right;" id = "number_of_sample"></p></li>
           <li class="list-group-item">Number of Samples: <p style="float: right;" id = "number_of_feature"></p></li>
           <li class="list-group-item">Between Subject Factor:
-              <select class="input-sm selectpicker factor" multiple  data-max-options="2" id="independent_factor">
+              <select class="input-sm selectpicker Thefactor" multiple  data-max-options="2" id="independent_factor">
           </select></li>
           <li class="list-group-item">Within Subject Factor:
-              <select class="input-sm selectpicker factor" multiple  data-max-options="2" id="repeated_factor"  data-width="fit">
+              <select class="input-sm selectpicker Thefactor" multiple  data-max-options="2" id="repeated_factor"  data-width="fit">
           </select></li>
           <li class="list-group-item">Sample Size:
 <pre><code id="Sample_Size_Table"></code></pre>
@@ -190,13 +207,13 @@
           <li class="list-group-item">
                                                     <div class="form-group">
                                             <label><p class="text-danger">Excluded Samples</p></label>
-                                            <input class="form-control" placeholder="None">
+                                            <input class="form-control" placeholder="None" id="Samples_To_Be_Deleted">
                                         </div>
             </li>
           <li class="list-group-item">
                                                     <div class="form-group">
                                             <label><p class="text-warning">Normalization Applided</p></label>
-                                            <input class="form-control" placeholder="None">
+                                            <input class="form-control" placeholder="example: mTIC;log;Pareto;" id = "Normalization_To_Be_Applied">
                                         </div>
             </li>
 <li class="list-group-item"><button type="button" class="btn btn-outline btn-success btn-lg btn-block" id="Submit_To_Statistics">Submit!</button></li>
@@ -219,10 +236,10 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-comments fa-5x"></i>
+                                    <i class="fa fa-comments"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div id = "EFP" class="huge"></div>
+                                    <div id = "EFP"  class="median"></div>
                                     <div>Columns Describing Sample and Features</div>
                                 </div>
                             </div>
@@ -307,10 +324,10 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-search fa-5x"></i>
+                                    <i class="fa fa-search"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge">Visualize</div>
+                                    <div  class="median">Visualize</div>
                                     <div>PCA to detect outlier</div>
                                 </div>
                             </div>
@@ -324,20 +341,17 @@
                         <div class="panel-heading">
                             Principal Componenet Analysis
                         </div>
-                        <div class="panel-body" style="min-height:500px">
-                                            <!--PCA-->
-        <div id="PCA_plot"></div><!--PCA-->
+                        <div class="panel-body" style="height:600px">
+        <!--PCA-->
+        <div id="stat_PCA_plot"></div><!--PCA-->
                         </div>
                         <div class="panel-footer">
          <div class="pull-left">
-         <select class="input-sm selectpicker factor" id="PCA_color">
+         <select class="input-sm selectpicker factor" data-width="fit" id="PCA_color">
           </select>
          </div>
         <div class="pull-right">
-         <select class="input-sm selectpicker factor" id="PCA_DATA">
-  <option>Raw Data</option>
-  <option disabled>Normalized Data</option>
-          </select>
+<button type="button" class="btn btn-outline btn-warning" id = "updatePCA" disabled>Update</button>
          </div>
 <div class="clearfix"></div>
          </div>
@@ -349,31 +363,33 @@
                         <div class="panel-heading">
                             Information of Selected Samples
                         </div>
-                        <div class="panel-body"  style="min-height:500px">
-                          <div id="morris-donut-chart"></div>
-                            <div class="list-group">
-                                <div  class="list-group-item">
-                                    <i class="fa fa-comment fa-fw"></i> New Comment
-                                    <span class="pull-right text-muted small"><em>4 minutes ago</em>
+                        <div class="panel-body"  style="height:600px;position: relative;">
+                          <div style="height:400px;margin: auto;height:60%;" id="morris-donut-chart"></div>
+                           <div style="height:40%;">
+<div style = 'bottom: 120px; position: absolute;width:95%;margin: auto;'>
+                                     Sample Selected
+                                    <span class="pull-right text-muted median" id = "sample_selected"><em></em>
                                     </span>
-                                </div>
-                                <div class="list-group-item">
-                                    <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                    <span class="pull-right text-muted small"><em>12 minutes ago</em>
-                                    </span>
-                                </div>
-                                <div class="list-group-item">
-                                    <i class="fa fa-envelope fa-fw"></i> Sample Index
-                                    <span class="pull-right text-muted median"><em>1,2,3,4,5,6</em>
-                                    </span>
-                                </div>
+</div>
+
+
+
+                                    <div class="form-group" style = 'bottom: 5px; position: absolute;width:95%;margin: auto;'>
+                                         <label><p class="pull-left">Sample Removed</p>
+                                         <button type="button" class="btn btn-outline btn-danger btn-xs" id = "remove_sample">Apply</button>
+                                         </label>
+                                        <textarea class="form-control" rows="3" id="sample_to_be_removed"></textarea>
+                                    </div>
+
 
                             </div>
                         </div>
                         <div class="panel-footer">
          <div class="pull-left">
-         <select class="input-sm selectpicker factor" id="Donut_color">
+         <select class="input-sm selectpicker factor" data-width="fit" id="Donut_color">
           </select>
+         </div>
+         <div class="pull-right">
          </div>
 <div class="clearfix"></div>
          </div>
@@ -390,9 +406,118 @@ Normalization
 
                             </div>
      </div>
-     <div class="panel-body"  style="min-height:500px">
-Body
-      </div>
+<div class="panel-body"  style="height:600px">
+<!--Sample Normalization-->
+<fieldset>
+    <form id = "samplenormalization">
+  <legend>1. Sample Normalization</legend>
+    <div class="radio">
+    <label>
+      <input type="radio" name="samplenormalization" id="samplenormalizationnone" value="None" checked class="normalization">
+      None
+    </label>
+  </div>
+    <div class="radio">
+    <label>
+      <input type="radio" name="samplenormalization" id="samplenormalizationmTIC" value="mTIC" class="normalization">
+      mTIC normalization
+    </label>
+    <div class="pull-right"><i class="fa fa-info-circle" data-toggle="tooltip" data-placement="left" data-original-title="Tooltip on left"></i></div>
+  </div>
+  <div class="radio">
+    <label>
+      <input type="radio" name="samplenormalization" id="samplenormalizationloess" value="loess" disabled  class="normalization">
+      Loess Normalization + Batch Median Correction (if available)
+    </label>
+  </div>
+    <div class="radio">
+    <label>
+      <input type="radio" name="samplenormalization" id="samplenormalizationMedianFoldChange" value="medianfoldchange"  class="normalization">
+      Use median and Fold change
+    </label>
+  </div>
+  <div class="radio">
+    <label>
+      <input type="radio" name="samplenormalization" id="samplenormalizationBatchMedian" value="BatchMedian" disabled  class="normalization">
+      Batch Median Correction
+    </label>
+  </div>
+  </form>
+ </fieldset><!--Sample Normalization-->
+<br>
+<!--Data Transformation-->
+<fieldset>
+    <form id = "datatransformation">
+  <legend>2. Data Transformation</legend>
+    <div class="radio">
+    <label>
+      <input type="radio" name="datatransformation" id="datatransformationnone" value="None" checked class="normalization">
+      None
+    </label>
+  </div>
+    <div class="radio">
+    <label>
+      <input type="radio" name="datatransformation" id="datatransformationlog" value="log"  class="normalization">
+      log
+    </label>
+  </div>
+
+  <div class="radio">
+    <label>
+      <input type="radio" name="datatransformation" id="datatransformationCube_root" value="Cube_root"  class="normalization">
+      Cube root transformation
+    </label>
+    </div>
+    </form>
+ </fieldset><!--Data Transformation-->
+<br>
+<!--Data Scaling-->
+<fieldset>
+  <form id = "datascaling">
+  <legend>3. Data Scaling</legend>
+      <div class="radio">
+    <label>
+      <input type="radio" name="datascaling" id="datascalingnone" value="None" checked class="normalization">
+      None
+    </label>
+  </div>
+    <div class="radio">
+    <label>
+      <input type="radio" name="datascaling" id="datascalingauto" value="autoscaling"  class="normalization">
+      Auto scaling
+    </label>
+  </div>
+  <div class="radio">
+    <label>
+      <input type="radio" name="datascaling" id="datascalingpareto" value="paretoscaling"  class="normalization">
+      Pareto scaling
+    </label>
+    </div>
+      <div class="radio">
+    <label>
+      <input type="radio" name="datascaling" id="datascalingrange" value="rangescaling"  class="normalization">
+      Range scaling
+    </label>
+    </div>
+    </form>
+ </fieldset><!--Data Scaling-->
+
+                                     <div class="timeline-panel">
+                                        <div class="timeline-heading">
+                                            <h4 class="timeline-title"><p class="text-warning">Normalization Applided</p></h4>
+                                            <p><small class="text-muted"><i class="fa fa-info-circle"></i> You can copy & paste following to Normalization Applided session</small>
+                                            </p>
+                                        </div>
+                                        <div class="timeline-body">
+                        <p id="normalizationapplied"></p>
+
+
+                                        </div>
+                                    </div>
+
+
+</div>
+
       <div class="panel-footer">
   Footer
 <div class="clearfix"></div>
@@ -420,10 +545,10 @@ Body
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-bar-chart fa-5x"></i>
+                                    <i class="fa fa-bar-chart"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div class="huge">Statistics</div>
+                                    <div  class="median">Statistics</div>
                                     <div>result of hypothesis testing</div>
                                 </div>
                             </div>
@@ -431,6 +556,9 @@ Body
                         <div class="panel-body">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum tincidunt est vitae ultrices accumsan. Aliquam ornare lacus adipiscing, posuere lectus et, fringilla augue.</p>
                             <table id="Statistics_Result" width="100%"></table>
+                            <div id="download_statistical_result_button">
+
+                            </div>
                         </div>
                         <div class="panel-footer">
                             Panel Footer
@@ -442,7 +570,17 @@ Body
 
 
 <!--  modal -->
-
+        <div id="notifyBox" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+          <div class="modal-dialog"><div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4>Converting ...</h4>
+            </div>
+            <div class="modal-body"><div style="height:200px">
+              <span id="loading_spinner" style="position: absolute;display: block;top: 50%;left: 50%;"></span>
+            </div></div>
+          </div></div>
+        </div>
 
 
       </div>
