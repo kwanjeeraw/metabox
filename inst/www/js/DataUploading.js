@@ -133,15 +133,33 @@ console.log(Object.values(eData[0])[0]);
     independent_factor_name:$("#independent_factor").val(),
     repeated_factor_name:$("#repeated_factor").val()
   },function(session4){
-     hideSpinner(loadSpinner);
-   session4.getObject(function(obj3){
-  Stat_Result = drawTable('#Statistics_Result',obj3);
-   });
-   download_address = session4.getLoc() + "R/.val/csv";
-    $("#download_statistical_result_button").empty();
-var r= $('<a download = "file.csv" href='+download_address+' class="btn btn-primary btn-lg active" role="button">Download Statistical Analysis Result</a>');
+              hideSpinner(loadSpinner);
+              session4.getObject(function(obj3){
+              Stat_Result = drawTable('#Statistics_Result',obj3);
+               });
+              download_address = session4.getLoc() + "R/.val/csv";
+              $("#download_statistical_result_button").empty();
+              var r= $('<a download = "file.csv" href='+download_address+' class="btn btn-primary btn-lg active" role="button">Download Statistical Analysis Result</a>');
+              $("#download_statistical_result_button").append(r);
+              var r_session = session4.getLoc();
 
-    $("#download_statistical_result_button").append(r);
+            var res_url = r_session+"files/colnames.json";
+            var targeturl = "/similarity.html?varname="
+            console.log(res_url);
+            $.getJSON(res_url)
+            		.success (function (response) {
+            		  console.log(r_session);
+            		var test_arr = Object.keys(response[0]).map(function (x) { if (x.match("_vs_")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
+            		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'" target="_blank">'+y+' </a></li>');
+            		});
+            		console.log(test_arr);
+            });
+
+
+
+
+
+
     });
   });
 

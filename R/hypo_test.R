@@ -96,6 +96,7 @@ if(length(repeated_factor_name)==0){
     colnames(result_stat) = c("Global Mean", paste("Mean of", names( by(dta$value, dta[,2],mean,na.rm = T))),
                               "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
     result = cbind(result,result_stat)
+    writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
     return(result)
   }else if(length(factor_name[!factor_name%in%repeated_factor_name])==2 & length(repeated_factor_name)==0){#twoway ANOVA
 
