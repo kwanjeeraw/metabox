@@ -4,7 +4,7 @@
 \alias{stat_cure_Dunn_format}
 \title{format bad sequence of DunnTest}
 \usage{
-stat_cure_Dunn_format(x, sudo_matrix)
+stat_cure_Dunn_format(x, sudo_matrix, temp)
 }
 \description{
 format bad sequence of DunnTest

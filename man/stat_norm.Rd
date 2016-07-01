@@ -6,7 +6,8 @@
 \usage{
 stat_norm(e, f, p, sample_index, mTICdid, Loessdid, medFCdid, BatchMediandid,
   mTIC, Loess, medFC, BatchMedian, sample_normalization = NULL,
-  data_transformation = NULL, data_scaling = NULL)
+  data_transformation = NULL, data_scaling = NULL,
+  selected_phenotype_by_check, selected_feature_by_check)
 }
 \description{
 normalization
