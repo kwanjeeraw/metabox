@@ -21,8 +21,12 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name){#factor_name
   p_value_nonPara = kruskal.test(data2$value ~ data2[,i])$p.value
   post.hoc = posthocTGH(data2$value , data2[,i],method="games-howell", digits=4)$output$games.howell[,3]
   # post.hoc_nonPara = dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res$P.adj
-  post.hoc_nonPara = stat_cure_Dunn_format(dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res$P.adj,
-                                                                          sudo_matrix)
+  temp = data.frame(post.hoc)
+  rownames(temp) = gsub(":", " - ", rownames(temp))
+  x = data.frame(dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res[,c(1,4)],row.names =1)
+  post.hoc_nonPara = stat_cure_Dunn_format(x = x,
+                                                                          sudo_matrix,temp = temp)
+  post.hoc_nonPara = post.hoc_nonPara[,1]
   result = matrix(nrow = ncol(data),ncol = length(c(ANOVA_p_value = p_value,ANOVA_p_value_nonPara=p_value_nonPara, stat_combine_vector_1by1(post.hoc, post.hoc_nonPara))))#no need for fdr
   for(j in 1:ncol(data)){
     data2$value = data[,j]
@@ -31,8 +35,12 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name){#factor_name
     p_value_nonPara = kruskal.test(data2$value ~ data2[,i])$p.value
     post.hoc = posthocTGH(data2$value , data2[,i],method="games-howell", digits=4)$output$games.howell[,3]
     # post.hoc_nonPara = dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res$P.adj
-    post.hoc_nonPara = stat_cure_Dunn_format(dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res$P.adj,
-                                             sudo_matrix)
+    temp = data.frame(post.hoc)
+    rownames(temp) = gsub(":", " - ", rownames(temp))
+    x = data.frame(dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res[,c(1,4)],row.names =1)
+    post.hoc_nonPara = stat_cure_Dunn_format(x = x,
+                                             sudo_matrix,temp = temp)
+    post.hoc_nonPara = post.hoc_nonPara[,1]
     result[j,] = c(p_value = p_value,p_value_nonPara, stat_combine_vector_1by1(post.hoc, post.hoc_nonPara))#fdr
   }
 

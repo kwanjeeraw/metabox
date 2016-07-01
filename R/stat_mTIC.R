@@ -14,10 +14,12 @@
 #'
 #'
 stat_mTIC = function(e,f,p){
-  means = apply(e[,f$KnownorUnknown=="TRUE"],1,mean)
+  means = sapply(unique(p$sampleID),function(id){
+    mean(unlist(e[p$sampleID%in%id,f$KnownorUnknown=="TRUE"]))
+  })
   M = mean(means)
-  for(i in 1:nrow(e)){
-    e[i,] = e[i,]/means[i] * M
+  for(id in unique(p$sampleID)){
+    e[p$sampleID%in%id,] = e[p$sampleID%in%id,]/means[names(means)%in%id] * M
   }
   return(e)
 }

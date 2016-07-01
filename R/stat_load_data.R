@@ -13,11 +13,11 @@
 #'load_aggregated_data(input$inputID,startRow=2)
 #'@export
 
-stat_load_data = function(file){ # returns a expression data frame(eData),
+stat_load_data = function(file,sheetIndex = NULL){ # returns a expression data frame(eData),
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # t test
-  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\\\two independent group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
+  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\\\two independent group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
   # ANOVA
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\one way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
@@ -29,17 +29,44 @@ stat_load_data = function(file){ # returns a expression data frame(eData),
   # paired t test
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two paired group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
   # one way repeated ANOVA
-  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\one way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\one way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+
+  # two way repeated ANOVA 2*2
+  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
+  # two way repeated ANOVA 3*4
+  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+
+  # mixed ANOVA 2*2
+  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
+  # mixed ANOVA 3*4
+  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
 
-  d <- tryCatch(xlsx::read.xlsx2(file, sheetIndex = 1, stringsAsFactors = FALSE,header=F, ...),
+
+  # metabolomics data for manuscript
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\manuscript\\mx 107155 _study 112912 TRDRP LC7 NYU Lung Tissue Miyamoto 10113.xlsx"
+  # gene data for manuscript
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\manuscript\\GeneExpression_GSE32863.xlsx"
+
+  if(length(sheetIndex)==0 | is.null(sheetIndex) | sheetIndex==""){
+    sheetIndex = 1
+  }
+
+  if(grepl("xlsx", file)){
+    d <- tryCatch(xlsx::read.xlsx2(file, sheetIndex = sheetIndex, stringsAsFactors = FALSE,header=F, ...),
                   error = function(e){
-                    openxlsx::read.xlsx(file, sheet = 1,colNames = F)
+                    openxlsx::read.xlsx(file, sheet = sheetIndex,colNames = F)
                   })
+  }else if(grepl("csv", file)){
+    # file = "C:\\Users\\fansi\\Downloads\\val (18).csv"
+    d <- read.csv(file,header = T,stringsAsFactors = FALSE)
+  }
+
+
   d[d==""] <- NA
   #### fData
   fData <- d[!is.na(d[,1]),c(which(is.na(d[1,])),sum(is.na(d[1,]))+1)] # The first row and column is critical of formating the data.
-  colnames(fData) = fData[1,]; fData = data.frame(fData[-1,],stringsAsFactors = F);rownames(fData) = 1:nrow(fData);
+  colnames(fData) = as.character(fData[1,]); fData = data.frame(fData[-1,],stringsAsFactors = F);rownames(fData) = 1:nrow(fData);
   #### pData
   pData <- d[is.na(d[,1]),!is.na(d[1,])]
   pData <- t(pData); colnames(pData) = pData[1,]; pData = data.frame(pData[-1,],stringsAsFactors = F)
@@ -64,12 +91,38 @@ stat_load_data = function(file){ # returns a expression data frame(eData),
     }
   }
 
+  if(sum(!c("phenotype_index","sampleID","feature_index","KnownorUnknown")%in%c(colnames(pData),colnames(fData)))>0){
+    warning_message = paste0("The data uploaded doesn't have ",
+                            paste(c("phenotype_index","sampleID","feature_index","KnownorUnknown")[
+      c("phenotype_index","sampleID","feature_index","KnownorUnknown")%in%c(colnames(pData),colnames(fData))],collapse = ", ")," and they are added automatically. You can examine them by ")
+
+    writeLines(warning_message,"messages.txt")
+  }else{
+    writeLines("sucess!","messages.txt")
+  }
+
+  if(!"phenotype_index"%in%colnames(pData)){
+    pData$phenotype_index = 1:nrow(pData)
+  }
+  if(!"sampleID"%in%colnames(pData)){
+    pData$sampleID = 1:nrow(pData)
+  }
+  if(!"feature_index"%in%colnames(fData)){
+    fData$feature_index = 1:nrow(pData)
+  }
+  if(!"KnownorUnknown"%in%colnames(fData)){
+    fData$KnownorUnknown = rep(T,nrow(fData))
+  }
+
+
+
+
+
   result <- list(expression = eData, feature = fData, phenotype = pData)
 
   # e = e_ori = eData; p = p_ori = pData; f = fData;
 
 
 
-  writeLines("sucess!","messages.txt")
   return(result)
 }

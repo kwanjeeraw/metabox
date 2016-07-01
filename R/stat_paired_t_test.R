@@ -16,10 +16,11 @@
 stat_paired_t_test = function(data,data2,i){ # i tells which column of data2 is group.
   # determine the dimension of result.
 
+
   data_wide <- data.frame(# to prevent that the id are not sorted in both group.
     ID=1:max(as.numeric(as.character(data2$id))),
-    group1=data2$value[data2$repeated1==levels(data2$repeated1)[1]],
-    group2=data2$value[data2$repeated1==levels(data2$repeated1)[2]]
+    group1=data2$value[data2[,i]==levels(data2[,i])[1]],
+    group2=data2$value[data2[,i]==levels(data2[,i])[2]]
   )
 
   # data2$value = data[,1]

@@ -26,9 +26,12 @@ stat_summary_data = function(DATA){
   why_not_able = vector()
   for(i in 1:ncol(pData)){
     why_not_able[i] = paste(ifelse(type_of_each_colum_pData[i]=="numeric","numeric",""),ifelse(pData_columns_num[i]>(nrow(eData)/3),"too_many_levels",""))
+    if(pData_columns_num[i]==1){
+      why_not_able[i] = "only_one_level"
+    }
   }
 
-
+  why_not_able[which(colnames(pData)%in%"sampleID")] = "too_many_levels"
 
   result = list(number_of_sample=nrow(pData),number_of_feature = nrow(fData),column_names_of_pData = colnames(pData),column_names_of_fData = colnames(fData),
                 ncol_of_p = ncol(pData), ncol_of_f = ncol(fData),

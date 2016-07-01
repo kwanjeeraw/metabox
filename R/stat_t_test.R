@@ -31,7 +31,7 @@ stat_t_test = function(data,data2,i){ # i tells which column of data2 is group.
   result[,2] = p.adjust(result[,1],"fdr")
   result[,4] = p.adjust(result[,3],"fdr")
   result = data.frame(result,stringsAsFactors = F,check.names = F)
-  temp = paste(levels(data2[,i])[levels(data2[,i])%in%unique(data2[,i])],collapse  = "_vs_")
+  temp = paste0("p_value_",paste(levels(data2[,i])[levels(data2[,i])%in%unique(data2[,i])],collapse  = "_vs_"))
   colnames(result) = c(temp,paste0("_Ajusted_",temp),paste0("_non_para_",temp),paste0("_Adjusted_non_para_",temp))
   rownames(result) = colnames(data)
   return(result)

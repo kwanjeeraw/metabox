@@ -17,7 +17,8 @@ stat_norm = function(e, f, p,
                      sample_index,
                      mTICdid,Loessdid,medFCdid,BatchMediandid,
                      mTIC,Loess,medFC,BatchMedian,
-                     sample_normalization = NULL,data_transformation = NULL,data_scaling = NULL){
+                     sample_normalization = NULL,data_transformation = NULL,data_scaling = NULL,
+                     selected_phenotype_by_check, selected_feature_by_check){ # selected_phenotype_by_check tells which column of phenotype would be kept.
 
   # mTICdid=Loessdid=medFCdid=BatchMediandid=F
   # mTIC=Loess=medFC=BatchMedian=list()
@@ -36,6 +37,15 @@ stat_norm = function(e, f, p,
   #   temp2 = class(mTIC)
   # }
 
+
+  if(length(selected_phenotype_by_check)==0){
+    selected_phenotype_by_check = colnames(p) # it means we need all the information of samples.
+  }
+  if(length(selected_feature_by_check)==0){
+    selected_feature_by_check = colnames(f) # it means we need all the information of features.
+  }
+
+
   sample_index = as.numeric(sample_index)
 # sample normalization
   if(sample_normalization == "None"){
@@ -43,6 +53,13 @@ stat_norm = function(e, f, p,
       e_after_sample_normalization = e
     }else{
       e_after_sample_normalization = e[!p$phenotype_index%in%sample_index,]
+    }
+  }else if(sample_normalization == "Sample_specific"){
+
+    if(length(sample_index)==0|| is.na(sample_index)){
+      e_after_sample_normalization = e * as.numeric(p$Sample_specific_weight)
+    }else{
+      e_after_sample_normalization = (e * as.numeric(p$Sample_specific_weight))[!p$phenotype_index%in%sample_index,]
     }
   }else if(sample_normalization == "mTIC"){
     if(mTICdid){
@@ -177,7 +194,7 @@ stat_norm = function(e, f, p,
 #   e_after_scaling[1,1]
 
 
-  return(list(expression = e_after_scaling, feature  = f, phenotype = p,
+  return(list(expression = e_after_scaling, feature  = f[selected_feature_by_check], phenotype = p[selected_phenotype_by_check],
               expression_only_rm_outlier = e[!p$phenotype_index%in%sample_index,],
               phenotype_only_rm_outlier = p[!p$phenotype_index%in%sample_index,],
               mTICdid = mTICdid, Loessdid = Loessdid, medFCdid = medFCdid, BatchMediandid = BatchMediandid,

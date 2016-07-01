@@ -18,9 +18,12 @@ stat_PCA_plot = function(e, f, p, color, sample_information_selection){
   }
   if(length(sample_information_selection)==0){
       sample_information_selection = colnames(p) # it means we need all the information of samples.
-  }else{
+  }else if(length(sample_information_selection)==ncol(p)){ # this is for first time drawing PCA plot.
     sample_information_selection = colnames(p)[sample_information_selection]
-    }
+  }else{ # later, if the user delete columns of p, then we use all the column of p
+    sample_information_selection = colnames(p)
+  }
+
   if(!color%in%colnames(p)){
     p$temp = "samples"
 color = "temp"
@@ -35,7 +38,7 @@ cols = gg_color_hue(length(unique(p[[color]])))
     score = data.frame(score, p[,sample_information_selection])
     rownames(score) = rownames(e)
     variance = pca$sdev^2/sum(pca$sdev^2)
-    temp = by(score,p[[color]],FUN=function(x){
+    temp = by(score,p[[color]],FUN=function(x){ # this is for the scatters.
       # x = score[p[[color]]==p[[color]][1],]
       text.temp = x[sample_information_selection]
       text.temp = apply(x[sample_information_selection],1,function(o){
@@ -55,8 +58,9 @@ cols = gg_color_hue(length(unique(p[[color]])))
            ,name = x[[color]][1]
            ,text = text.temp,marker=NULL
            ),
-           list(x = pred[,1], y = pred[,2]
-                ,mode = 'lines',type='scatter'
+           list(x = pred[,1], y = pred[,2] # this is for the ellipse.
+                ,mode = 'lines',line= list(dash='solid',
+                                           width=1)
                 ,name = x[[color]][1]
                 ,marker=NULL,showlegend=FALSE
            ))
@@ -91,9 +95,25 @@ cols = gg_color_hue(length(unique(p[[color]])))
     for(i in 1:length(temp)){
       result[[i]] = temp[[i]][[1]]
       result[[i]]$marker =  list(color = cols[i])
-      result[[i+length(temp)]] = temp[[i]][[2]]
+      result[[i+length(temp)]] = temp[[i]][[2]] # this is for the ellipse.
       result[[i+length(temp)]]$marker =  list(color = cols[i])
     }
+
+    full_id = unique(p$sampleID)
+    for(i in 1:length(full_id)){
+      result[[length(temp)+length(temp)+i]] = list(x = score[,1][p$sampleID%in%full_id[i]], y = score[,2][p$sampleID%in%full_id[i]]
+           ,mode = 'lines'
+           ,name = NULL, line = list(dash='dot',color = "black",
+                                     width=.5)
+           ,text = NULL,marker=NULL,showlegend=FALSE
+      )
+    }
+
+
+
+
+
+
 
 data = jsonlite::toJSON(result,auto_unbox=T)
 layout = jsonlite::toJSON(result2,auto_unbox=T)
