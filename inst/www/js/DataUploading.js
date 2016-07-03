@@ -185,7 +185,7 @@ $("#Submit_To_Statistics").click(function(){
             		  });
 
             		} else {
-            		  alter("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
+            		  alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
 
             		}
             });
