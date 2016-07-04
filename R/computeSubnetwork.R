@@ -61,7 +61,7 @@ computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, f
       }
     }
     if(tolower(method) == 'bionet'){
-      outnw = callBionet(edgelist, nodelist, pval, fdr)
+      outnw = callBionet(edgelist, nodelist, pval[pval!=0], fdr)
     }else if(tolower(method) == 'sili'){
       stop('Under development')
     }else{
