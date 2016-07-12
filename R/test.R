@@ -14,17 +14,10 @@
 #
 
 test = function(n){
-  library(parallel);
-  cl <- makeCluster(getOption("cl.cores", 2))
-  n = as.numeric(n)
-  m = 100
-
-
-
-  result=  parSapply(cl, 1:20, function(x,n,m){
-    x + n + m
-  },n = n, m = m)
-  stopCluster(cl)
-
-  return(result)
+  identity(x = {
+    x = rnorm(1000)
+    plot(x)
+    mean(x)
+    write.table(x, "aaaa.txt")
+  })
 }

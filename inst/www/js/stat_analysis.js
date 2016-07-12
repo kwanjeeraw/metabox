@@ -12,7 +12,7 @@ var selected = [];
 var e_after_sample_normalization = [];
 var medianFoldChange = [];
 var log_trans = [];
-var cube_trans = [];
+var power_trans = [];
 var auto_scaling = [];var pareto_scaling = [];var range_scaling = [];
 var sample_index;
 var mTICdid = Loessdid = medFCdid = BatchMediandid = false;
@@ -31,6 +31,7 @@ $("#inputUploadData").on("change", function(){
       var req=ocpu.call("stat_load_data",{
         file: $("#inputUploadData")[0].files[0],
         sheetIndex: $("#stat_load_data_para_submit").val()
+       // ,from_example:$('input[name="optionsRadiosInline"]:checked').val()
       },function(session){
 
         session.getObject(function(obj){
@@ -54,6 +55,8 @@ $("#inputUploadData").on("change", function(){
                 fData_column = obj2.column_names_of_fData;
                 why_not_able = obj2.why_not_able;
                 decidenormalizationability(obj2.column_names_of_pData);
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor");
@@ -63,11 +66,12 @@ $("#inputUploadData").on("change", function(){
                 summaryFeature("#Summary_Feature_Data",obj2.column_names_of_fData,obj2.fData_columns_num);
                 e_after_sample_normalization = e_after_transformation = e_after_scaling = eData;
                 $("#showafterupload").collapse('show');
+                $("#draw_boxplot_div").collapse('show');
                 $("#visualization_body").collapse('show');
               plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
                           hideSpinner(loadSpinner);
               });
-          });
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
           var req3 = ocpu.call("stat_get_modified_data",{
             DATA:D
           },function(session3){
@@ -85,7 +89,88 @@ $("#ViewData").collapse('show');
 
         });
 
-          });
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+
+        });
+
+
+      }).fail(function(error){
+      errormsg(1 + error.responseText);
+    });
+
+});// load data.
+// use example data.
+$("input[name='optionsRadiosInline']").on("click", function(){
+  document.getElementById('submit_example_data').style.visibility = 'visible';
+})
+
+
+
+
+$("#submit_example_data").on("click", function(){
+  var loadSpinner = showSpinner();
+      var req=ocpu.call("stat_load_data",{
+        file: $("#inputUploadData")[0].files[0],
+        sheetIndex: $("#stat_load_data_para_submit").val(),
+        from_example:$('input[name="optionsRadiosInline"]:checked').val()
+      },function(session){
+
+        session.getObject(function(obj){
+          DATA = obj;
+          D = obj;
+          d = obj;
+          eData = obj.expression;
+          fData = obj.feature;
+          pData = obj.phenotype;
+          pDataTable = drawTable('#View_pData',obj.phenotype);
+          fDataTable = drawTable('#View_fData',obj.feature);
+          var req2 = ocpu.call("stat_summary_data",{
+            DATA:D
+          },function(session2){
+              session2.getObject(function(obj2){
+                $("#Sample_times_Metabolites").text(obj2.number_of_sample+" X "+obj2.number_of_feature);
+                $("#number_of_sample").text(obj2.number_of_sample);
+                $("#number_of_feature").text(obj2.number_of_feature);
+                $("#EFP").text(obj2.ncol_of_p + " / " + obj2.ncol_of_f);
+                pData_column = obj2.column_names_of_pData;
+                fData_column = obj2.column_names_of_fData;
+                why_not_able = obj2.why_not_able;
+                decidenormalizationability(obj2.column_names_of_pData);
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color");
+                summaryPhenotype("#Summary_Phenotype_Data",obj2.column_names_of_pData,obj2.pData_columns_num);
+                summaryFeature("#Summary_Feature_Data",obj2.column_names_of_fData,obj2.fData_columns_num);
+                e_after_sample_normalization = e_after_transformation = e_after_scaling = eData;
+                $("#showafterupload").collapse('show');
+                $("#draw_boxplot_div").collapse('show');
+                $("#visualization_body").collapse('show');
+              plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
+                          hideSpinner(loadSpinner);
+              });
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+          var req3 = ocpu.call("stat_get_modified_data",{
+            DATA:D
+          },function(session3){
+            modified_dataset_download_address = session3.getLoc() + "R/.val/csv";
+         session.getFile("messages.txt", function(text){
+          if(text.length>10){
+           warningmsg(text);
+          }else{
+           successmsg(text);
+          }
+
+$("#UploadData").collapse('toggle');
+$("#StudyDesign").collapse('show');
+$("#ViewData").collapse('show');
+
+        });
+
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
 
         });
 
@@ -97,11 +182,14 @@ $("#ViewData").collapse('show');
 });// load data.
 
 
-
-
 $("#Submit_To_Statistics").click(function(){
-  var loadSpinner = showSpinner();
 
+  if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
+    alert("You haven't selected factor yet!");
+  }else if($("#independent_factor").val() === $("#repeated_factor").val()){
+    alert("Between Subject Factor CANNOT equal to Within Subject Factor");
+  }else{
+      var loadSpinner = showSpinner();
   // change the DATA. Remove the outlier.
   var req=ocpu.call("stat_rm_sample",{
     e:D.expression,p:D.phenotype,f:D.feature,sample_index:$("#Samples_To_Be_Deleted").val().split(',')
@@ -127,7 +215,11 @@ $("#Submit_To_Statistics").click(function(){
   mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
   mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
   sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
-  selected_phenotype_by_check:selected_phenotype_by_check, selected_feature_by_check:selected_feature_by_check
+  selected_phenotype_by_check:selected_phenotype_by_check, selected_feature_by_check:selected_feature_by_check,
+
+  log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log : $('#logparaautoindependent_factor').val(),
+  power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power : $('#powerparaautoindependent_factor').val()
+
   },function(session_norm){
     session_norm.getObject(function(obj){
 
@@ -150,37 +242,34 @@ $("#Submit_To_Statistics").click(function(){
     $("#ViewData").collapse('hide');
     $("#visualization_body").collapse('hide');
     $("#Statistics_Result_panel").collapse('show');
-
-
-
               hideSpinner(loadSpinner);
               session4.getObject(function(obj3){
-
                 stat_result = obj3;
-
+                console.log(typeof stat_result[0])
+                if(typeof stat_result[0]==="string"){
+                  alert(stat_result);
+                }else{
               Stat_Result = drawTable('#Statistics_Result',obj3);
-               });
-              download_address = session4.getLoc() + "R/.val/csv";
+                            download_address = session4.getLoc() + "R/.val/csv";
               $("#download_statistical_result_button").empty();
               var r= $('<a download = "file.csv" href='+download_address+' class="btn btn-primary btn-lg active" role="button">Download Statistical Analysis Result</a>');
               $("#download_statistical_result_button").append(r);
               var rsession = session4.getLoc();
-
             var res_url = rsession +"files/colnames.json";
             var targeturl = "/ocpu/library/mETABOX/www/similarity.html?varname="
             $.getJSON(res_url)
             		.success (function (response) {
             		if(response.indexOf("PubChem_id")!==-1 ) {
-            		  var test_arr = response.map(function (x) { if (x.match("_vs_")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
+            		  var test_arr = response.map(function (x) { if (x.match("p_value")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
             		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'&rsess='+rsession+'&idtype=compound" target="_blank">'+y+' </a></li>');
             		  });
             		} else if (response.indexOf("ensembl")!==-1 ) {
-            		  var test_arr = response.map(function (x) { if (x.match("_vs_")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
+            		  var test_arr = response.map(function (x) { if (x.match("p_value")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
             		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'&rsess='+rsession+'&idtype=gene" target="_blank">'+y+' </a></li>');
             		  });
 
             		} else if (response.indexOf("uniprot")!==-1 ) {
-            		  var test_arr = response.map(function (x) { if (x.match("_vs_")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
+            		  var test_arr = response.map(function (x) { if (x.match("p_value")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
             		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'&rsess='+rsession+'&idtype=protein" target="_blank">'+y+' </a></li>');
             		  });
 
@@ -189,18 +278,27 @@ $("#Submit_To_Statistics").click(function(){
 
             		}
             });
+                }
+               });
+
 
 
     });
   });
   });
   });
-    });
+    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+  }
+
+
 
 });
 
 
 $(".Thefactor").on("change",function(){
+    if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
+    $("#Sample_Size_Table").text("Waiting user to select factor.")
+  }else{
     var loadSpinner = showSpinner();
     var req = ocpu.call("stat_Study_Design",{
     DATA:D,
@@ -211,7 +309,9 @@ $(".Thefactor").on("change",function(){
             $("#Sample_Size_Table").text(outtxt);
                           hideSpinner(loadSpinner);
         });
-    });
+    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+  }
+
 })
 
 
@@ -232,11 +332,10 @@ $("#Donut_color").change(function(){
   $("#morris-donut-chart").html("");
   plotDonut(e1 = eData, f1 = fData, p1 = pData,selected);
 });
-// functions
-function print_info_of_selected(){
-var text="";
 
-}
+
+// functions
+
 
 function listSelector(full_options,why_not_able,id,furtherlimit){
   // why_not_able = ["numeric","",]
@@ -269,10 +368,18 @@ function decidenormalizationability(column_names_of_pData){
 
 if($.inArray('Batch', column_names_of_pData) == -1){
     document.getElementById("samplenormalizationBatchMedian").disabled = true;
+    $("#why_not_able_batch").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Batch" ></i>');
     document.getElementById("samplenormalizationloess").disabled = true;
+    $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Batch" ></i>');
 }
 if($.inArray('Sample_specific_weight', column_names_of_pData) == -1){
     document.getElementById("samplenormalizationSample_specific").disabled = true;
+$("#why_not_able_Sample_specific").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Sample_specific_weight" ></i>');
+if($.inArray('QC', column_names_of_pData) == -1){
+    document.getElementById("samplenormalizationloess").disabled = true;
+    $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column QC" ></i>');
+}
+
 }
 
 }
@@ -318,7 +425,7 @@ PCA_score_plot.on('plotly_selected',function(eventData){
   sample_index = obj.result;
   $("#sample_selected").text(sample_index);
     });
-  });
+  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
 
 $("#morris-donut-chart").html("");
 plotDonut(e1,f1,p1,selected);
@@ -343,7 +450,7 @@ Morris.Donut({
 });
     });
 
-  });
+  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
 
 }
 
@@ -377,7 +484,7 @@ summaryFeature = function(id,columns,columns_num){
 var text = '<ul class="list-group">';
 
 for(var i = 0;i<columns.length;i++){
-  if(columns[i] === "feature_index" || columns[i] === "KnownorUnknown" ){
+  if(columns[i] === "feature_index" || columns[i] === "KnownorUnknown" || columns[i]==="PubChem_id" || columns[i]==="ensembl"||columns[i]==="uniprot"){
        text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkFeature" checked type="checkbox" disabled readonly></div></li>';
   }else{
     text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkFeature" checked type="checkbox"></div></li>';
@@ -437,7 +544,7 @@ $(document).on("change","input[name='checkFeature']",function(){
 
 
               session.getObject(function(obj){
-console.log(obj);
+
               $("#Statistics_Result").empty()
              Stat_Result = drawTable('#Statistics_Result',obj);
                });
@@ -451,7 +558,7 @@ console.log(obj);
               $("#download_statistical_result_button").append(r);
 
  hideSpinner(loadSpinner);
-    })
+    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
   }
 
 });
@@ -486,21 +593,17 @@ function errormsg(text){
 $("#remove_sample").click(function(){
 var loadSpinner = showSpinner();
 
-
-
   var req = ocpu.call("stat_rm_sample",{
     e:D.expression,p:D.phenotype,f:D.feature,sample_index:$("#sample_to_be_removed").val().split(',')
   },function(session){
     session.getObject(function(obj){
       apply_normalization();
 
-//$('#updatePCA').prop("disabled", false); // Element(s) are now enabled.
-
 // the mTICdid and others would be false because data changed.
 mTICdid = Loessdid = medFCdid = BatchMediandid = false;
-// hideSpinner(loadSpinner);
+
     });
-  });
+  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
 });
 
 // Normalization
@@ -525,9 +628,10 @@ for (var i = 0, length = radios1.length; i < length; i++) {
 var radios2 = document.getElementsByName('datatransformation');
 for (var i = 0, length = radios2.length; i < length; i++) {
     if (radios2[i].checked) {
-      datatransformation_method = ["None","log","Cube Root"][i]
+      datatransformation_method = ["None","log","power"][i]
     }
 }
+
 
 var radios3 = document.getElementsByName('datascaling');
 for (var i = 0, length = radios3.length; i < length; i++) {
@@ -543,7 +647,10 @@ var req=ocpu.call("stat_norm",{
   mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
   mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
   sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
-  selected_phenotype_by_check:selected_phenotype_by_check,selected_feature_by_check:selected_feature_by_check
+  selected_phenotype_by_check:selected_phenotype_by_check,selected_feature_by_check:selected_feature_by_check,
+  log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log:$('#logparaautoindependent_factor').val(),
+  power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power:$('#powerparaautoindependent_factor').val()
+
 },function(session){
 
   session.getObject(function(obj){
@@ -568,7 +675,7 @@ var req=ocpu.call("stat_norm",{
   plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
    hideSpinner(loadSpinner);
   });
-});
+}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
 
 };
 
@@ -577,11 +684,18 @@ var req=ocpu.call("stat_norm",{
 
 
 $(".normalization").change(function(event){
-
   apply_normalization();
 });
 
+$("#stat_norm_log_para_submit").click(function(event){
+$('#datatransformationlog').attr('checked', true);
+  apply_normalization();
+});
 
+$("#stat_norm_power_para_submit").click(function(event){
+  $('#datatransformationpower').attr('checked', true);
+  apply_normalization();
+});
 
 
 
@@ -604,11 +718,84 @@ Object.values = function(object) {
 
 // download boxplots.
 
+$("#draw_boxplot").click(function(){
+// print the boxplot_order_option
+  if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
+    alert("You haven't selected factor yet!");
+
+  }else if($("#independent_factor").val() === $("#repeated_factor").val()){
+    alert("Between Subject Factor CANNOT equal to Within Subject Factor");
+
+  }else{
+
+var req = ocpu.call("stat_get_levels",{
+  e:eData,
+  f:fData,
+  p:pData,
+  factor:$("#repeated_factor").val()[0]
+},function(session){
+session.getObject(function(obj){
+      document.getElementById("boxplot_order_option").innerHTML = obj;
+  })
+})
+
+  }
+})
 
 
 
 
+var title_of_boxplots;
+var download_boxplot_address;
+$("#draw_boxplot_submit").click(function(){
+  if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
+    alert("You haven't selected factor yet! Close me and go to Study Design box to select factor first.");
 
+  }else if($("#independent_factor").val() === $("#repeated_factor").val()){
+    alert("Between Subject Factor CANNOT equal to Within Subject Factor");
+
+  }else{
+
+    var loadSpinner = showSpinner();
+  var req = ocpu.call("stat_boxplot", {
+      e:D.expression,
+      f:D.feature,
+      p:D.phenotype,
+      independent_factor_name:$("#independent_factor").val(),
+      repeated_factor_name:$("#repeated_factor").val(),
+      compound_name_column_index : 3,
+      order_of_factor: $("#boxplot_factor_order").val().split(";")
+  },function(session){
+
+    download_boxplot_address = session.getLoc() + "tar";
+
+             $("#download_boxplot").empty();
+             var r= $('<a href='+download_boxplot_address+' class="btn btn-primary btn-lg active" role="button">Download Boxplots</a>');
+             $("#download_boxplot").append(r);
+  }).fail(function(){
+    alert("R returned an error: " + req.responseText);
+    }).done(function(){
+ hideSpinner(loadSpinner);
+    });
+}
+
+})
+
+
+$("input[name = 'logpara']").click(function(){
+  if(document.getElementById('logparaauto').checked){
+   $("#logparaautoindependent_factor_div").collapse('show');
+  }else{
+   $("#logparaautoindependent_factor_div").collapse('hide');
+  }
+})
+$("input[name = 'powerpara']").click(function(){
+  if(document.getElementById('powerparaauto').checked){
+   $("#powerparaautoindependent_factor_div").collapse('show');
+  }else{
+   $("#powerparaautoindependent_factor_div").collapse('hide');
+  }
+})
 
 
 

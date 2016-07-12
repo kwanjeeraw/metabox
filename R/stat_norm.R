@@ -18,7 +18,13 @@ stat_norm = function(e, f, p,
                      mTICdid,Loessdid,medFCdid,BatchMediandid,
                      mTIC,Loess,medFC,BatchMedian,
                      sample_normalization = NULL,data_transformation = NULL,data_scaling = NULL,
-                     selected_phenotype_by_check, selected_feature_by_check){ # selected_phenotype_by_check tells which column of phenotype would be kept.
+                     selected_phenotype_by_check, selected_feature_by_check,
+
+                     log_para,independent_factor_name_log,
+                     power_para,independent_factor_name_power
+
+
+                     ){ # selected_phenotype_by_check tells which column of phenotype would be kept.
 
   # mTICdid=Loessdid=medFCdid=BatchMediandid=F
   # mTIC=Loess=medFC=BatchMedian=list()
@@ -157,9 +163,93 @@ stat_norm = function(e, f, p,
 
   }else if(data_transformation == "log"){
     e_after_sample_normalization[e_after_sample_normalization<=0] = 0.001 #!!!
-    e_after_transformation = log(e_after_sample_normalization)
-  }else if(data_transformation =="Cube root"){
-    e_after_transformation = e_after_sample_normalization^(1/3)
+if(log_para=="auto"){
+  if(length(independent_factor_name_log)==1){
+    res = sapply(e_after_sample_normalization, function(x){
+      residuals(lm(x~p[,independent_factor_name_log[1]]))
+    })
+  }else{
+    res = sapply(e_after_sample_normalization, function(x){
+      residuals(lm(x~p[,independent_factor_name_log[1]]*p[,independent_factor_name_log[2]]))
+    })
+  }
+  for(i in 1:ncol(res)){
+    res[,i] = res[,i] - min(res[,i]) + 100
+  }
+  try_e = log(res,base = log(exp(exp(1))))
+  try_2 = log(res,base = log(exp(2)))
+  try_10 = log(res,base = log(exp(10)))
+  try_e = sum(apply(try_e,2,function(x){
+    shapiro.test(x)$p.value<0.05
+  }))
+  try_2 = sum(apply(try_2,2,function(x){
+    shapiro.test(x)$p.value<0.05
+  }))
+  try_10 = sum(apply(try_10,2,function(x){
+    shapiro.test(x)$p.value<0.05
+  }))
+  selected_index = which.min(c(try_e,try_2,try_10))
+  if(selected_index==1){
+    e_after_transformation = log(e_after_sample_normalization,base = log(exp(exp(1))))
+  }else if(selected_index==2){
+    e_after_transformation = log(e_after_sample_normalization,base = log(exp(2)))
+  }else if(selected_index==3){
+    e_after_transformation = log(e_after_sample_normalization,base = log(exp(10)))
+  }
+}else{
+  if(log_para=="exp"){
+    log_para = exp(1)
+  }
+  log_para = as.numeric(log_para)
+  e_after_transformation = log(e_after_sample_normalization,base = log(exp(log_para)))
+}
+
+  }else if(data_transformation =="power"){
+
+
+    if(power_para=="auto"){
+      if(length(independent_factor_name_power)==1){
+        res = sapply(e_after_sample_normalization, function(x){
+          residuals(lm(x~p[,independent_factor_name_power[1]]))
+        })
+      }else{
+        res = sapply(e_after_sample_normalization, function(x){
+          residuals(lm(x~p[,independent_factor_name_power[1]]*p[,independent_factor_name_power[2]]))
+        })
+      }
+      try_.3 =  e_after_sample_normalization^(as.numeric(1/3))
+      try_.5 = e_after_sample_normalization^(as.numeric(.5))
+      try_2 = e_after_sample_normalization^(as.numeric(2))
+      try_3 = e_after_sample_normalization^(as.numeric(3))
+
+      try_.3 = sum(apply(try_.3,2,function(x){
+        shapiro.test(x)$p.value<0.05
+      }))
+      try_.5 = sum(apply(try_.5,2,function(x){
+        shapiro.test(x)$p.value<0.05
+      }))
+      try_2 = sum(apply(try_2,2,function(x){
+        shapiro.test(x)$p.value<0.05
+      }))
+      try_3 = sum(apply(try_3,2,function(x){
+        shapiro.test(x)$p.value<0.05
+      }))
+      selected_index = which.min(c(try_.3,try_.5,try_2,try_3))
+      if(selected_index==1){
+        e_after_transformation = data.frame(e_after_sample_normalization^(as.numeric(1/3)))
+      }else if(selected_index==2){
+        e_after_transformation = data.frame(e_after_sample_normalization^(as.numeric(.5)))
+      }else if(selected_index==3){
+        e_after_transformation = data.frame(e_after_sample_normalization^(as.numeric(2)))
+      }else if(selected_index==4){
+        e_after_transformation = data.frame(e_after_sample_normalization^(as.numeric(3)))
+      }
+    }else{
+      power_para = as.numeric(power_para)
+      e_after_transformation = data.frame(e_after_sample_normalization^(as.numeric(power_para)))
+
+    }
+
   }else{
     e_after_transformation = e_after_sample_normalization
   }

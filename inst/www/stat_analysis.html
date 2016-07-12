@@ -16,7 +16,7 @@
   <link href="bootstrap/css/sb-admin.css" rel="stylesheet">
   <link href="bootstrap/css/morris.css" rel="stylesheet">
   <link href="bootstrap/css/mETABOX.css" rel="stylesheet">
-  <link href="bootstrap/css/DataUploading.css" rel="stylesheet">
+  <link href="bootstrap/css/stat_analysis.css" rel="stylesheet">
   <!-- Custom Fonts -->
   <link href="bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
@@ -30,7 +30,7 @@
 
   <script type="text/javascript" src="bootstrap/js/morris.min.js"></script>
 
-  <script type="text/javascript" src="js/DataUploading.js"></script>
+  <script type="text/javascript" src="js/stat_analysis.js"></script>
     <!--<script src="bootstrap/js/bootstrap.js"></script>-->
   <!-- App JavaScript -->
   <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
@@ -46,6 +46,11 @@
     <script type="text/javascript" src="js/jszip.min.js"></script>
     <script type="text/javascript" src="js/stat_FileSaver.min.js"></script>
     <script type="text/javascript" src="js/stat_canvas-toBlob.js"></script>
+
+<!--draggable. for boxplot.
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>-->
+
 
 
   <!-- Load nav menu
@@ -127,6 +132,10 @@
 <!--Upload Data-->
 <div class="row"><div class="col-lg-12">
 
+
+
+
+
   <div id="message"></div>
   <div class="panel-group">
   <div class="panel panel-default">
@@ -156,18 +165,42 @@
                                         <div class="form-group">
                                             <label>Use Example Data</label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline1" value="option1" checked>Two Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_ttest" value="Two Independent Group Data">Two Independent Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline2" value="option2">Multi-Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_ANOVA" value="Multi-Independent Group Data">Multi-Independent Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="optionsRadiosInline3" value="option3">Multi-factor Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_ANOVA" value="3*4-Independent Group Data">3*4-Independent Group Data
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_ANOVA" value="2*2-Independent Group Data">2*2-Independent Group Data
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ttest" value="Two Paired Group Data">Two Paired Group Data
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ANOVA" value="Multi-Paired Group Data">Multi-Paired Group Data
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_repeated_ANOVA" value="3*4-Paired Group Data">3*4-Paired Group Data
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_repeated_ANOVA" value="2*2-Paired Group Data">2*2-Paired Group Data
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_mixed_ANOVA" value="3*4-Mixed Group Data">3*4-Mixed Group Data
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_mixed_ANOVA" value="2*2-Mixed Group Data">2*2-Mixed Group Data
                                             </label>
                                         </div>
-<button type="button" class="btn btn-outline btn-success btn-sm" style="float: left;">Success</button>
+<button type="button" class="btn btn-outline btn-success btn-sm" style="float: left; visibility: hidden;" id="submit_example_data">Submit</button>
+
                             </div>
+
                             </div>
+
     </div>
   </div>
 </div>
@@ -262,8 +295,7 @@
 
       <div class="panel-heading">
                             <div class="row">
-
-                                      <i class="fa fa-cog"></i>
+                                      <i class="fa fa-gears"></i>
 Normalization
 
                             </div>
@@ -287,32 +319,30 @@ Normalization
       <input type="radio" name="samplenormalization" id="samplenormalizationSample_specific" value="Sample_specific" class="normalization">
       Sample-specific Normalization
     </label>
+    <div id = "why_not_able_Sample_specific" style="display:inline"></div>
   </div>
     <div class="radio">
     <label>
       <input type="radio" name="samplenormalization" id="samplenormalizationmTIC" value="mTIC" class="normalization">
       mTIC normalization
     </label>
-    <div class="pull-right"><i class="fa fa-info-circle" data-toggle="tooltip" data-placement="left" data-original-title="Tooltip on left"></i></div>
   </div>
 
   <div class="radio">
     <label>
       <input type="radio" name="samplenormalization" id="samplenormalizationloess" value="loess"   class="normalization">
-      Loess Normalization + Batch Median Correction (if available)
+      Loess Normalization + Batch Median Correction
     </label>
+    <div id = "why_not_able_loess" style="display:inline"></div>
   </div>
     <div class="radio">
-    <label>
-      <input type="radio" name="samplenormalization" id="samplenormalizationMedianFoldChange" value="medianfoldchange"  class="normalization">
-      Use median and Fold change
-    </label>
   </div>
   <div class="radio">
     <label>
       <input type="radio" name="samplenormalization" id="samplenormalizationBatchMedian" value="BatchMedian"  class="normalization">
       Batch Median Correction
     </label>
+        <div id = "why_not_able_batch" style="display:inline"></div>
   </div>
   </form>
  </fieldset><!--Sample Normalization-->
@@ -331,13 +361,17 @@ Normalization
       <input type="radio" name="datatransformation" id="datatransformationlog" value="log"  class="normalization">
       log
     </label>
+    <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_norm_log_para" data-target="#stat_norm_log_para_modal"><i class="fa fa-gear pull-right"></i></button></div>
+
+
   </div>
 
   <div class="radio">
     <label>
-      <input type="radio" name="datatransformation" id="datatransformationCube_root" value="Cube_root"  class="normalization">
-      Cube root transformation
+      <input type="radio" name="datatransformation" id="datatransformationpower" value="power"  class="normalization">
+      power transformation
     </label>
+    <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_norm_power_para" data-target="#stat_norm_power_para_modal"><i class="fa fa-gear pull-right"></i></button></div>
     </div>
     </form>
  </fieldset><!--Data Transformation-->
@@ -445,11 +479,8 @@ Normalization
               <select class="input-sm selectpicker Thefactor" multiple  data-max-options="2" id="repeated_factor"  data-width="fit">
           </select></li>
           <li class="list-group-item">Sample Size:
-<pre><code id="Sample_Size_Table"></code></pre>
+<pre><code id="Sample_Size_Table">Waiting user to select factor.</code></pre>
           </li>
-          <li class="list-group-item">Confounding Factor:
-              <select class="input-sm selectpicker" multiple  data-max-options="2" id="confounding_factor"  data-width="fit">
-          </select></li>
           <li class="list-group-item">
                                                     <div class="form-group">
                                             <label><p class="text-danger">Excluded Samples</p></label>
@@ -601,6 +632,53 @@ Normalization
                     </div>
 </div><!--statistical result-->
 
+<div id="draw_boxplot_div" hidden>
+  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" id = "draw_boxplot" style="display:inline;" data-target="#draw_boxplot_modal"> Draw Boxplots</button>
+
+                            <div id="download_boxplot" style="display:inline;">
+
+                            </div>
+</div>
+
+
+<div id="draw_boxplot_modal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"> How you want to order the factor?</h4>
+              </div>
+              <div class="modal-body">
+                    <div class="form-group">
+<label>Options are:</label>
+                                            <div id = "boxplot_order_option"></div>
+
+
+                                        <div class="form-group">
+                                            <label>Factor Order</label>
+                                            <input class="form-control" id="boxplot_factor_order">
+                                            <p class="help-block">Example: factorA;factorB;factorC;</p>
+                                        </div>
+
+
+
+
+                     </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id = "draw_boxplot_submit">Submit</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+
+
+
+
 
 
 <ul id = "testlist" >
@@ -646,6 +724,124 @@ Normalization
 
           </div>
         </div>
+
+
+
+
+
+        <div id="stat_norm_log_para_modal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change Log Base</h4>
+              </div>
+              <div class="modal-body">
+                    <div class="form-group">
+                                            <div class="form-group">
+                                            <label>Log Base</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="logpara" id="logparae" value="exp" checked>log_e
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="logpara" id="logpara2" value="2">log_2
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="logpara" id="logpara10" value="10">log_10
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="logpara" id="logparaauto" value="auto">Automatically Select
+                                                </label>
+                                            </div>
+                                        </div>
+<div id="logparaautoindependent_factor_div" hidden> Between Subject Factor:
+               <select class="input-sm selectpicker Thefactor" multiple  data-max-options="2" id="logparaautoindependent_factor">
+          </select>
+</div>
+
+                     </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default normalization2" data-dismiss="modal" id = "stat_norm_log_para_submit">Submit</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div id="stat_norm_power_para_modal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Change Log Base</h4>
+              </div>
+              <div class="modal-body">
+                    <div class="form-group">
+                                            <div class="form-group">
+                                            <label>Log Base</label>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="powerpara" id="powerpara0.33" value="0.333" checked>1/3
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="powerpara" id="powerpara0.5" value="0.5">0.5
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="powerpara" id="powerpara2" value="2">2
+                                                </label>
+                                            </div>
+                                            <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="powerpara" id="powerpara3" value="3">3
+                                                </label>
+                                            </div>
+                                             <div class="radio">
+                                                <label>
+                                                    <input type="radio" name="powerpara" id="powerparaauto" value="auto">Automatically Select
+                                                </label>
+                                            </div>
+                                        </div>
+<div id="powerparaautoindependent_factor_div" hidden> Between Subject Factor:
+               <select class="input-sm selectpicker Thefactor" multiple  data-max-options="2" id="powerparaautoindependent_factor">
+          </select>
+</div>
+                     </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default normalization2" data-dismiss="modal" id = "stat_norm_power_para_submit">Submit</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

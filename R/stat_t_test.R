@@ -13,7 +13,7 @@
 #'@export
 #'
 #'
-stat_t_test = function(data,data2,i){ # i tells which column of data2 is group.
+stat_t_test = function(data,data2,i,cl){ # i tells which column of data2 is group.
   # determine the dimension of result.
 
   data2$value = data[,1]
@@ -21,13 +21,30 @@ stat_t_test = function(data,data2,i){ # i tells which column of data2 is group.
   p_value = oneway.test(data2$value ~ data2[,i])$p.value
   p_value_nonPara = wilcox.test(data2$value ~ data2[,i])$p.value
   result = matrix(nrow = ncol(data),ncol = length(c(p_value = p_value,p_value_nonPara)) + 1 + 1)#fdr
-  for(j in 1:ncol(data)){
+
+
+
+
+  o  = parLapply(cl, 1:ncol(data), fun = function(j,data2,data,i){
     data2$value = data[,j]
     # data2_nonPara$value = data[,j]
     p_value = oneway.test(data2$value ~ data2[,i])$p.value
     p_value_nonPara = wilcox.test(data2$value ~ data2[,i])$p.value
-    result[j,c(1,3)] = c(p_value = p_value,p_value = p_value_nonPara)#fdr
-  }
+    c(p_value = p_value,p_value = p_value_nonPara)#fdr
+
+
+  },data2,data,i)
+  result[,c(1,3)] = matrix(unlist(o),nrow = ncol(data),byrow = T)
+
+#
+#
+#   for(j in 1:ncol(data)){
+#     data2$value = data[,j]
+#     # data2_nonPara$value = data[,j]
+#     p_value = oneway.test(data2$value ~ data2[,i])$p.value
+#     p_value_nonPara = wilcox.test(data2$value ~ data2[,i])$p.value
+#     result[j,c(1,3)] = c(p_value = p_value,p_value = p_value_nonPara)#fdr
+#   }
   result[,2] = p.adjust(result[,1],"fdr")
   result[,4] = p.adjust(result[,3],"fdr")
   result = data.frame(result,stringsAsFactors = F,check.names = F)
