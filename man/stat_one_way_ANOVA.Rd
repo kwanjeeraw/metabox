@@ -4,7 +4,7 @@
 \alias{stat_one_way_ANOVA}
 \title{normalization}
 \usage{
-stat_one_way_ANOVA(data, data2, i, sudo_matrix, factor_name)
+stat_one_way_ANOVA(data, data2, i, sudo_matrix, factor_name, cl)
 }
 \description{
 normalization

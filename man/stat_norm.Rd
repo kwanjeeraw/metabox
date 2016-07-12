@@ -7,7 +7,8 @@
 stat_norm(e, f, p, sample_index, mTICdid, Loessdid, medFCdid, BatchMediandid,
   mTIC, Loess, medFC, BatchMedian, sample_normalization = NULL,
   data_transformation = NULL, data_scaling = NULL,
-  selected_phenotype_by_check, selected_feature_by_check)
+  selected_phenotype_by_check, selected_feature_by_check, log_para,
+  independent_factor_name_log, power_para, independent_factor_name_power)
 }
 \description{
 normalization

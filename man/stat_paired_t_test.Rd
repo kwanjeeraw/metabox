@@ -4,7 +4,7 @@
 \alias{stat_paired_t_test}
 \title{stat_paired_t_test}
 \usage{
-stat_paired_t_test(data, data2, i)
+stat_paired_t_test(data, data2, i, cl)
 }
 \description{
 stat_paired_t_test

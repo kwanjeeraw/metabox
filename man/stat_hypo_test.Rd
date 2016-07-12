@@ -5,7 +5,7 @@
 \title{hypothesis test}
 \usage{
 stat_hypo_test(e, p, f, e_ori, p_ori, independent_factor_name = NULL,
-  repeated_factor_name = NULL, confound = NULL, equal_variance_anova = F)
+  repeated_factor_name = NULL, equal_variance_anova = F)
 }
 \description{
 hypothesis test
