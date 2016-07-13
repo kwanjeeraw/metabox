@@ -19,7 +19,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # t test
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two independent group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
   # ANOVA
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\one way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\one way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # two way ANOVA 2*2
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\\\data\\two way ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
@@ -50,7 +50,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
 
 
   # temp
-  # file = "C:\\Users\\fansi\\Desktop\\mx 271133_Nicolas Villarino_cat plasma_07-2016_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Desktop\\test.xlsx"
 
   if(is.null(from_example)){
     if(length(sheetIndex)==0 | sheetIndex==""){

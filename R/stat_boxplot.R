@@ -53,7 +53,7 @@ if(ncol(dta)==2){
   for(i in 1:ncol(e)){#for two way cases.
     dta$value = e[,i]
 
-    png(paste0(i,'th_',f[i,compound_name_column_index],'.png'))
+    png(paste0(i,'th_',f[i,compound_name_column_index],'.png'), width = 800, height = 600)
     boxplot(value ~ V1, data = dta,
             boxwex = 0.25,
             col = cols[1],
@@ -70,7 +70,7 @@ if(ncol(dta)==2){
 
   for(i in 1:ncol(e)){#for two way cases.
     dta$value = e[,i]
-    png(paste0(i,'th_',f[i,compound_name_column_index],'.png'))
+    png(paste0(i,'th_',f[i,compound_name_column_index],'.png'), width = 800, height = 600)
     boxplot(value ~ V2, data = dta,
             boxwex = max(position),at = 1:length(unique(dta$V2))-max(position),
             col = cols[1],subset = dta$V1 == levels( dta$V1)[1],

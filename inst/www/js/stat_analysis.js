@@ -24,7 +24,9 @@ var fData_column;
 var pData_column;
 var modified_dataset_download_address = [];
 var download_norm_data_adress = [];
-
+var res_url;
+var rsession;
+var type;
 // load data.
 $("#inputUploadData").on("change", function(){
   var loadSpinner = showSpinner();
@@ -56,6 +58,9 @@ $("#inputUploadData").on("change", function(){
                 why_not_able = obj2.why_not_able;
                 decidenormalizationability(obj2.column_names_of_pData);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
+
+                listSelector(obj2.column_names_of_fData,null,"#boxplottitle");
+
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
@@ -137,6 +142,9 @@ $("#submit_example_data").on("click", function(){
                 why_not_able = obj2.why_not_able;
                 decidenormalizationability(obj2.column_names_of_pData);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
+                listSelector(obj2.column_names_of_fData,null,"#boxplottitle");
+
+
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
@@ -185,7 +193,7 @@ $("#ViewData").collapse('show');
 $("#Submit_To_Statistics").click(function(){
 
   if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
-    alert("You haven't selected factor yet!");
+    alert("You haven't selected factor yet! Go to Study Design box to select factor first.");
   }else if($("#independent_factor").val() === $("#repeated_factor").val()){
     alert("Between Subject Factor CANNOT equal to Within Subject Factor");
   }else{
@@ -203,10 +211,10 @@ $("#Submit_To_Statistics").click(function(){
 
   var str = $("#Normalization_To_Be_Applied").val();
 
-  var res = str.split(";");
-  samplenormalization_method = res[0];
-  datatransformation_method = res[1];
-  datascaling_method = res[2];
+
+  samplenormalization_method = str[0];
+  datatransformation_method = str[1];
+  datascaling_method = str[2];
 
 
   var req = ocpu.call("stat_norm",{
@@ -245,18 +253,50 @@ $("#Submit_To_Statistics").click(function(){
               hideSpinner(loadSpinner);
               session4.getObject(function(obj3){
                 stat_result = obj3;
-                console.log(typeof stat_result[0])
+
                 if(typeof stat_result[0]==="string"){
                   alert(stat_result);
                 }else{
+
+
+
+                $("#continue_analysis").collapse('show');
+
+
               Stat_Result = drawTable('#Statistics_Result',obj3);
                             download_address = session4.getLoc() + "R/.val/csv";
               $("#download_statistical_result_button").empty();
               var r= $('<a download = "file.csv" href='+download_address+' class="btn btn-primary btn-lg active" role="button">Download Statistical Analysis Result</a>');
               $("#download_statistical_result_button").append(r);
-              var rsession = session4.getLoc();
+
+
+              rsession = session4.getLoc();
             var res_url = rsession +"files/colnames.json";
-            var targeturl = "/ocpu/library/mETABOX/www/similarity.html?varname="
+$.getJSON(res_url).success(function(obj){
+  console.log(obj)
+
+                if(obj.indexOf("PubChem_id")!==-1 ) {
+                type = "compound";
+
+            		} else if (obj.indexOf("ensembl")!==-1 ) {
+            		  type = "ensembl";
+
+
+            		} else if (obj.indexOf("uniprot")!==-1 ) {
+            		  type = "uniprot";
+
+            		}else{
+            		  type = "nothing"
+            		}
+
+
+});
+// decide if it has which compound and disable certain thing!
+
+
+
+
+/*!!            var targeturl = "/ocpu/library/mETABOX/www/similarity.html?varname="
             $.getJSON(res_url)
             		.success (function (response) {
             		if(response.indexOf("PubChem_id")!==-1 ) {
@@ -277,11 +317,18 @@ $("#Submit_To_Statistics").click(function(){
             		  alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
 
             		}
-            });
+            });*/
                 }
                });
 
 
+session4.getFile("messages_hypo_test.txt", function(text){
+          if(text.length>10){
+           warningmsg(text);
+          }
+
+
+        });
 
     });
   });
@@ -293,6 +340,56 @@ $("#Submit_To_Statistics").click(function(){
 
 
 });
+
+
+
+
+
+
+
+
+
+
+
+$("#enrBtn").click(function(){
+  if(type==="nothing"){
+alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
+  }else{
+      window.location = 'subnetwork.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+  }
+
+});
+
+
+$("#overrepBtn").click(function(){
+    if(type==="nothing"){
+alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
+  }else{
+      window.location = 'overrepanalysis.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+  }
+});
+
+$("#cloudBtn").click(function(){
+    if(type==="nothing"){
+alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
+  }else{
+      window.location = 'wordcloud.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+  }
+
+});
+
+$("#SltBtn").click(function(){
+    if(type!=="compound"){
+alert("No compound id found in the table. Cannot proceed to the next step for MetaBox workflow.");
+  }else{
+      window.location = 'similarity.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+  }
+});
+
+
+
+
+
 
 
 $(".Thefactor").on("change",function(){
@@ -341,7 +438,16 @@ function listSelector(full_options,why_not_able,id,furtherlimit){
   // why_not_able = ["numeric","",]
     // selected_options = ["disabled","",...]
 var selector = '';
-if(furtherlimit==null){
+if(why_not_able==null){
+
+for(var i = 0;i<full_options.length;i++){
+
+       selector += "<option>" + full_options[i] + "</option>";
+
+}
+
+}else{
+  if(furtherlimit==null){
 for(var i = 0;i<full_options.length;i++){
   if(why_not_able[i].length<2){
        selector += "<option data-subtext= "+ why_not_able[i]+">" + full_options[i] + "</option>";
@@ -359,6 +465,13 @@ for(var i = 0;i<full_options.length;i++){
 
 }
 }
+}
+
+
+
+
+
+
 $(id).html(selector).selectpicker('refresh');
 }
 
@@ -367,17 +480,48 @@ $(id).html(selector).selectpicker('refresh');
 function decidenormalizationability(column_names_of_pData){
 
 if($.inArray('Batch', column_names_of_pData) == -1){
-    document.getElementById("samplenormalizationBatchMedian").disabled = true;
+
+  var needBatch = document.getElementsByClassName("needBatch");
+
+
+  for(var i=0; i<needBatch.length;i++){
+    needBatch[i].disabled = true;
+  }
+
     $("#why_not_able_batch").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Batch" ></i>');
-    document.getElementById("samplenormalizationloess").disabled = true;
+
     $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Batch" ></i>');
+
+
+
 }
 if($.inArray('Sample_specific_weight', column_names_of_pData) == -1){
-    document.getElementById("samplenormalizationSample_specific").disabled = true;
+
+    var v = document.getElementsByClassName("needSample_specific");
+
+
+  for(var i=0; i<v.length;i++){
+    v[i].disabled = true;
+  }
+
 $("#why_not_able_Sample_specific").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Sample_specific_weight" ></i>');
 if($.inArray('QC', column_names_of_pData) == -1){
-    document.getElementById("samplenormalizationloess").disabled = true;
+  var v = document.getElementsByClassName("needQC");
+
+
+  for(var i=0; i<v.length;i++){
+    v[i].disabled = true;
+  }
     $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column QC" ></i>');
+}
+if($.inArray('Time_of_Injection', column_names_of_pData) == -1){
+  var v = document.getElementsByClassName("needTime_of_Injection");
+
+
+  for(var i=0; i<v.length;i++){
+    v[i].disabled = true;
+  }
+    $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Time_of_Injection" ></i>');
 }
 
 }
@@ -503,6 +647,20 @@ $('.toggleone').bootstrapToggle({
 );
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $(document).on("change","input[name='checkPhenotype']",function(){
 
   for(var i=0;i<pData_column.length;i++){
@@ -577,7 +735,7 @@ function successmsg(text){
   $("#message").empty().append('<div class="alert alert-success alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text+ + '</div>');
 }
 function warningmsg(text){
-  $("#message").empty().append('<div class="alert alert-warning alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text + '<a download = "file.csv" href='+modified_dataset_download_address+' role="button">downloading the data set.</a></div>');
+  $("#message").empty().append('<div class="alert alert-warning alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text + '<a download = "file.csv" href='+modified_dataset_download_address+' role="button">downloading the data set with elements added.</a></div>');
 }
 
 
@@ -721,12 +879,18 @@ Object.values = function(object) {
 $("#draw_boxplot").click(function(){
 // print the boxplot_order_option
   if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
-    alert("You haven't selected factor yet!");
+    alert("You haven't selected factor yet!  Go to Study Design box to select factor first.");
 
   }else if($("#independent_factor").val() === $("#repeated_factor").val()){
     alert("Between Subject Factor CANNOT equal to Within Subject Factor");
 
   }else{
+
+
+if($("#repeated_factor").val() == null){
+document.getElementById("boxplot_factor_order").disabled = true;
+document.getElementById("boxplot_factor_order").placeholder = "Only Available for Within Subject Study Design..";
+}
 
 var req = ocpu.call("stat_get_levels",{
   e:eData,
@@ -756,22 +920,27 @@ $("#draw_boxplot_submit").click(function(){
 
   }else{
 
-    var loadSpinner = showSpinner();
+  var loadSpinner = showSpinner();
   var req = ocpu.call("stat_boxplot", {
       e:D.expression,
       f:D.feature,
       p:D.phenotype,
       independent_factor_name:$("#independent_factor").val(),
       repeated_factor_name:$("#repeated_factor").val(),
-      compound_name_column_index : 3,
+      compound_name_column_index : $("#boxplottitle").val(),
       order_of_factor: $("#boxplot_factor_order").val().split(";")
   },function(session){
 
     download_boxplot_address = session.getLoc() + "tar";
 
              $("#download_boxplot").empty();
-             var r= $('<a href='+download_boxplot_address+' class="btn btn-primary btn-lg active" role="button">Download Boxplots</a>');
-             $("#download_boxplot").append(r);
+             var r= $('<a href='+download_boxplot_address+' class="active"><font color="white">Download Boxplots</font></a>');
+            $("#download_boxplot").append(r);
+
+             var temp = document.getElementById('download_boxplot');
+             temp.disabled = false;
+
+
   }).fail(function(){
     alert("R returned an error: " + req.responseText);
     }).done(function(){
@@ -780,6 +949,15 @@ $("#draw_boxplot_submit").click(function(){
 }
 
 })
+
+$("#Normalization_To_Be_Applied").on("change",function(){
+  var v = $("#Normalization_To_Be_Applied").val();
+$( "#samplenormalizationselected" ).text( v[0] );
+$( "#datatransformationselected" ).text( v[1] );
+$( "#featuretransformationselected" ).text( v[2] );
+
+})
+
 
 
 $("input[name = 'logpara']").click(function(){

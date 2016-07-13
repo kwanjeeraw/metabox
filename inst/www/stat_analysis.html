@@ -316,7 +316,7 @@ Normalization
   </div>
     <div class="radio">
     <label>
-      <input type="radio" name="samplenormalization" id="samplenormalizationSample_specific" value="Sample_specific" class="normalization">
+      <input type="radio" name="samplenormalization" id="samplenormalizationSample_specific" value="Sample_specific" class="normalization needSample_specific">
       Sample-specific Normalization
     </label>
     <div id = "why_not_able_Sample_specific" style="display:inline"></div>
@@ -330,7 +330,7 @@ Normalization
 
   <div class="radio">
     <label>
-      <input type="radio" name="samplenormalization" id="samplenormalizationloess" value="loess"   class="normalization">
+      <input type="radio" name="samplenormalization" id="samplenormalizationloess" value="loess"   class="normalization needBatch needQC needTime_of_Injection">
       Loess Normalization + Batch Median Correction
     </label>
     <div id = "why_not_able_loess" style="display:inline"></div>
@@ -339,7 +339,7 @@ Normalization
   </div>
   <div class="radio">
     <label>
-      <input type="radio" name="samplenormalization" id="samplenormalizationBatchMedian" value="BatchMedian"  class="normalization">
+      <input type="radio" name="samplenormalization" id="samplenormalizationBatchMedian" value="BatchMedian"  class="normalization needBatch">
       Batch Median Correction
     </label>
         <div id = "why_not_able_batch" style="display:inline"></div>
@@ -361,7 +361,7 @@ Normalization
       <input type="radio" name="datatransformation" id="datatransformationlog" value="log"  class="normalization">
       log
     </label>
-    <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_norm_log_para" data-target="#stat_norm_log_para_modal"><i class="fa fa-gear pull-right"></i></button></div>
+    <!-- <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_norm_log_para" data-target="#stat_norm_log_para_modal"><i class="fa fa-gear pull-right"></i></button></div>-->
 
 
   </div>
@@ -371,7 +371,7 @@ Normalization
       <input type="radio" name="datatransformation" id="datatransformationpower" value="power"  class="normalization">
       power transformation
     </label>
-    <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_norm_power_para" data-target="#stat_norm_power_para_modal"><i class="fa fa-gear pull-right"></i></button></div>
+    <!--<div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_norm_power_para" data-target="#stat_norm_power_para_modal"><i class="fa fa-gear pull-right"></i></button></div>-->
     </div>
     </form>
  </fieldset><!--Data Transformation-->
@@ -489,11 +489,49 @@ Normalization
             </li>
           <li class="list-group-item">
                                                     <div class="form-group">
-                                            <label><p class="text-warning">Normalization Applided</p></label>
-                                            <input class="form-control" value="mTIC;log;Pareto;" id = "Normalization_To_Be_Applied">
+<label><p class="text-warning">Normalization Applied</p></label><br>
+
+<div class="text-muted">
+  <p>Sample Normalization: <span id="samplenormalizationselected">mTIC</span></p>
+  <p>Data Transformation: <span id="datatransformationselected">log</span></p>
+  <p>Feature Transformation: <span id="featuretransformationselected">Pareto</span><span> Scaling</span></p>
+</div>
+<select class="selectpicker" multiple id="Normalization_To_Be_Applied">
+  <optgroup label="Sample Normalizatoin" data-max-options="1">
+    <option>None</option>
+    <option class="needSample_specific">Sample_specific</option>
+    <option selected>mTIC</option>
+    <option value = "Loess" class="needBatch needQC needTime_of_Injection">Loess Normalization + Batch Median Correction</option>
+    <option value = "Batch Median" class="needBatch">Batch Median Correction</option>
+  </optgroup>
+  <optgroup label="Data Transformation" data-max-options="1">
+    <option>None</option>
+    <option selected>log</option>
+    <option value = "power">power transformation</option>
+  </optgroup>
+  <optgroup label="Feature Normalization" data-max-options="1">
+    <option>None</option>
+    <option value = "Auto">Auto scaling</option>
+    <option  selected value = "Pareto">Pareto scaling</option>
+    <option value = "Range">Range scaling</option>
+  </optgroup>
+</select>
+
+
+
                                         </div>
             </li>
 <li class="list-group-item"><button type="button" class="btn btn-outline btn-success btn-lg btn-block" id="Submit_To_Statistics">Submit!</button></li>
+
+
+<li class="list-group-item">
+  <div id="draw_boxplot_div" hidden>
+  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" id = "draw_boxplot" style="display:inline;" data-target="#draw_boxplot_modal"> Draw Boxplots</button>
+  <button type="button" class="btn btn-primary btn-sm" id = "download_boxplot" style="display:inline;" disabled> Download Boxplots</button>
+
+</div>
+  </li>
+
         </ul>
     </div>
   </div>
@@ -632,13 +670,7 @@ Normalization
                     </div>
 </div><!--statistical result-->
 
-<div id="draw_boxplot_div" hidden>
-  <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" id = "draw_boxplot" style="display:inline;" data-target="#draw_boxplot_modal"> Draw Boxplots</button>
 
-                            <div id="download_boxplot" style="display:inline;">
-
-                            </div>
-</div>
 
 
 <div id="draw_boxplot_modal" class="modal fade" role="dialog">
@@ -650,9 +682,24 @@ Normalization
                 <h4 class="modal-title"> How you want to order the factor?</h4>
               </div>
               <div class="modal-body">
+
                     <div class="form-group">
-<label>Options are:</label>
-                                            <div id = "boxplot_order_option"></div>
+                                      <label>Which Column is title?</label>
+
+<select id="boxplottitle">
+
+</select>
+
+
+
+
+
+                     </div>
+
+
+
+                    <div class="form-group">
+
 
 
                                         <div class="form-group">
@@ -661,7 +708,8 @@ Normalization
                                             <p class="help-block">Example: factorA;factorB;factorC;</p>
                                         </div>
 
-
+                                      <label>Options are:</label>
+                                            <div id = "boxplot_order_option"></div>
 
 
                      </div>
@@ -677,12 +725,20 @@ Normalization
 
 
 
+<div id="continue_analysis" hidden>
+
+<button id="enrBtn" type="button" class="btn btn-info" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Enrichment page"><i class="fa fa-pie-chart"></i> Enrichment</button>
+<button id="overrepBtn" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Perform overrepresentation analysis"><i class="fa fa-users"></i> Overrepresentation</button>
+<button id="cloudBtn" type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Generate WordCloud"><i class="fa fa-cloud"></i> WordCloud</button>
+<button id="SltBtn" type="button" class="btn btn-primary" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Compute Similarity"><i class="fa fa-flask"></i> Similarity</button>
+
+</div>
+
+
+</div>
 
 
 
-
-<ul id = "testlist" >
-</ul>
 
 
 <!--  modal -->

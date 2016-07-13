@@ -73,7 +73,7 @@ if(length(independent_factor_name)==0){
       if(length(feature_contain_constant_group)>0){ # all the compounds that have constant value would be have NA as p value at the re
 
         for( i in feature_contain_constant_group){
-          sds = by(e[,i],apply(p[,factor_name],1,function(y){
+          sds = by(e[,i],apply(data.frame(p[,factor_name]),1,function(y){
             paste(y,collapse = "!")
           }),function(z){
             sd(z)
@@ -82,8 +82,16 @@ if(length(independent_factor_name)==0){
           for(n in name){
             var1_name = strsplit(n, "!")[[1]][1]
             var2_name = strsplit(n, "!")[[1]][2]
-            e[p[,factor_name[1]] == var1_name & p[,factor_name[2]] == var2_name,i] = rnorm(length(e[p[,factor_name[1]] == var1_name & p[,factor_name[2]] == var2_name,i]))
-          }
+
+            if(length(factor_name)==2){
+              e[p[,factor_name[1]] == var1_name & p[,factor_name[2]] == var2_name,i] = rnorm(length(e[p[,factor_name[1]] == var1_name & p[,factor_name[2]] == var2_name,i]))
+
+            }else{
+              e[p[,factor_name[1]] == var1_name,i] = rnorm(length(e[p[,factor_name[1]] == var1_name,i]))
+
+            }
+
+         }
         }
 
       }
@@ -133,7 +141,7 @@ if(length(independent_factor_name)==0){
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
           result = cbind(result,result_stat)
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
-          return(result)
+
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==1 & length(repeated_factor_name)==0 & (length(unique(dta[,2]))==2)){ # t test
           result = stat_t_test(data = e,data2 = dta,i = 2,cl) # 2nd column is the group
           f$'outlier exist?' = stat_test_outlier(e,f,p,factor_name)
@@ -662,34 +670,16 @@ if(length(independent_factor_name)==0){
 
 
 
+
         if(length(feature_contain_constant_group)>0){
 
           for( i in feature_contain_constant_group){
-            sds = by(e_before_delete_feature_contain_constant_group[,i],apply(p[,factor_name],1,function(y){
-              paste(y,collapse = "!")
-            }),function(z){
-              sd(z)
-            })
-            name = names(sds)[which(sds==0)]
-            for(n in name){
-              var1_name = strsplit(n, "!")[[1]][1]
-              var2_name = strsplit(n, "!")[[1]][2]
 
-              for(j in 1:ncol(result)){
+result[i, -c(1:ncol(f))] = "NA"
 
-                if(grepl(var1_name, colnames(result)[j]) & grepl(var2_name, colnames(result)[j]) &
-                   !grepl("Mean", colnames(result)[j]) & !grepl("Standard Deviation", colnames(result)[j])){
-                  result[i,j] = NA
-                }
-
-              }
-
-
-
-            }
           }
 
-          writeLines(paste(feature_contain_constant_group,"th feature contains group that has constant value. No result would be given for that feature."),
+          writeLines(paste(paste(feature_contain_constant_group,collapse = ","),"th feature contains group that has constant value. No result would be given for that feature."),
                      "messages_hypo_test.txt")
         }else{
           writeLines("Done!",
