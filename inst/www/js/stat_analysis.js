@@ -275,15 +275,15 @@ $("#Submit_To_Statistics").click(function(){
 $.getJSON(res_url).success(function(obj){
   console.log(obj)
 
-                if(obj.indexOf("PubChem_id")!==-1 ) {
+                if(obj.indexOf("PubChem")!==-1 ) {
                 type = "compound";
 
             		} else if (obj.indexOf("ensembl")!==-1 ) {
-            		  type = "ensembl";
+            		  type = "gene";
 
 
             		} else if (obj.indexOf("uniprot")!==-1 ) {
-            		  type = "uniprot";
+            		  type = "protein";
 
             		}else{
             		  type = "nothing"
@@ -355,7 +355,7 @@ $("#enrBtn").click(function(){
   if(type==="nothing"){
 alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'subnetwork.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'enrichmentrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -365,7 +365,7 @@ $("#overrepBtn").click(function(){
     if(type==="nothing"){
 alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'overrepanalysis.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'overreprsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 });
 
@@ -373,7 +373,7 @@ $("#cloudBtn").click(function(){
     if(type==="nothing"){
 alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'wordcloud.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'wordcloudrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -382,7 +382,7 @@ $("#SltBtn").click(function(){
     if(type!=="compound"){
 alert("No compound id found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'similarity.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'similarityrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 });
 
