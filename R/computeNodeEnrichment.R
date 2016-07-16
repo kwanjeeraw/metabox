@@ -1,7 +1,8 @@
 #'Perform enrichment analysis on the input entities
 #'@description perform enrichment analysis from p-values of the input entities. The function wraps around the main functions of \pkg{\link{piano}}.
-#'@usage computeNodeEnrichment(nodedata, nodetype, annotation, internalid, method, size)
+#'@usage computeNodeEnrichment(nodedata, pcol, nodetype, annotation, internalid, method, size)
 #'@param nodedata a two-column data frame of entities and the statistical values. The 1st column is entities and the second is statistical values e.g. p-values.
+#'@param pcol a string specifying columnname containing p-values. This parameter is only for accepting the input from GUI.
 #'@param nodetype a string specifying a node type. It can be one of compound (default), protein, gene, pathway, rna, dna.
 #'@param annotation a string specifying the annotation type e.g. pathway (default) and mesh. Pathway annotation requires the database.
 #'Mesh annotation doesn't require the database but it is available for PubChem compounds only.
@@ -56,9 +57,9 @@
 #'#dt <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790), stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
 #'#result <- computeNodeEnrichment(nodedata=dt, nodetype="compound", annotation="mesh", internalid=FALSE)
 #'@export
-computeNodeEnrichment <- function(nodedata, nodetype="compound", annotation="pathway", internalid = TRUE, method="reporter", size=c(3,500)) UseMethod("computeNodeEnrichment")
+computeNodeEnrichment <- function(nodedata, pcol=NULL, nodetype="compound", annotation="pathway", internalid = TRUE, method="reporter", size=c(3,500)) UseMethod("computeNodeEnrichment")
 #'@export
-computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annotation="pathway", internalid = TRUE, method="reporter", size=c(3,500)){
+computeNodeEnrichment.default <- function (nodedata, pcol="", nodetype="compound", annotation="pathway", internalid = TRUE, method="reporter", size=c(3,500)){
   out <- tryCatch(
     {
       tmparg <- try(nodetype <- match.arg(tolower(nodetype), c("compound","protein","gene","rna","dna"), several.ok = FALSE), silent = TRUE)
@@ -75,6 +76,16 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
       }
       if (class(nodedata) != "data.frame"){
         stop("argument 'nodedata' is not valid, data frame is required.")
+      }
+      if(!is.null(pcol)){#get result from statistical analysis
+        if(!is.null(nodedata$PubChem)){
+          nodedata = nodedata[,c('PubChem',pcol)]
+        }else if(!is.null(nodedata$uniprot)){
+          nodedata = nodedata[,c('uniprot',pcol)]
+        }else if(!is.null(nodedata$ensembl)){
+          nodedata = nodedata[,c('ensembl',pcol)]
+        }
+        #nodedata = na.omit(nodedata)
       }
       require('dplyr')#load dplyr for opencpu
       nodetype = Hmisc::capitalize(nodetype)
@@ -115,8 +126,7 @@ computeNodeEnrichment.default <- function (nodedata, nodetype="compound", annota
           ptwls = unique(era$id) #list of pathways
           ptwstat = lapply(ptwls, function(x){#get total number of annotated nodes of a pathway
             qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',nodetype,') where ID(from) = ',x,' RETURN toString(ID(from)), labels(to), count(to)')
-            annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring), stringsAsFactors = FALSE)
-            colnames(annosize) = c('id','nodelabel','annotation_size')
+            annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, col.names = c('id','nodelabel','annotation_size'), stringsAsFactors = FALSE) #get annotation info from db
             annosize
           })
           ptwstat = plyr::ldply(ptwstat, data.frame)

@@ -115,8 +115,7 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
             ntypels = subtotls[subtotls$source == x$id,] #get nodetype
             apply(ntypels, 1, function(y){
               qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',y[2],') where ID(from) = ',x$id,' RETURN toString(ID(from)), labels(to), count(to)')
-              annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring), stringsAsFactors = FALSE) #get annotation info
-              colnames(annosize) = c('id','nodelabel','count')
+              annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, col.names = c('id','nodelabel','count'), stringsAsFactors = FALSE) #get annotation info from db
               annosize
             })
           })
