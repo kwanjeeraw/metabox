@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- Core CSS -->
+  <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="bootstrap/css/sb-admin.css" rel="stylesheet">
+  <link href="bootstrap/css/mETABOX.css" rel="stylesheet">
+  <!-- Custom Fonts -->
+  <link href="bootstrap/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+  <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+  <!-- Core JavaScript -->
+  <script type="text/javascript" src="js/jquery-2.2.3.min.js"></script>
+  <script type="text/javascript" src="js/opencpu-0.5.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/mETABOX.js"></script>
+  <!-- App JavaScript -->
+  <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="cytoscape/cytoscape.min.js"></script>
+  <script type="text/javascript" src="js/jszip.min.js"></script>
+  <script type="text/javascript" src="js/spin.js"></script>
+  <!-- App CSS -->
+  <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
+  <!-- Load nav menu -->
+  <script> 
+  $(function(){
+    $("#includedNav").load("nav.html");  
+  });
+  </script>
+  <title>metabox</title>
+  <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
+  <!-- Embedded script calling R -->
+  <script>
+  $(function(){
+    //global var
+    var compute_session;
+    var txtinput;
+    var inputTable;
+    var nodeTable;
+    var edgeTable;
+    var fnTable;
+    var annopairTable;
+    var robj;
+    var clobj;
+    var fnobj;
+    var cyImg;
+    var legendImg;
+    var url = getURLVars('rsess')+"R/.val/json";
+    var annotation;
+    var fntype;
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+      success: function (data) {
+        $("#inputnw").text('Input data overview:\nNo of entries from statistical analysis: '+data.length+'\n');        
+        //Table output
+        if (inputTable != undefined) {
+           inputTable.destroy();
+           $('#inputdt').empty();
+        }
+        inputTable = drawTable('#inputdt',data);//statinput
+        $("#computeBtn").click(function(){
+          var loadSpinner = showSpinner();    
+          var txtinput = data;
+          var coef = Number($("#coef").val());
+          var req = ocpu.call("computeSimilarity",{txtinput:txtinput, coef:coef}, function(session) {//calls R function: computeSimilarity
+            compute_session = session;
+            session.getStdout(function(outtxt){
+              $("#consolemsg").text(outtxt);
+            });
+            session.getObject(function(object){
+              robj = object;
+              //Table output
+              if (object.edges.length > 0) {
+                clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=true);
+                nodeTable = drawTable('#nodes',object.nodes);
+                edgeTable = drawTable('#edges',object.edges);
+              }else{
+                clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=false);
+              }
+              //Network output    
+              cyImg = drawNetwork(formatNode(object.nodes), formatEdge(object.edges),'cy');
+              cleanFnOutputs();
+            });//getObject    
+            hideSpinner(loadSpinner);
+          }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
+        });//computeBtn
+      }, error: function(){console.log("Ajax error: Cannot get data");}//success
+    });//ajax
+    $("#cloudBtn").click(function(){
+      var loadSpinner = showSpinner(txt='** Updating Network and Ploting WordCloud ..');
+      annotation = $('input[name="annotation"]:checked').val();
+      var req = ocpu.call("computeNwWordCloud", {edgelist:robj.edges, nodelist:robj.nodes, annotation:annotation}, function(cld_session) {
+        cld_session.getStdout(function(outtxt){
+          $("#consolemsgwc").text(outtxt);
+        });
+        cld_session.getObject(function(cld_object){
+          clobj = cld_object;
+          //Table output
+          if (cld_object.wordcloud.length > 0) {
+            clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=true);
+            fnTable = drawPieTable('#wordcld',cld_object.wordcloud);
+            annopairTable = drawTable('#annopairs',cld_object.pairs);
+          }else{
+            clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=false);
+          }
+          //Wordcloud output
+          fnobj = cld_object.wordcloud;
+          fntype = "wordcloud";
+          $("#wc").rplot("plotWordCloud", {wordtable:cld_object.wordcloud});
+          var pienodes = formatPieNode(cld_object.nodes, cld_object.wordcloud);
+          cyImg = drawNetwork(pienodes[0], formatEdge(cld_object.edges),'cy');//update network
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
+        });//getObject
+        hideSpinner(loadSpinner);
+        $('#wdc').show();
+        toggleMeshTree(annotation);
+      }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
+    });//cloudBtn
+    $("#overrepBtn").click(function(){
+      var loadSpinner = showSpinner(txt='** Updating Network ..');
+      annotation = $('input[name="annotation"]:checked').val();
+      var req = ocpu.call("computeNwOverrep", {edgelist:robj.edges, nodelist:robj.nodes, annotation:annotation}, function(cld_session) {
+        cld_session.getStdout(function(outtxt){
+          $("#consolemsgwc").text(outtxt);
+        });
+        cld_session.getObject(function(cld_object){
+          clobj = cld_object;
+          //Table output
+          if (cld_object.overrepresentation.length > 0) {
+            clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=true);
+            fnTable = drawPieTable('#wordcld',cld_object.overrepresentation);
+            annopairTable = drawTable('#annopairs',cld_object.pairs);
+          }else{
+            clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=false);
+          }
+          //Network output
+          fnobj = cld_object.overrepresentation;
+          fntype = "overrepresentation";
+          var pienodes = formatPieNode(cld_object.nodes, cld_object.overrepresentation);
+          cyImg = drawNetwork(pienodes[0], formatEdge(cld_object.edges),'cy');//update network
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
+        });//getObject
+        hideSpinner(loadSpinner);
+        $('#wdc').hide();
+        toggleMeshTree(annotation);
+      }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
+    });//overrepBtn  
+    $("#downloadBtn").click(function(){
+      exportNwZip(robj.nodes, robj.edges, cyImg.png({bg: '#ffffff', scale:5}));       
+    });//downloadBtn
+    $("#subnetworkBtn").click(function(){
+      window.location = 'subnetwork.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
+    });//subnetworkBtn
+    $("#enrBtn").click(function(){
+      window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment    
+    });//enrBtn
+    $("#downloadOut").click(function(){
+      exportEnrichmentZip(robj.nodes, null, fnobj, clobj.pairs, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
+    });//downloadOut
+    $("#treeBtn").click(function(){
+      $('#d3tree').show();
+      var req = ocpu.call("createMeshTree",{meshtable:fnobj, fntype:fntype}, function(session) {//calls R function: createMeshTree
+        var frameSrc = 'plottree.html?rsess='+session.getLoc();
+        $('iframe').attr("src",frameSrc);
+      }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
+    });//treeBtn
+    $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
+  });
+  </script>
+</head>
+<body>
+  <div id="wrapper">
+    <!-- Navigation -->       
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div id="includedNav"></div>
+    </nav>  
+    <div id="page-wrapper">
+      <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="row">
+          <div class="col-lg-12">
+            <h3>Compute chemical-structure similarity network</h3>
+            <div class="alert alert-default alert-dismissable">
+              <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+              <i class="fa fa-info-circle"></i> Compute chemical structure similarity network, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <!-- Main content -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="panel panel-primary">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#args" href="#">Inputs</a></h3>
+              </div>
+              <div id="args" class="panel-body collapse in">
+                <form role="form">
+                  <h5>PubChem CIDs will be used for computing the similarity network.</h5>
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <ul class="nav nav-tabs">
+                        <li class="active"><a href="#networkOv" data-toggle="tab" data-value="NetworkOv">Input summary</a></li>
+                        <li><a href="#dataOv" data-toggle="tab" data-value="DataOv">Input data</a></li>
+                        <li class="pull-right"><h5>Input overview</h5></li>
+                      </ul>
+                      <div class="tab-content">
+                        <div class="tab-pane active" data-value="NetworkOv" id="networkOv">
+                          <pre id="inputnw"></pre>
+                        </div>
+                        <div class="tab-pane" data-value="DataOv" id="dataOv">
+                          <table id="inputdt" class="display" width="100%"></table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                  <div class="row">
+                    <div class="col-lg-6">
+                      <div class="form-group">
+                        <label for="coef">Minimum Tanimoto similarity correlation coefficient:</label>
+                        <input class="form-control" type="number" id="coef" name="coef" value="0.7" min="0.1" max="1" step="0.05">
+                      </div>
+                    </div>
+                  </div>
+                  <!-- /.row -->
+                  <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <h4>Network</h4><hr>
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#console" data-toggle="tab" data-value="Console">Console</a></li>
+              <li><a href="#node" data-toggle="tab" data-value="Node">Node</a></li>
+              <li><a href="#edge" data-toggle="tab" data-value="Edge">Edge</a></li>
+              <li class="pull-right"><h5>Summary</h5></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" data-value="Console" id="console">
+                <pre id="consolemsg" class="pre-scrollable"></pre>
+              </div>
+              <div class="tab-pane" data-value="Node" id="node">
+                <table id="nodes" class="display" width="100%"></table>
+              </div>
+              <div class="tab-pane" data-value="Edge" id="edge">
+                  <table id="edges" class="display" width="100%"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <hr>
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="panel panel-info">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#network" href="#network">Network</a></h3>
+              </div>
+              <div id="network" class="panel-body collapse in">
+                <div id="cy"></div>
+                <div class="nwLegend"><span>Network legend</span></div><br>
+                <div><img src="image/sim_legend.png"/></div>
+                <div id="legendCy"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <button id="downloadBtn" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Download network outputs"><i class="fa fa-download"></i> Download network</button>
+            <button id="subnetworkBtn" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Subnetwork page"><i class="fa fa-gears"></i> Subnetwork</button>
+            <button id="enrBtn" type="button" class="btn btn-info" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Enrichment page"><i class="fa fa-pie-chart"></i> Enrichment</button>
+          </div>
+        </div>
+        <!-- /.row -->
+        <hr class="dash">
+        <div class="row">
+          <div class="col-lg-12"><h4>Function overview <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Perform functional analysis<br> on the network nodes"></i></h4></div>
+          <div class="col-lg-6">
+            <form role="form">
+              <div class="form-group">
+                <label>Select annotation: </label>
+                <label class="radio-inline"><input type="radio" name="annotation" value="pathway" checked>Pathway</label>
+                <label class="radio-inline"><input type="radio" name="annotation" value="mesh">Mesh</label>
+                <p class="help-block">Mesh annotation is available for PubChem compounds only.</p>
+              </div>
+            </form>
+          </div>
+          <div class="col-lg-3">
+            <button id="overrepBtn" type="button" class="btn btn-danger" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Perform overrepresentation analysis"><i class="fa fa-users"></i> Overrepresentation</button>
+          </div>
+          <div class="col-lg-3">
+            <button id="cloudBtn" type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Generate WordCloud"><i class="fa fa-cloud"></i> WordCloud</button>
+          </div>
+        </div>
+        <!-- /.row -->
+        <hr>
+        <div class="row">
+          <div class="col-lg-12">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#consolewc" data-toggle="tab" data-value="Consolewc">Console</a></li>
+              <li><a href="#wordcl" data-toggle="tab" data-value="Wordcl">Output</a></li>
+              <li><a href="#annopair" data-toggle="tab" data-value="AnnotationPair">AnnotationPair</a></li>
+              <li class="pull-right"><h5>Summary</h5></li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" data-value="Consolewc" id="consolewc">
+                <pre id="consolemsgwc" class="pre-scrollable"></pre>
+              </div>
+              <div class="tab-pane" data-value="Wordcl" id="wordcl">
+                <table id="wordcld" class="display" width="100%"></table>
+              </div>
+              <div class="tab-pane" data-value="AnnotationPair" id="annopair">
+                  <table id="annopairs" class="display" width="100%"></table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <hr>
+        <div class="row">
+          <div class="col-lg-12">
+            <div id="wdc" class="panel panel-warning" style="display: none">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#wordcloud" href="#wordcloud">WordCloud</a></h3>
+              </div>
+              <div id="wordcloud" class="panel-body collapse in">
+                <div id="wc"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div id="d3tree" class="panel panel-danger">
+              <div class="panel-heading">
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#mtree" href="#mtree">Mesh tree</a></h3>
+              </div>
+              <div id="mtree" class="panel-body collapse in">
+                <iframe src="" frameborder="0" width="100%" height="100%" scrolling="auto"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+          <div class="col-lg-12">
+            <button id="downloadOut" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="left" data-html="true" title="Download functional analysis outputs"><i class="fa fa-download"></i> Download output</button>
+            <button id="treeBtn" type="button" class="btn btn-default" disabled><i class="fa fa-sitemap"></i> Show Mesh tree</button>
+          </div>
+        </div>
+        <!-- /.row -->
+        <!-- notify box -->
+        <div id="notifyBox" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
+          <div class="modal-dialog"><div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4>Computing ...</h4>
+              <span id="notifyTxt"></p>
+            </div>
+            <div class="modal-body"><div style="height:200px">
+              <span id="loading_spinner" style="position: absolute;display: block;top: 50%;left: 50%;"></span>
+            </div></div>
+          </div></div>
+        </div>
+        <!-- /.notify box -->
+      </div>
+      <!-- /.container-fluid -->
+    </div>
+    <!-- /#page-wrapper -->
+  </div>
+  <!-- /#wrapper -->
+</body>
+</html>
