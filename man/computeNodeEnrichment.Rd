@@ -4,10 +4,12 @@
 \alias{computeNodeEnrichment}
 \title{Perform enrichment analysis on the input entities}
 \usage{
-computeNodeEnrichment(nodedata, nodetype, annotation, internalid, method, size)
+computeNodeEnrichment(nodedata, pcol, nodetype, annotation, internalid, method, size)
 }
 \arguments{
 \item{nodedata}{a two-column data frame of entities and the statistical values. The 1st column is entities and the second is statistical values e.g. p-values.}
+
+\item{pcol}{a string specifying columnname containing p-values. This parameter is only for accepting the input from GUI.}
 
 \item{nodetype}{a string specifying a node type. It can be one of compound (default), protein, gene, pathway, rna, dna.}
 
