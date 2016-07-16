@@ -85,7 +85,7 @@
       annotation = $('input[name="annotation"]:checked').val();
       var internalid = $('#internalid').is(':checked');
       var method = $("#method").val();
-      var req = ocpu.call("computeNodeEnrichment",{nodedata:inp_session, nodetype:nodetype, annotation:annotation, internalid:internalid, method:method}, function(session) {//calls R function: computeNwEnrichment
+      var req = ocpu.call("computeNodeEnrichment",{nodedata:inp_session, pcol:null, nodetype:nodetype, annotation:annotation, internalid:internalid, method:method}, function(session) {//calls R function: computeNwEnrichment
         compute_session = session;
         session.getStdout(function(outtxt){
           $("#consolemsg").text(outtxt);
