@@ -65,7 +65,17 @@ computeNodeOverrep.default <- function (txtinput, nodetype="compound", annotatio
       require('doParallel') #load doParallel for opencpu
       doParallel::registerDoParallel(cores = 2)
       nodetype = Hmisc::capitalize(nodetype)
+      if (class(txtinput) == "data.frame") {#get result from statistical analysis
+        if(!is.null(txtinput$PubChem)){
+          txtinput = txtinput$PubChem
+        }else if(!is.null(txtinput$uniprot)){
+          txtinput = txtinput$uniprot
+        }else if(!is.null(txtinput$ensembl)){
+          txtinput = txtinput$ensembl
+        }
+      }
       txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
+      txtinput = txtinput[!is.na(txtinput)]
       if(tolower(annotation) == 'pathway' && foundDb()){#pathway overrepresentation
         cat("Querying database ...\n")
         if(internalid){

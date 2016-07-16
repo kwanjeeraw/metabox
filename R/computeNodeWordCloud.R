@@ -54,7 +54,17 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
       if (class(tmparg) == "try-error") {
         stop("argument 'annotation' is not valid, choose one from the list: pathway,mesh")
       }
+      if (class(txtinput) == "data.frame") {#get result from statistical analysis
+        if(!is.null(txtinput$PubChem)){
+          txtinput = txtinput$PubChem
+        }else if(!is.null(txtinput$uniprot)){
+          txtinput = txtinput$uniprot
+        }else if(!is.null(txtinput$ensembl)){
+          txtinput = txtinput$ensembl
+        }
+      }
       txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
+      txtinput = txtinput[!is.na(txtinput)]
       if(tolower(annotation) == 'pathway' && foundDb()){#pathway wordcloud
         cat("Querying database ...\n")
         if(internalid){

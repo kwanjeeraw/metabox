@@ -43,6 +43,11 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
 {
   out <- tryCatch(
     {
+      if (class(txtinput) == "data.frame") {#get result from statistical analysis
+        if(!is.null(txtinput$PubChem)){
+          txtinput = txtinput$PubChem
+        }
+      }
       txtinput = unique(stringr::str_trim(unlist(gsub("[^[:digit:]]","",txtinput)))) #remove whiteline, duplicate, words
       txtinput = txtinput[txtinput!=""]
       cat("Computing Tanimoto similarity ...\n")
