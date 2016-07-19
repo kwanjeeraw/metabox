@@ -14,14 +14,14 @@
 
 
 stat_norm = function(e, f, p,
-                     sample_index,
-                     mTICdid,Loessdid,medFCdid,BatchMediandid,
-                     mTIC,Loess,medFC,BatchMedian,
+                     sample_index,                             # samples to be deleted.
+                     mTICdid,Loessdid,medFCdid,BatchMediandid, # If it has done before. If so, we don't need to calculate it again.
+                     mTIC,Loess,medFC,BatchMedian,             # The mTIC, etc. that has been calculated.
                      sample_normalization = NULL,data_transformation = NULL,data_scaling = NULL,
-                     selected_phenotype_by_check, selected_feature_by_check,
+                     # selected_phenotype_by_check = NULL, selected_feature_by_check = NULL,
 
-                     log_para,independent_factor_name_log,
-                     power_para,independent_factor_name_power
+                     log_para,independent_factor_name_log,     # This is for select the right log
+                     power_para,independent_factor_name_power  # This is for select the right power
 
 
                      ){ # selected_phenotype_by_check tells which column of phenotype would be kept.
@@ -35,21 +35,15 @@ stat_norm = function(e, f, p,
   # sample_index = ""
   # Median Fold Change
 
-  # if(length(mTIC)==0){
-  #   temp = temp2 = "a"
-  #
-  # }else{
-  #   temp = mTIC
-  #   temp2 = class(mTIC)
-  # }
 
 
-  if(length(selected_phenotype_by_check)==0){
+
+  # if(length(selected_phenotype_by_check)==0){
     selected_phenotype_by_check = colnames(p) # it means we need all the information of samples.
-  }
-  if(length(selected_feature_by_check)==0){
+  # }
+  # if(length(selected_feature_by_check)==0){
     selected_feature_by_check = colnames(f) # it means we need all the information of features.
-  }
+  # }
 
 
   sample_index = as.numeric(sample_index)
@@ -82,11 +76,16 @@ stat_norm = function(e, f, p,
         if(length(sample_index)==0|| is.na(sample_index)){
           e_after_sample_normalization = mTIC
         }else{
-          e_after_sample_normalization = mTIC[!p$phenotype_index%in%sample_index,]  *   (mean(apply(e[!p$phenotype_index%in%sample_index,],1,mean))/mean(apply(e,1,mean)))
+          e_after_sample_normalization = mTIC[!p$phenotype_index%in%sample_index,]  *   (mean(apply(e[!p$phenotype_index%in%sample_index,f$KnownorUnknown=="TRUE"],1,mean))/mean(apply(e,1,mean)))
         }
     }
 
   }else if(sample_normalization == "Loess"){
+    if(sum(sample_index<1)>0){
+      stop("For Loess + Batch normalization, you cannot remove QC before normalization because QC are enssential of fitting the right loess curve.
+           However, if you insist on remove it, please remove them before upload data. ")
+    }
+
     if(Loessdid){
       if(length(sample_index)==0|| is.na(sample_index)){
         e_after_sample_normalization = Loess
@@ -94,7 +93,9 @@ stat_norm = function(e, f, p,
         e_after_sample_normalization = Loess[!p$phenotype_index%in%sample_index,]
       }
     }else{
-      Loess = stat_LoessNorm(e)
+      Loess = stat_LoessNorm(data = e, f=f, p=p,
+                             loess.para = 0.75,auto.batch.detection = FALSE,
+                             robust = TRUE)[,colnames(e)]
       Loess = data.frame(Loess)
       colnames(Loess) = colnames(e);rownames(Loess) = rownames(e);
       Loessdid = T
@@ -162,7 +163,7 @@ stat_norm = function(e, f, p,
     e_after_transformation = e_after_sample_normalization
 
   }else if(data_transformation == "log"){
-    e_after_sample_normalization[e_after_sample_normalization<=0] = 0.001 #!!!
+    e_after_sample_normalization[e_after_sample_normalization<=0] = 1 #!!!
 if(log_para=="auto"){
   if(length(independent_factor_name_log)==1){
     res = sapply(e_after_sample_normalization, function(x){
@@ -205,7 +206,7 @@ if(log_para=="auto"){
 }
 
   }else if(data_transformation =="power"){
-
+    e_after_sample_normalization[e_after_sample_normalization<=0] = 1 #!!!
 
     if(power_para=="auto"){
       if(length(independent_factor_name_power)==1){
@@ -272,7 +273,6 @@ if(log_para=="auto"){
   }else{
     e_after_scaling = data.frame(e_after_scaling)
     colnames(e_after_scaling) = colnames(e[!p$phenotype_index%in%sample_index,]);rownames(e_after_scaling) = rownames(e[!p$phenotype_index%in%sample_index,]);
-    p = p[!p$phenotype_index%in%sample_index,]
   }
 
 
@@ -284,7 +284,7 @@ if(log_para=="auto"){
 #   e_after_scaling[1,1]
 
 
-  return(list(expression = e_after_scaling, feature  = f[selected_feature_by_check], phenotype = p[selected_phenotype_by_check],
+  return(list(expression = e_after_scaling, feature  = f[selected_feature_by_check], phenotype = p[!p$phenotype_index%in%sample_index,selected_phenotype_by_check],
               expression_only_rm_outlier = e[!p$phenotype_index%in%sample_index,],
               phenotype_only_rm_outlier = p[!p$phenotype_index%in%sample_index,],
               mTICdid = mTICdid, Loessdid = Loessdid, medFCdid = medFCdid, BatchMediandid = BatchMediandid,

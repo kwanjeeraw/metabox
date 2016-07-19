@@ -12,7 +12,7 @@
 #'@examples
 #'@export
 
-stat_PCA_plot = function(e, f, p, color, sample_information_selection){
+stat_PCA_plot = function(e, f, p, color, sample_information_selection =NULL, Ellipse = TRUE, dot_size = 18, IDtrend = T){
   if(length(color)==0){
     color = "fdafdafdasfdasfdasfdasfsd"
   }
@@ -33,6 +33,8 @@ cols = gg_color_hue(length(unique(p[[color]])))
   }
 
     p$Sample_name = rownames(p)
+
+
     pca = prcomp(e, center = F, scale. = F)
     score = pca$x
     score = data.frame(score, p[,sample_information_selection])
@@ -44,24 +46,32 @@ cols = gg_color_hue(length(unique(p[[color]])))
       text.temp = apply(x[sample_information_selection],1,function(o){
         paste(paste(sample_information_selection,o, sep=": "),collapse = "</br>")
       })
-      ell.info <- cov.wt(cbind(x[,1], x[,2]))
-      eigen.info <- eigen(ell.info$cov)
-      lengths <- sqrt(eigen.info$values * 2 * qf(.95, 2, length(x[,1])-1))
-      d = rbind(ell.info$center + lengths[1] * eigen.info$vectors[,1],
-                ell.info$center - lengths[1] * eigen.info$vectors[,1],
-                ell.info$center + lengths[2] * eigen.info$vectors[,2],
-                ell.info$center - lengths[2] * eigen.info$vectors[,2])
-      r <- cluster::ellipsoidhull(d)
-      pred = predict(r)
+
+
+      if(Ellipse){
+        ell.info <- cov.wt(cbind(x[,1], x[,2]))
+        eigen.info <- eigen(ell.info$cov)
+        lengths <- sqrt(eigen.info$values * 2 * qf(.95, 2, length(x[,1])-1))
+        d = rbind(ell.info$center + lengths[1] * eigen.info$vectors[,1],
+                  ell.info$center - lengths[1] * eigen.info$vectors[,1],
+                  ell.info$center + lengths[2] * eigen.info$vectors[,2],
+                  ell.info$center - lengths[2] * eigen.info$vectors[,2])
+        r <- cluster::ellipsoidhull(d)
+        pred = predict(r,100)
+      }else{
+        pred = NULL
+      }
+
       list(list(x = x[,1], y = x[,2]
            ,mode = 'markers',type='scatter'
            ,name = x[[color]][1]
-           ,text = text.temp,marker=NULL
+           ,text = text.temp
            ),
            list(x = pred[,1], y = pred[,2] # this is for the ellipse.
-                ,mode = 'lines',line= list(dash='solid',
-                                           width=1)
-                ,name = x[[color]][1]
+                ,mode = 'lines',
+                line= list(dash='solid',width=1)
+                ,hoverinfo='none'
+                # ,name = x[[color]][1]
                 ,marker=NULL,showlegend=FALSE
            ))
     },simplify =F)
@@ -94,20 +104,24 @@ cols = gg_color_hue(length(unique(p[[color]])))
     result = list()
     for(i in 1:length(temp)){
       result[[i]] = temp[[i]][[1]]
-      result[[i]]$marker =  list(color = cols[i])
+      result[[i]]$marker =  list(color = cols[i] , size = dot_size)
       result[[i+length(temp)]] = temp[[i]][[2]] # this is for the ellipse.
       result[[i+length(temp)]]$marker =  list(color = cols[i])
     }
 
-    full_id = unique(p$sampleID)
-    for(i in 1:length(full_id)){
-      result[[length(temp)+length(temp)+i]] = list(x = score[,1][p$sampleID%in%full_id[i]], y = score[,2][p$sampleID%in%full_id[i]]
-           ,mode = 'lines'
-           ,name = NULL, line = list(dash='dot',color = "black",
-                                     width=.5)
-           ,text = NULL,marker=NULL,showlegend=FALSE
-      )
+
+    if(IDtrend){
+      full_id = unique(p$sampleID)
+      for(i in 1:length(full_id)){
+        result[[length(temp)+length(temp)+i]] = list(x = score[,1][p$sampleID%in%full_id[i]], y = score[,2][p$sampleID%in%full_id[i]]
+                                                     ,mode = 'lines'
+                                                     ,name = NULL, line = list(dash='dot',color = "black",
+                                                                               width=.5)
+                                                     ,text = NULL,marker=NULL,showlegend=FALSE
+        )
+      }
     }
+
 
 
 

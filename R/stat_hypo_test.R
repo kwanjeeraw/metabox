@@ -16,43 +16,57 @@
 
 stat_hypo_test = function(e,p,f,
                      e_ori,p_ori, # This is for mean and sd.
+                     e_before, p_before,
                      independent_factor_name = NULL, repeated_factor_name = NULL,
 
                      equal_variance_anova = F){#For repeated study design, samples should match.
-  library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(WRS2);library(outliers)
-if(length(repeated_factor_name)==0){
+  library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(WRS2);library(outliers);library(pwr);
+
+
+  # Here need to check the whether the QC in p have right format!
+  # the independent or repeated factor must be empty cell!
+
+
+  if(length(repeated_factor_name)==0){
   repeated_factor_name = NULL
-}
+
+  if("QC"%in%colnames(p)){
+    if(sum(!p[p$QC=="TRUE",independent_factor_name]=="NA")>0){
+      stop(paste0("QC must have empty cell for the column ",independent_factor_name,". Please correct them before upload your file."))
+    }
+  }
+
+
+
+  }else{
+    if(sum(duplicated(p$sampleID))==0){
+      stop("The sampleID you provided doesn't support the repeated design. Please close and check or not to select within subject factor.")
+    }
+  }
+
 if(length(independent_factor_name)==0){
   independent_factor_name = NULL
+  if("QC"%in%colnames(p)){
+  if(sum(!p[p$QC=="TRUE",repeated_factor_name]=="NA")>0){
+    stop(paste0("QC must have empty cell for the column ",repeated_factor_name,". Please correct them before upload your file."))
+  }
+  }
 }
 
   factor_name = c(independent_factor_name,repeated_factor_name)
-  if(length(unique(factor_name))>2){
-    return("Sorry. Cannot support more than two way design cases now.")
-  }else{
 
 
 
 
 
-    # check if sampleID OK.
-
-    if(is.null(repeated_factor_name)){# t test, ANOVA, two way ANOVA, sampleID should be identical to each other.
-      if(sum(duplicated(p$sampleID))>0){
-        return("sampleID should be identical to each other if your design is independent design.")
-      }
-    }else if(!is.null(independent_factor_name)){# Mixed factor ANOVA.
-      if(sum(as.numeric(by(p$sampleID,p[,repeated_factor_name],function(x){
-        sum(duplicated(x))
-      })))>0){
-        stop("sampleID conflicts with your study design.")
-      }
-    }# others should be OK.
 
 
+  noNA = !(tryCatch(p[,independent_factor_name]=="NA",error = function(e){return(rep(F,nrow(p)))}) | tryCatch(p[,repeated_factor_name]=="NA",error = function(e){return(rep(F,nrow(p)))}))
 
+  e_withQC = e[!noNA,];p_withQC = p[!noNA,];
 
+  e = e[noNA,]; p = p[noNA,]
+  e_ori = e_ori[noNA,]; p_ori = p_ori[noNA,]
 
 
       excluded = p$sampleID[!p$sampleID%in%names(table(p$sampleID))[table(p$sampleID)%in%sort(table(p$sampleID),decreasing=TRUE)[1]]]
@@ -93,10 +107,7 @@ if(length(independent_factor_name)==0){
 
          }
         }
-
       }
-
-
 
       dta = data.frame(value = e[,1], p[factor_name[!factor_name%in%repeated_factor_name]],p[repeated_factor_name])
       if(is.null(repeated_factor_name)){
@@ -140,6 +151,8 @@ if(length(independent_factor_name)==0){
           colnames(result_stat) = c("Global Mean", paste("Mean of", names( by(dta$value, dta[,2],mean,na.rm = T))),
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
           result = cbind(result,result_stat)
+          result_power = stat_ANOVA_power(dta = dta,i=2, result_stat=result_stat, sig.level = 0.05, desired_power = 0.8,independent_factor_name, cl)
+          result = cbind(result,result_power)
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==1 & length(repeated_factor_name)==0 & (length(unique(dta[,2]))==2)){ # t test
@@ -157,7 +170,12 @@ if(length(independent_factor_name)==0){
           result_stat = data.frame(result_stat,check.names = F)
           colnames(result_stat) = c("Global Mean", paste("Mean of", names( by(dta$value, dta[,2],mean,na.rm = T))),
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
+
+          power = stat_t_test_power(dta=dta, i = 2,result_stat=result_stat, sig.level = 0.05, desired_power = 0.8,
+                                    independent_factor_name = independent_factor_name,cl)
+
           result = cbind(result,result_stat)
+          result = cbind(result,power)
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==2 & length(repeated_factor_name)==0){#two way ANOVA
@@ -306,9 +324,31 @@ if(length(independent_factor_name)==0){
 
           result = cbind(result,result_stat)
 
+          result_stat_variable1 = result_stat[,c(1,
+                                                 2:(num_factor_variable1+1),
+                                                 ((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1):
+                                                   ((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1+num_factor_variable1))]
 
+          result_stat_variable2 = result_stat[,c(1,
+                                                 (num_factor_variable1+2):(num_factor_variable1+num_factor_variable2+1),
+                                                 ((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1),
+                                                  (((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1+num_factor_variable1)+1):
+                                                   ((((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1+num_factor_variable1)+1)+num_factor_variable2-1))]
 
+          result_stat_inter = result_stat[,c(1,
+                                             (num_factor_variable1+num_factor_variable2+2):(num_factor_variable1+num_factor_variable2+num_factor_variable2*num_factor_variable1+1),
+                                             ((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1),
+                                               ((((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1+num_factor_variable1)+1)+num_factor_variable2-1):
+                                               ((((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1+num_factor_variable1)+1)+num_factor_variable2-1+
+                                                  num_factor_variable2*num_factor_variable1))]
 
+          variable1power = stat_ANOVA_power(dta = dta, i = 2, result_stat = result_stat_variable1,sig.level = 0.05,desired_power = 0.8,independent_factor_name = independent_factor_name,cl)
+          variable2power = stat_ANOVA_power(dta = dta, i = 3, result_stat = result_stat_variable2,sig.level = 0.05,desired_power = 0.8,independent_factor_name = independent_factor_name,cl)
+          interpower = stat_ANOVA_power(dta = dta, i = c(2,3), result_stat = result_stat_inter,sig.level = 0.05,desired_power = 0.8,independent_factor_name = independent_factor_name,cl)
+
+          result = cbind(result,variable1power)
+          result = cbind(result,variable2power)
+          result = cbind(result,interpower)
 
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
@@ -339,8 +379,11 @@ if(length(independent_factor_name)==0){
           colnames(result_stat) = c("Global Mean", paste("Mean of", names( by(dta$value, dta[,2],mean,na.rm = T))),
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
           result = cbind(result,result_stat)
-          writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
+          result_power = stat_repeated_ANOVA_power(e=e,p=p,f=f,dta=dta,i=2,result_stat,sig.level=0.05,desired_power=0.8,factor_name=repeated_factor_name,epsilon=1,k=1,cl)
+
+          result = cbind(result,result_power)
+          writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
 
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==0 & length(repeated_factor_name)==1 & (length(unique(dta[,2]))==2)){# paired t test
@@ -359,7 +402,14 @@ if(length(independent_factor_name)==0){
           colnames(result_stat) = c("Global Mean", paste("Mean of", names( by(dta$value, dta[,2],mean,na.rm = T))),
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
           result = cbind(result,result_stat)
+
+          result_power = stat_paired_t_test_power(e =e, f = f, p = p, dta =dta, i =2, result_stat, sig.level = 0.05, desired_power = 0.8, factor_name = repeated_factor_name, cl)
+
+          result = cbind(result,result_power)
+
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
+
+
 
 
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==0 & length(repeated_factor_name)==2){# two way repeated anova.
@@ -376,7 +426,7 @@ if(length(independent_factor_name)==0){
             interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id, within = .(repeated1,repeated2), type = 3)$ANOVA[3,5]
             # interaction_repeated1_repeated2_nonPara = pbad2way(value ~repeated1*repeated2,
             #                                                    data = dta,est = "median")$AB.p.value
-            interaction_repeated1_repeated2_nonPara = NA
+            interaction_repeated1_repeated2_nonPara = "NA"
 
             return(data.frame(interaction_repeated1_repeated2,interaction_repeated1_repeated2=interaction_repeated1_repeated2_nonPara))
           },e,dta,ezANOVA)
@@ -662,10 +712,15 @@ if(length(independent_factor_name)==0){
           )
 
           result = cbind(result,result_stat)
+
+
+          result_power = stat_repeated_ANOVA_power(e=e,p=p,dta=dta,result_stat = result_stat,sig.level = 0.05,desired_power = 0.8,factor_name = factor_name,epsilon=1,cl)
+
+          result = cbind(result,result_power)
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
         }else{
-          return("Your Design is too complex that we couldn't analysis. If you have any question, please contact Sili: slfan@ucdavis.edu")
+          return("Your Design is so complicated that we couldn't analysis. If you have any question, please contact Sili: slfan@ucdavis.edu")
         }
 
 
@@ -681,11 +736,15 @@ result[i, -c(1:ncol(f))] = "NA"
 
           writeLines(paste(paste(feature_contain_constant_group,collapse = ","),"th feature contains group that has constant value. No result would be given for that feature."),
                      "messages_hypo_test.txt")
+
         }else{
           writeLines("Done!",
                      "messages_hypo_test.txt")
         }
-
+        if(nrow(e_withQC)>1){
+          result_RSD = stat_QC_RSD(e_before,p_before,f,cl)
+          result =cbind(result,result_RSD)
+        }
         return(result)
 
       }
@@ -694,49 +753,6 @@ result[i, -c(1:ncol(f))] = "NA"
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  }
 
 }
 

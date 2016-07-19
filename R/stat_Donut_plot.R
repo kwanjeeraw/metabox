@@ -17,7 +17,9 @@ stat_Donut_plot = function(e,f,p,p_column,selected_sample){
   e = as.matrix(e)
     pca = prcomp(e, center = F, scale. = F)
     score = pca$x
-    p_temp = p[round(score[,1],4)%in%round(selected_sample,4),]
+    p_temp = tryCatch(p[round(score[,1],4)%in%round(selected_sample,4),],error = function(e){
+      stop("No points selected from PCA plot.")
+    })
 
     table = table(p_temp[,p_column])
     names = names(table)

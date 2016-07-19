@@ -16,7 +16,7 @@
 #'
 #'
 stat_rm_sample = function(e,p,f,
-                          sample_index){
+                          sample_index = NULL){
   sample_index = as.numeric(sample_index)
   if(sample_index == 0 || is.null(sample_index) || sum(is.na(as.numeric(sample_index)))>0){
     e_result = e

@@ -24,7 +24,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # two way ANOVA 2*2
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\\\data\\two way ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
   # two way ANOVA 3*4
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # paired t test
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two paired group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
@@ -32,22 +32,25 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\one way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # two way repeated ANOVA 2*2
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
   # two way repeated ANOVA 3*4
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # mixed ANOVA 2*2
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
   # mixed ANOVA 3*4
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
 
 
   # metabolomics data for manuscript
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\manuscript\\mx 107155 _study 112912 TRDRP LC7 NYU Lung Tissue Miyamoto 10113.xlsx"
   # gene data for manuscript
-  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\manuscript\\GeneExpression_GSE32863.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\manuscript\\GeneExpression_GSE32863.xlsx"
 
+
+  # loess norm
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\loessnorm.xlsx"
 
   # temp
   # file = "C:\\Users\\Sili Fan\\Desktop\\test.xlsx"
@@ -55,6 +58,8 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   if(is.null(from_example)){
     if(length(sheetIndex)==0 | sheetIndex==""){
       sheetIndex = 1
+    }else{
+      sheetIndex=as.numeric(sheetIndex)
     }
 
     if(grepl("xlsx", file)){
@@ -144,9 +149,15 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
     }else{
       writeLines(message,"messages.txt")
     }
-
-    result <- list(expression = eData, feature = fData, phenotype = pData)
+    if(sum(duplicated(pData$sampleID[pData$sampleID>0]))){
+      duplicatedID = T
+    }else{
+      duplicatedID = F
+    }
+    result <- list(expression = eData, feature = fData, phenotype = pData, duplicatedID=duplicatedID )
     # e = e_ori = eData; p = p_ori = pData; f = fData;
+
+
 
     return(result)
   }else{

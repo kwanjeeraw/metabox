@@ -27,15 +27,15 @@ var download_norm_data_adress = [];
 var res_url;
 var rsession;
 var type;
+var duplicatedID;
 // load data.
 $("#inputUploadData").on("change", function(){
   var loadSpinner = showSpinner();
       var req=ocpu.call("stat_load_data",{
         file: $("#inputUploadData")[0].files[0],
-        sheetIndex: $("#stat_load_data_para_submit").val()
+        sheetIndex: $("#stat_load_data_para_SheetIndex").val()
        // ,from_example:$('input[name="optionsRadiosInline"]:checked').val()
       },function(session){
-
         session.getObject(function(obj){
           DATA = obj;
           D = obj;
@@ -45,6 +45,10 @@ $("#inputUploadData").on("change", function(){
           pData = obj.phenotype;
           pDataTable = drawTable('#View_pData',obj.phenotype);
           fDataTable = drawTable('#View_fData',obj.feature);
+          duplicatedID = obj.duplicatedID;
+          if(duplicatedID[0]){
+              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend" checked value = "TRUE"></label></div>';
+          }
           var req2 = ocpu.call("stat_summary_data",{
             DATA:D
           },function(session2){
@@ -58,9 +62,7 @@ $("#inputUploadData").on("change", function(){
                 why_not_able = obj2.why_not_able;
                 decidenormalizationability(obj2.column_names_of_pData);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
-
                 listSelector(obj2.column_names_of_fData,null,"#boxplottitle");
-
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
@@ -73,10 +75,11 @@ $("#inputUploadData").on("change", function(){
                 $("#showafterupload").collapse('show');
                 $("#draw_boxplot_div").collapse('show');
                 $("#visualization_body").collapse('show');
+
               plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
-                          hideSpinner(loadSpinner);
+                         // hideSpinner(loadSpinner);
               });
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);hideSpinner(loadSpinner);});
           var req3 = ocpu.call("stat_get_modified_data",{
             DATA:D
           },function(session3){
@@ -89,18 +92,24 @@ $("#inputUploadData").on("change", function(){
           }
 
 $("#UploadData").collapse('toggle');
+
+$(".disableafterupload").attr("disabled", true);
+
+$(".alertToRefresh").html("If you want to upload a new file, please refresh the page first.");
+
+
 $("#StudyDesign").collapse('show');
 $("#ViewData").collapse('show');
 
         });
 
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
 
         });
 
 
       }).fail(function(error){
-      errormsg(1 + error.responseText);
+      errormsg(1 + error.responseText);hideSpinner(loadSpinner);
     });
 
 });// load data.
@@ -109,14 +118,11 @@ $("input[name='optionsRadiosInline']").on("click", function(){
   document.getElementById('submit_example_data').style.visibility = 'visible';
 })
 
-
-
-
 $("#submit_example_data").on("click", function(){
   var loadSpinner = showSpinner();
       var req=ocpu.call("stat_load_data",{
         file: $("#inputUploadData")[0].files[0],
-        sheetIndex: $("#stat_load_data_para_submit").val(),
+        sheetIndex: $("#stat_load_data_para_SheetIndex").val(),
         from_example:$('input[name="optionsRadiosInline"]:checked').val()
       },function(session){
 
@@ -129,6 +135,11 @@ $("#submit_example_data").on("click", function(){
           pData = obj.phenotype;
           pDataTable = drawTable('#View_pData',obj.phenotype);
           fDataTable = drawTable('#View_fData',obj.feature);
+          duplicatedID = obj.duplicatedID;
+
+          if(duplicatedID[0]){
+              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend" checked value = "TRUE"></label></div>';
+          }
           var req2 = ocpu.call("stat_summary_data",{
             DATA:D
           },function(session2){
@@ -143,8 +154,6 @@ $("#submit_example_data").on("click", function(){
                 decidenormalizationability(obj2.column_names_of_pData);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
                 listSelector(obj2.column_names_of_fData,null,"#boxplottitle");
-
-
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
@@ -160,7 +169,7 @@ $("#submit_example_data").on("click", function(){
               plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
                           hideSpinner(loadSpinner);
               });
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
           var req3 = ocpu.call("stat_get_modified_data",{
             DATA:D
           },function(session3){
@@ -173,49 +182,51 @@ $("#submit_example_data").on("click", function(){
           }
 
 $("#UploadData").collapse('toggle');
+$(".disableafterupload").attr("disabled", true);
+$(".alertToRefresh").html("If you want to upload a new file, please refresh the page (F5) first.");
 $("#StudyDesign").collapse('show');
 $("#ViewData").collapse('show');
-
         });
-
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
-
+          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);hideSpinner(loadSpinner);});
         });
-
-
       }).fail(function(error){
-      errormsg(1 + error.responseText);
+      errormsg(1 + error.responseText);hideSpinner(loadSpinner);
     });
 
 });// load data.
 
 
 $("#Submit_To_Statistics").click(function(){
+    // check if stat_hypo_test ca procede or not.
+console.log($("#independent_factor").val());
+console.log($("#repeated_factor").val());
 
-  if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
+  if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){ // must have at least one factor.
     alert("You haven't selected factor yet! Go to Study Design box to select factor first.");
-  }else if($("#independent_factor").val() === $("#repeated_factor").val()){
+  }else if($("#independent_factor").val() === $("#repeated_factor").val()){ // cannot have same for independent_factor and repeated_factor
     alert("Between Subject Factor CANNOT equal to Within Subject Factor");
+  }else if(!$("#independent_factor").val()===null && !$("#repeated_factor").val()===null){ // cannot handle three or more factor cases.
+
+    if(($("#independent_factor").val().length + $("#repeated_factor").val().length)>2){
+      alert("Currently, metabox can only handle two factor case or one factor case!");
+    }
+
   }else{
       var loadSpinner = showSpinner();
   // change the DATA. Remove the outlier.
   var req=ocpu.call("stat_rm_sample",{
-    e:D.expression,p:D.phenotype,f:D.feature,sample_index:$("#Samples_To_Be_Deleted").val().split(',')
+    e:D.expression,p:D.phenotype,f:D.feature,sample_index : ""
   },function(session){
     session.getObject(function(obj){
       DATA = obj;
       eData = obj.expression;
       fData = obj.feature;
       pData = obj.phenotype;
-
-
   var str = $("#Normalization_To_Be_Applied").val();
-
 
   samplenormalization_method = str[0];
   datatransformation_method = str[1];
   datascaling_method = str[2];
-
 
   var req = ocpu.call("stat_norm",{
     e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
@@ -223,19 +234,22 @@ $("#Submit_To_Statistics").click(function(){
   mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
   mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
   sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
-  selected_phenotype_by_check:selected_phenotype_by_check, selected_feature_by_check:selected_feature_by_check,
+  //selected_phenotype_by_check:selected_phenotype_by_check, selected_feature_by_check:selected_feature_by_check,
 
   log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log : $('#logparaautoindependent_factor').val(),
   power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power : $('#powerparaautoindependent_factor').val()
 
   },function(session_norm){
-    session_norm.getObject(function(obj){
 
-    eData = obj.expression;
-    fData = obj.feature;
-    pData = obj.phenotype;
-    e_ori = obj.expression_only_rm_outlier;
-    p_ori = obj.phenotype_only_rm_outlier;
+    session_norm.getObject(function(obj2){
+
+    eData = obj2.expression;
+    fData = obj2.feature;
+    pData = obj2.phenotype;
+    e_ori = obj2.expression_only_rm_outlier;
+    p_ori = obj2.phenotype_only_rm_outlier;
+
+
 
     var req=ocpu.call("stat_hypo_test",{
     e:eData,
@@ -243,6 +257,8 @@ $("#Submit_To_Statistics").click(function(){
     p:pData,
     e_ori:e_ori,
     p_ori:p_ori,
+    e_before:D.expression,
+    p_before:D.phenotype,
     independent_factor_name:$("#independent_factor").val(),
     repeated_factor_name:$("#repeated_factor").val()
   },function(session4){
@@ -258,8 +274,6 @@ $("#Submit_To_Statistics").click(function(){
                   alert(stat_result);
                 }else{
 
-
-
                 $("#continue_analysis").collapse('show');
 
 
@@ -273,17 +287,16 @@ $("#Submit_To_Statistics").click(function(){
               rsession = session4.getLoc();
             var res_url = rsession +"files/colnames.json";
 $.getJSON(res_url).success(function(obj){
-  console.log(obj)
 
                 if(obj.indexOf("PubChem")!==-1 ) {
                 type = "compound";
 
             		} else if (obj.indexOf("ensembl")!==-1 ) {
-            		  type = "gene";
+            		  type = "ensembl";
 
 
             		} else if (obj.indexOf("uniprot")!==-1 ) {
-            		  type = "protein";
+            		  type = "uniprot";
 
             		}else{
             		  type = "nothing"
@@ -299,7 +312,7 @@ $.getJSON(res_url).success(function(obj){
 /*!!            var targeturl = "/ocpu/library/mETABOX/www/similarity.html?varname="
             $.getJSON(res_url)
             		.success (function (response) {
-            		if(response.indexOf("PubChem_id")!==-1 ) {
+            		if(response.indexOf("PubChem")!==-1 ) {
             		  var test_arr = response.map(function (x) { if (x.match("p_value")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
             		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'&rsess='+rsession+'&idtype=compound" target="_blank">'+y+' </a></li>');
             		  });
@@ -330,22 +343,19 @@ session4.getFile("messages_hypo_test.txt", function(text){
 
         });
 
-    });
+    }).fail(function(jqXHR){hideSpinner(loadSpinner);alert(jqXHR.responseText); });
+
+
+
   });
+  }).fail(function(jqXHR){ hideSpinner(loadSpinner);alert(jqXHR.responseText);});
   });
-  });
-    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
   }
 
 
 
 });
-
-
-
-
-
-
 
 
 
@@ -355,7 +365,7 @@ $("#enrBtn").click(function(){
   if(type==="nothing"){
 alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'enrichmentrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'subnetwork.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -365,7 +375,7 @@ $("#overrepBtn").click(function(){
     if(type==="nothing"){
 alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'overreprsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'overrepanalysis.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 });
 
@@ -373,7 +383,7 @@ $("#cloudBtn").click(function(){
     if(type==="nothing"){
 alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'wordcloudrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'wordcloud.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -382,14 +392,16 @@ $("#SltBtn").click(function(){
     if(type!=="compound"){
 alert("No compound id found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'similarityrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'similarity.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 });
 
 
 
 
-
+$("#PCA_plot_para_submit").click(function(){
+    plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
+})
 
 
 $(".Thefactor").on("change",function(){
@@ -406,7 +418,7 @@ $(".Thefactor").on("change",function(){
             $("#Sample_Size_Table").text(outtxt);
                           hideSpinner(loadSpinner);
         });
-    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
   }
 
 })
@@ -470,8 +482,6 @@ for(var i = 0;i<full_options.length;i++){
 
 
 
-
-
 $(id).html(selector).selectpicker('refresh');
 }
 
@@ -479,7 +489,7 @@ $(id).html(selector).selectpicker('refresh');
 
 function decidenormalizationability(column_names_of_pData){
 
-if($.inArray('Batch', column_names_of_pData) == -1){
+if($.inArray('batch', column_names_of_pData) == -1){
 
   var needBatch = document.getElementsByClassName("needBatch");
 
@@ -488,9 +498,9 @@ if($.inArray('Batch', column_names_of_pData) == -1){
     needBatch[i].disabled = true;
   }
 
-    $("#why_not_able_batch").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Batch" ></i>');
+    $("#why_not_able_batch").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column batch" ></i>');
 
-    $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Batch" ></i>');
+    $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column batch" ></i>');
 
 
 
@@ -514,14 +524,14 @@ if($.inArray('QC', column_names_of_pData) == -1){
   }
     $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column QC" ></i>');
 }
-if($.inArray('Time_of_Injection', column_names_of_pData) == -1){
-  var v = document.getElementsByClassName("needTime_of_Injection");
+if($.inArray('time_of_injection', column_names_of_pData) == -1){
+  var v = document.getElementsByClassName("needtime_of_injection");
 
 
   for(var i=0; i<v.length;i++){
     v[i].disabled = true;
   }
-    $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Time_of_Injection" ></i>');
+    $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column time_of_injection" ></i>');
 }
 
 }
@@ -531,34 +541,28 @@ if($.inArray('Time_of_Injection', column_names_of_pData) == -1){
 
 
 function plotPCAScore(e1,f1,p1){
-    var loadSpinner = showSpinner();
+var loadSpinner = showSpinner();
 $(".normalization").prop('disabled', true);
-
-
   var rep=ocpu.call("stat_PCA_plot",{
         e:e1,
         f:f1,
         p:p1,
         color:$('#PCA_color').val(),
-        sample_information_selection:selected_phenotype_by_check
+        sample_information_selection:selected_phenotype_by_check,
+        Ellipse : $("#PCA_Ellipse").is(":checked"), dot_size : $("#PCA_dot_size").val(),
+        IDtrend:$("#PCA_IDtrend").is(":checked")
       },function(session){
-
-
-
 session.getObject(function(obj){
-
 Plotly.newPlot(PCA_score_plot, eval(obj.data[0]),JSON.parse(obj.layout[0]));
-
 $(".normalization").prop('disabled', false);
 decidenormalizationability(pData_column);
-
-hideSpinner(loadSpinner);
 
 PCA_score_plot.on('plotly_selected',function(eventData){
   selected = [];
   eventData.points.forEach(function(pt){
     selected.push(pt.x);
   });
+
   var rep=ocpu.call("stat_get_index_from_PCA",{
     e:e1,
     p:p1,
@@ -569,17 +573,20 @@ PCA_score_plot.on('plotly_selected',function(eventData){
   sample_index = obj.result;
   $("#sample_selected").text(sample_index);
     });
-  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
 
 $("#morris-donut-chart").html("");
 plotDonut(e1,f1,p1,selected);
-});});}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});}
+});});}).done(function(){
+  hideSpinner(loadSpinner);
+}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});}
 
 
 
 
 function plotDonut(e1,f1,p1,select){
-  var rep=ocpu.call("stat_Donut_plot",{
+  var loadSpinner = showSpinner();
+var rep=ocpu.call("stat_Donut_plot",{
 e:e1,
 f:f1,
 p:p1,
@@ -594,7 +601,7 @@ Morris.Donut({
 });
     });
 
-  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+  }).done(function(){ hideSpinner(loadSpinner);}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
 
 }
 
@@ -605,7 +612,8 @@ summaryPhenotype = function(id,columns,columns_num){
 var text = '<ul class="list-group">';
 
 for(var i = 0;i<columns.length;i++){
-  if(columns[i] === "phenotype_index" || columns[i] === "sampleID" ||columns[i] === "Batch" ||columns[i] === "Sample_specific_weight"){
+  if(columns[i] === "phenotype_index" || columns[i] === "sampleID" ||columns[i] === "batch" ||columns[i] === "Sample_specific_weight" ||columns[i] === "QC"||
+  columns[i]==="time_of_injection"||columns[i]=="rank"){
        text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkPhenotype" checked type="checkbox" disabled readonly></div></li>';
   }else{
        text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkPhenotype" checked type="checkbox"></div></li>';
@@ -628,7 +636,7 @@ summaryFeature = function(id,columns,columns_num){
 var text = '<ul class="list-group">';
 
 for(var i = 0;i<columns.length;i++){
-  if(columns[i] === "feature_index" || columns[i] === "KnownorUnknown" || columns[i]==="PubChem_id" || columns[i]==="ensembl"||columns[i]==="uniprot"){
+  if(columns[i] === "feature_index" || columns[i] === "KnownorUnknown" || columns[i]==="PubChem" || columns[i]==="ensembl"||columns[i]==="uniprot"){
        text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkFeature" checked type="checkbox" disabled readonly></div></li>';
   }else{
     text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkFeature" checked type="checkbox"></div></li>';
@@ -716,7 +724,7 @@ $(document).on("change","input[name='checkFeature']",function(){
               $("#download_statistical_result_button").append(r);
 
  hideSpinner(loadSpinner);
-    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
   }
 
 });
@@ -748,21 +756,18 @@ function errormsg(text){
 // Other Utility
 
 // after click remove_sample, some samples would be removed for visualization.
-$("#remove_sample").click(function(){
+/*$("#remove_sample").click(function(){
 var loadSpinner = showSpinner();
 
   var req = ocpu.call("stat_rm_sample",{
-    e:D.expression,p:D.phenotype,f:D.feature,sample_index:$("#sample_to_be_removed").val().split(',')
+    e:D.expression,p:D.phenotype,f:D.feature,sample_index:""
   },function(session){
     session.getObject(function(obj){
       apply_normalization();
-
-// the mTICdid and others would be false because data changed.
 mTICdid = Loessdid = medFCdid = BatchMediandid = false;
-
     });
   }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
-});
+});*/
 
 // Normalization
 
@@ -775,8 +780,6 @@ var datascaling_method;
 
 apply_normalization = function(){
     var loadSpinner = showSpinner();
-
-
 var radios1 = document.getElementsByName('samplenormalization');
 for (var i = 0, length = radios1.length; i < length; i++) {
     if (radios1[i].checked) {
@@ -789,15 +792,14 @@ for (var i = 0, length = radios2.length; i < length; i++) {
       datatransformation_method = ["None","log","power"][i]
     }
 }
-
-
 var radios3 = document.getElementsByName('datascaling');
 for (var i = 0, length = radios3.length; i < length; i++) {
     if (radios3[i].checked) {
       datascaling_method = ["None","Auto","Pareto","Range"][i]
     }
 }
-
+console.log(Loessdid);
+console.log($("#sample_to_be_removed").val().split(','));
 
 var req=ocpu.call("stat_norm",{
   e : D.expression,f : D.feature,p : D.phenotype,
@@ -805,20 +807,15 @@ var req=ocpu.call("stat_norm",{
   mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
   mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
   sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
-  selected_phenotype_by_check:selected_phenotype_by_check,selected_feature_by_check:selected_feature_by_check,
   log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log:$('#logparaautoindependent_factor').val(),
   power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power:$('#powerparaautoindependent_factor').val()
-
 },function(session){
-
   session.getObject(function(obj){
-
     mTICdid = obj.mTICdid; Loessdid = obj.Loessdid; medFCdid = obj.medFCdid; BatchMediandid = obj.BatchMediandid;
     mTIC = obj.mTIC; Loess = obj.Loess; medFC = obj.medFC; BatchMedian = obj.BatchMedian;
     eData = obj.expression;
     fData = obj.feature;
     pData = obj.phenotype;
-
     var req2=ocpu.call("stat_get_modified_data",{
       DATA:obj
     },function(session2){
@@ -831,19 +828,28 @@ var req=ocpu.call("stat_norm",{
 
 
   plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
-   hideSpinner(loadSpinner);
+ //  hideSpinner(loadSpinner);
   });
-}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
+}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
 
 };
 
 
-
-
-
-$(".normalization").change(function(event){
-  apply_normalization();
+$(".normalization").change(function(event){// able the applynormalization button.
+$("#applynormalization").prop( "disabled", false);
 });
+
+
+$(".applynormalization").on("click",function(event){
+  apply_normalization();
+  $("#applynormalization").prop( "disabled", true);
+});
+
+
+
+
+
+
 
 $("#stat_norm_log_para_submit").click(function(event){
 $('#datatransformationlog').attr('checked', true);
