@@ -47,7 +47,7 @@ $("#inputUploadData").on("change", function(){
           fDataTable = drawTable('#View_fData',obj.feature);
           duplicatedID = obj.duplicatedID;
           if(duplicatedID[0]){
-              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend" checked value = "TRUE"></label></div>';
+              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend" value = "TRUE"></label></div>';
           }
           var req2 = ocpu.call("stat_summary_data",{
             DATA:D
