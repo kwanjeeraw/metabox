@@ -157,46 +157,47 @@
                                 <div class="tab-pane fade in active" id="UploadDataTab">
                                     <div style="float: left;"><div class="form-group">
                                             <label>Select File</label>
-                                            <input id="inputUploadData" type="file">
+                                            <input id="inputUploadData" type="file" class = "disableafterupload">
                                         </div></div>
                                     <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_load_data_para" data-target="#stat_load_data_para_modal"><i class="glyphicon glyphicon-edit"> Settings</i></button></div>
+<p class="text-danger alertToRefresh"></p>
                                 </div>
                                 <div class="tab-pane fade" id="UploadDataTabUseExample">
                                         <div class="form-group">
                                             <label>Use Example Data</label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_ttest" value="Two Independent Group Data">Two Independent Group Data
+                                                <input  class = "disableafterupload" type="radio" name="optionsRadiosInline" id="example_ttest" value="Two Independent Group Data">Two Independent Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_ANOVA" value="Multi-Independent Group Data">Multi-Independent Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_ANOVA" value="Multi-Independent Group Data" class = "disableafterupload">Multi-Independent Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_ANOVA" value="3*4-Independent Group Data">3*4-Independent Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_ANOVA" value="3*4-Independent Group Data" class = "disableafterupload">3*4-Independent Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_ANOVA" value="2*2-Independent Group Data">2*2-Independent Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_ANOVA" value="2*2-Independent Group Data" class = "disableafterupload">2*2-Independent Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ttest" value="Two Paired Group Data">Two Paired Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ttest" value="Two Paired Group Data" class = "disableafterupload">Two Paired Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ANOVA" value="Multi-Paired Group Data">Multi-Paired Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ANOVA" value="Multi-Paired Group Data" class = "disableafterupload">Multi-Paired Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_repeated_ANOVA" value="3*4-Paired Group Data">3*4-Paired Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_repeated_ANOVA" value="3*4-Paired Group Data" class = "disableafterupload">3*4-Paired Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_repeated_ANOVA" value="2*2-Paired Group Data">2*2-Paired Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_repeated_ANOVA" value="2*2-Paired Group Data" class = "disableafterupload">2*2-Paired Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_mixed_ANOVA" value="3*4-Mixed Group Data">3*4-Mixed Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_mixed_ANOVA" value="3*4-Mixed Group Data" class = "disableafterupload">3*4-Mixed Group Data
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_mixed_ANOVA" value="2*2-Mixed Group Data">2*2-Mixed Group Data
+                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_mixed_ANOVA" value="2*2-Mixed Group Data" class = "disableafterupload">2*2-Mixed Group Data
                                             </label>
                                         </div>
-<button type="button" class="btn btn-outline btn-success btn-sm" style="float: left; visibility: hidden;" id="submit_example_data">Submit</button>
-
+<button type="button" class="btn btn-outline btn-success btn-sm disableafterupload" style="float: left; visibility: hidden;" id="submit_example_data">Submit</button>
+<p class="text-danger alertToRefresh"></p>
                             </div>
 
                             </div>
@@ -248,6 +249,8 @@
           </select>
          </div>
 
+         <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "PCA_plot_para" data-target="#PCA_plot_para_modal"><i class="glyphicon glyphicon-edit"> Settings</i></button></div>
+
 <div class="clearfix"></div>
          </div>
                     </div>
@@ -270,8 +273,8 @@
 
 
                                     <div class="form-group" style = 'bottom: 5px; position: absolute;width:95%;margin: auto;'>
-                                         <label><p class="pull-left">Sample Removed</p>
-                                         <button type="button" class="btn btn-outline btn-danger btn-xs normalization" id = "remove_sample">Apply</button>
+                                         <label><p class="pull-left">Remove Following Samples: </p>
+                                         <div style="float:right; display:inline"><button type="button" class="btn btn-outline btn-danger btn-xs applynormalization" id = "remove_sample">Apply</button></div>
                                          </label>
                                         <textarea class="form-control" rows="3" id="sample_to_be_removed"></textarea>
                                     </div>
@@ -296,14 +299,13 @@
       <div class="panel-heading">
                             <div class="row">
                                       <i class="fa fa-gears"></i>
-Normalization
+ Data Processing
 
                             </div>
      </div>
 
 <div class="panel-body"  style="height:600px;position: relative;">
   <div style="height:400px;margin: auto;height:100%;">
-
     <!--Sample Normalization-->
 <fieldset>
     <form id = "samplenormalization">
@@ -330,7 +332,7 @@ Normalization
 
   <div class="radio">
     <label>
-      <input type="radio" name="samplenormalization" id="samplenormalizationloess" value="loess"   class="normalization needBatch needQC needTime_of_Injection">
+      <input type="radio" name="samplenormalization" id="samplenormalizationloess" value="loess"   class="normalization needBatch needQC needtime_of_injection">
       Loess Normalization + Batch Median Correction
     </label>
     <div id = "why_not_able_loess" style="display:inline"></div>
@@ -406,28 +408,20 @@ Normalization
     </div>
     </form>
  </fieldset><!--Data Scaling-->
+ <button style="position:absolute;bottom:5px;right:5px;" type="button" class="btn btn-outline btn-primary applynormalization"  id="applynormalization" disabled>Apply</button>
+
   </div>
 
 
-
-
-
 </div>
-
     <div class="panel-footer">
+
          <div class="pull-right">
-
-
-
-                           <div id="download_norm_data">
-
-                            </div>
+                           <div id="download_norm_data"></div>
          </div>
 
 <div class="clearfix"></div>
          </div>
-</div>
-
 
 
         </div>
@@ -501,7 +495,7 @@ Normalization
     <option>None</option>
     <option class="needSample_specific">Sample_specific</option>
     <option selected>mTIC</option>
-    <option value = "Loess" class="needBatch needQC needTime_of_Injection">Loess Normalization + Batch Median Correction</option>
+    <option value = "Loess" class="needBatch needQC needtime_of_injection">Loess Normalization + Batch Median Correction</option>
     <option value = "Batch Median" class="needBatch">Batch Median Correction</option>
   </optgroup>
   <optgroup label="Data Transformation" data-max-options="1">
@@ -769,8 +763,20 @@ Normalization
               <div class="modal-body">
                     <div class="form-group">
                                             <label>Sheet Index</label>
-                                            <input class="form-control" id="stat_load_data_para_SheetIndex">
-
+                                            <select class="form-control" id="stat_load_data_para_SheetIndex">
+                                                <option selected>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                                <option>8</option>
+                                                <option>9</option>
+                                                <option>10</option>
+                                                <option>11</option>
+                                                <option>12</option>
+                                            </select>
                      </div>
               </div>
               <div class="modal-footer">
@@ -781,6 +787,60 @@ Normalization
           </div>
         </div>
 
+
+
+
+        <div id="PCA_plot_para_modal" class="modal fade" role="dialog">
+          <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">PCA Score Plot SettingsS</h4>
+              </div>
+              <div class="modal-body">
+                    <div class="form-group">
+                                      <!-- 1 ellipse.-->
+                                      <div class="form-group">
+                                            <label>Display 95% confidence regions:</label>
+                                            <label class="checkbox-inline pull-right" >
+                                                <input type="checkbox" id = "PCA_Ellipse" checked value = "TRUE"></label>
+                                        </div>
+                                      <!-- 2 ellipse.-->
+                                        <div class="form-group">
+                                            <label>Selects</label>
+                                            <select class="form-control" id="PCA_dot_size">
+                                                <option>1</option>
+                                                <option>2</option>
+                                                <option>3</option>
+                                                <option>4</option>
+                                                <option>5</option>
+                                                <option>6</option>
+                                                <option>7</option>
+                                                <option>8</option>
+                                                <option>9</option>
+                                                <option selected="selected">10</option>
+                                                <option>15</option>
+                                                <option>20</option>
+                                                <option>25</option>
+                                                <option>30</option>
+                                            </select>
+                                        </div>
+                                      <!-- If there is repeated positive id, then user can select wether to see the lines connecting the dots.-->
+                                      <div id="PCA_connect_id">
+
+                                      </div>
+
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id = "PCA_plot_para_submit">Submit</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
 
 
 
@@ -841,12 +901,12 @@ Normalization
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Change Log Base</h4>
+                <h4 class="modal-title">Change Power Parameter</h4>
               </div>
               <div class="modal-body">
                     <div class="form-group">
                                             <div class="form-group">
-                                            <label>Log Base</label>
+                                            <label>Power</label>
                                             <div class="radio">
                                                 <label>
                                                     <input type="radio" name="powerpara" id="powerpara0.33" value="0.333" checked>1/3
