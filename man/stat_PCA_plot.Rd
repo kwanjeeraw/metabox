@@ -4,7 +4,8 @@
 \alias{stat_PCA_plot}
 \title{stat_PCA_plot}
 \usage{
-stat_PCA_plot(e, f, p, color, sample_information_selection)
+stat_PCA_plot(e, f, p, color, sample_information_selection = NULL,
+  Ellipse = TRUE, dot_size = 18, IDtrend = T)
 }
 \arguments{
 \item{e}{should be the e, where rows are samples and columns are compounds.}

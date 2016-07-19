@@ -4,7 +4,7 @@
 \alias{stat_rm_sample}
 \title{stat_rm_sample}
 \usage{
-stat_rm_sample(e, p, f, sample_index)
+stat_rm_sample(e, p, f, sample_index = NULL)
 }
 \description{
 stat_rm_sample

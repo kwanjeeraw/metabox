@@ -4,8 +4,9 @@
 \alias{stat_hypo_test}
 \title{hypothesis test}
 \usage{
-stat_hypo_test(e, p, f, e_ori, p_ori, independent_factor_name = NULL,
-  repeated_factor_name = NULL, equal_variance_anova = F)
+stat_hypo_test(e, p, f, e_ori, p_ori, e_before, p_before,
+  independent_factor_name = NULL, repeated_factor_name = NULL,
+  equal_variance_anova = F)
 }
 \description{
 hypothesis test
