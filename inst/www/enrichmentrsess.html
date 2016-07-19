@@ -105,7 +105,7 @@
       }, error: function(){console.log("Ajax error: Cannot get data");}//success
     });//ajax    
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, null, robj.enrichment, robj.edges, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
+      exportEnrichmentZip(robj.nodes, null, robj.enrichment, robj.edges, cyImg.png({bg: '#ffffff', scale:2}), legendImg.png({bg: '#ffffff', scale:2}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();

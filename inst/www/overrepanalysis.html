@@ -84,7 +84,7 @@
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
     $("#downloadBtn").click(function(){
-      exportEnrichmentZip(robj.nodes, null, robj.overrepresentation, robj.edges, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
+      exportEnrichmentZip(robj.nodes, null, robj.overrepresentation, robj.edges, cyImg.png({bg: '#ffffff', scale:2}), legendImg.png({bg: '#ffffff', scale:2}));
     });//downloadBtn
     $("#treeBtn").click(function(){
       $('#d3tree').show();

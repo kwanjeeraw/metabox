@@ -146,7 +146,7 @@
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call    
     });//overrepBtn 
     $("#downloadBtn").click(function(){
-      exportNwZip(robj.nodes, robj.edges, cyImg.png({bg: '#ffffff', scale:5}));       
+      exportNwZip(robj.nodes, robj.edges, cyImg.png({bg: '#ffffff', scale:2}));       
     });//downloadBtn
     $("#subnetworkBtn").click(function(){
       window.location = 'subnetwork.html?rsess='+compute_session.getLoc();//send r object for subnetwork    
@@ -155,7 +155,7 @@
       window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment    
     });//enrBtn
     $("#downloadOut").click(function(){
-      exportEnrichmentZip(robj.nodes, null, fnobj, clobj.pairs, cyImg.png({bg: '#ffffff', scale:5}), legendImg.png({bg: '#ffffff', scale:5}));
+      exportEnrichmentZip(robj.nodes, null, fnobj, clobj.pairs, cyImg.png({bg: '#ffffff', scale:2}), legendImg.png({bg: '#ffffff', scale:2}));
     });//downloadOut
     $("#treeBtn").click(function(){
       $('#d3tree').show();
