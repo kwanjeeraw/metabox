@@ -2,7 +2,7 @@ Package: mETABOX
 Type: Package
 Title: mETABOX
 Version: 1.0
-Date: 2016-03-22
+Date: 2016-07-20
 Authors@R: "Kwanjeera W <kwanich@ucdavid.edu> [aut, cre]"
 Description: mETABOX.
 Depends:
@@ -22,5 +22,9 @@ Imports:
     qpgraph,
     BioNet,
     metabomapr,
-    doParallel
+    doParallel,
+    data.tree,
+    tm,
+    wordcloud,
+    ChemmineR
 RoxygenNote: 5.0.1.9000
