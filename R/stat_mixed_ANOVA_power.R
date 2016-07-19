@@ -13,7 +13,7 @@
 #'@export
 #'
 #'
-stat_repeated_ANOVA_power = function(e,p,dta,result_stat, sig.level = 0.05, desired_power = 0.8,factor_name, epsilon = 1, cl){
+stat_mixed_ANOVA_power = function(e,p,dta,result_stat, sig.level = 0.05, desired_power = 0.8,factor_name, epsilon = 1, cl){
 
   sample_size = as.numeric(table(dta$repeated1))
   m = length(sample_size)

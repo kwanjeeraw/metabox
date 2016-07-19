@@ -714,7 +714,7 @@ if(length(independent_factor_name)==0){
           result = cbind(result,result_stat)
 
 
-          result_power = stat_repeated_ANOVA_power(e=e,p=p,dta=dta,result_stat = result_stat,sig.level = 0.05,desired_power = 0.8,factor_name = factor_name,epsilon=1,cl)
+          result_power = stat_mixed_ANOVA_power(e=e,p=p,dta=dta,result_stat = result_stat,sig.level = 0.05,desired_power = 0.8,factor_name = factor_name,epsilon=1,cl=cl)
 
           result = cbind(result,result_power)
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
