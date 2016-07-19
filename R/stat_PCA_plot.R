@@ -115,6 +115,7 @@ cols = gg_color_hue(length(unique(p[[color]])))
       for(i in 1:length(full_id)){
         result[[length(temp)+length(temp)+i]] = list(x = score[,1][p$sampleID%in%full_id[i]], y = score[,2][p$sampleID%in%full_id[i]]
                                                      ,mode = 'lines'
+                                                     ,hoverinfo='none'
                                                      ,name = NULL, line = list(dash='dot',color = "black",
                                                                                width=.5)
                                                      ,text = NULL,marker=NULL,showlegend=FALSE
