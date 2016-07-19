@@ -71,7 +71,7 @@ cols = gg_color_hue(length(unique(p[[color]])))
                 ,mode = 'lines',
                 line= list(dash='solid',width=1)
                 ,hoverinfo='none'
-                # ,name = x[[color]][1]
+                ,name = x[[color]][1]
                 ,marker=NULL,showlegend=FALSE
            ))
     },simplify =F)
