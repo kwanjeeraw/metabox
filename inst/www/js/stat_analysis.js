@@ -262,6 +262,9 @@ console.log($("#repeated_factor").val());
     independent_factor_name:$("#independent_factor").val(),
     repeated_factor_name:$("#repeated_factor").val()
   },function(session4){
+
+    console.log(session4)
+
     $("#StudyDesign").collapse('hide');
     $("#ViewData").collapse('hide');
     $("#visualization_body").collapse('hide');
