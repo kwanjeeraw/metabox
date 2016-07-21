@@ -28,6 +28,13 @@ var res_url;
 var rsession;
 var type;
 var duplicatedID;
+
+//turn to inline mode
+$.fn.editable.defaults.mode = 'inline';
+
+ $('#username').editable();
+
+
 // load data.
 $("#inputUploadData").on("change", function(){
   var loadSpinner = showSpinner();
