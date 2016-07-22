@@ -33,19 +33,6 @@ var guess_repeated_factor;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //turn to inline mode
 $.fn.editable.defaults.mode = 'inline';
 
