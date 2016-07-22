@@ -28,11 +28,36 @@ var res_url;
 var rsession;
 var type;
 var duplicatedID;
+var guess_independent_factor;
+var guess_repeated_factor;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //turn to inline mode
 $.fn.editable.defaults.mode = 'inline';
 
- $('#username').editable();
+/*$('#username').editable({
+    type: 'text',
+    title: 'Enter username',
+    success: function(response, newValue) {
+        console.log(response)
+        console.log(newValue)//update backbone model
+    }
+});*/
+
 
 
 // load data.
@@ -54,11 +79,13 @@ $("#inputUploadData").on("change", function(){
           fDataTable = drawTable('#View_fData',obj.feature);
           duplicatedID = obj.duplicatedID;
           if(duplicatedID[0]){
-              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend" value = "TRUE"></label></div>';
+              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend"  value = "TRUE"></label></div>';
           }
           var req2 = ocpu.call("stat_summary_data",{
             DATA:D
           },function(session2){
+
+
               session2.getObject(function(obj2){
                 $("#Sample_times_Metabolites").text(obj2.number_of_sample+" X "+obj2.number_of_feature);
                 $("#number_of_sample").text(obj2.number_of_sample);
@@ -67,18 +94,41 @@ $("#inputUploadData").on("change", function(){
                 pData_column = obj2.column_names_of_pData;
                 fData_column = obj2.column_names_of_fData;
                 why_not_able = obj2.why_not_able;
+
+
+                guess_independent_factor=obj2.guess_independent_factor;
+                guess_repeated_factor=obj2.guess_repeated_factor;
+
+
                 decidenormalizationability(obj2.column_names_of_pData);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
-                listSelector(obj2.column_names_of_fData,null,"#boxplottitle");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor",null,"dfdasfdasfewrf");
+                listSelector(obj2.column_names_of_fData,null,"#boxplottitle",null,"dfdasfdasfewrf");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor",null,"dfdasfdasfewrf");
+
+
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor",null,guess_independent_factor);
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor",null,guess_repeated_factor);
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor",null,"dfdasfdasfewrf");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color",null,guess_independent_factor);
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
+
+
+                  var req = ocpu.call("stat_Study_Design",{
+                    DATA:D,
+                    between_factor:guess_independent_factor,
+                    within_factor:guess_repeated_factor
+                    },function(session){
+                  session.getStdout(function(outtxt){
+                            $("#Sample_Size_Table").text(outtxt);
+                                          hideSpinner(loadSpinner);
+                        });
+                }).fail(function(jqXHR){hideSpinner(loadSpinner); alert(jqXHR.responseText); });
+
                 summaryPhenotype("#Summary_Phenotype_Data",obj2.column_names_of_pData,obj2.pData_columns_num);
                 summaryFeature("#Summary_Feature_Data",obj2.column_names_of_fData,obj2.fData_columns_num);
                 e_after_sample_normalization = e_after_transformation = e_after_scaling = eData;
+
+
                 $("#showafterupload").collapse('show');
                 $("#draw_boxplot_div").collapse('show');
                 $("#visualization_body").collapse('show');
@@ -150,6 +200,8 @@ $("#submit_example_data").on("click", function(){
           var req2 = ocpu.call("stat_summary_data",{
             DATA:D
           },function(session2){
+
+
               session2.getObject(function(obj2){
                 $("#Sample_times_Metabolites").text(obj2.number_of_sample+" X "+obj2.number_of_feature);
                 $("#number_of_sample").text(obj2.number_of_sample);
@@ -158,15 +210,35 @@ $("#submit_example_data").on("click", function(){
                 pData_column = obj2.column_names_of_pData;
                 fData_column = obj2.column_names_of_fData;
                 why_not_able = obj2.why_not_able;
+                guess_independent_factor=obj2.guess_independent_factor;
+                guess_repeated_factor=obj2.guess_repeated_factor;
+
+
                 decidenormalizationability(obj2.column_names_of_pData);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor");
-                listSelector(obj2.column_names_of_fData,null,"#boxplottitle");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor",null,"dfdasfdasfewrf");
+                listSelector(obj2.column_names_of_fData,null,"#boxplottitle",null,"dfdasfdasfewrf");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor",null,"dfdasfdasfewrf");
+
+
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor",null,guess_independent_factor);
+
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor",null,guess_repeated_factor);
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor",null,"dfdasfdasfewrf");
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color",null,guess_independent_factor);
+                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
+
+                var req = ocpu.call("stat_Study_Design",{
+                    DATA:D,
+                    between_factor:guess_independent_factor,
+                    within_factor:guess_repeated_factor
+                    },function(session){
+                  session.getStdout(function(outtxt){
+                            $("#Sample_Size_Table").text(outtxt);
+                                          hideSpinner(loadSpinner);
+                        });
+                }).fail(function(jqXHR){hideSpinner(loadSpinner); alert(jqXHR.responseText); });
+
+
                 summaryPhenotype("#Summary_Phenotype_Data",obj2.column_names_of_pData,obj2.pData_columns_num);
                 summaryFeature("#Summary_Feature_Data",obj2.column_names_of_fData,obj2.fData_columns_num);
                 e_after_sample_normalization = e_after_transformation = e_after_scaling = eData;
@@ -202,24 +274,123 @@ $("#ViewData").collapse('show');
 
 });// load data.
 
+function arraysEqual(a, b) {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (a.length != b.length) return false;
+
+  // If you don't care about the order of the elements inside
+  // the array, you should sort both arrays here.
+
+  for (var i = 0; i < a.length; ++i) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+var pwr = 80;
+   $('#desired_power').editable({
+        title: 'Enter Power Desired (0-100)',
+        success: function(response, newValue) {
+        pwr = newValue
+    }
+    });
+
+
+var samplenormalization_method = 'mTIC';
+$('#samplenormalizationselected').editable({
+        showbuttons: false,
+        unsavedclass: null,
+        type: 'select',
+        inputclass: 'input-medium privacy-select',
+        source: [
+            {value: 'None', text: 'None'},
+            {value: 'Sample_specific', text: 'Sample_specific'},
+            {value: 'mTIC', text: 'mTIC'},
+            {value: 'Loess', text: 'Loess'},
+            {value: 'Batch Median', text: 'Batch Median'}
+        ],
+        success: function(response, newValue) {
+        samplenormalization_method = newValue//update backbone model
+    }
+    });
+
+
+var datatransformation_method = 'log';
+$('#datatransformationselected').editable({
+        showbuttons: false,
+        unsavedclass: null,
+        type: 'select',
+        inputclass: 'input-medium privacy-select',
+        source: [
+            {value: 'None', text: 'None'},
+            {value: 'log', text: 'log'},
+            {value: 'power', text: 'power'}
+        ],
+        success: function(response, newValue) {
+        datatransformation_method = newValue//update backbone model
+    }
+    });
+
+
+
+
+var datascaling_method = 'log';
+$('#featuretransformationselected').editable({
+        showbuttons: false,
+        unsavedclass: null,
+        type: 'select',
+        inputclass: 'input-medium privacy-select',
+        source: [
+            {value: 'None', text: 'None'},
+            {value: 'Auto', text: 'Auto'},
+            {value: 'Pareto', text: 'Pareto'},
+            {value: 'Range', text: 'Range'}
+        ],
+        success: function(response, newValue) {
+        datascaling_method = newValue//update backbone model
+    }
+    });
+
+
+
+
+
+
+
+
+
 
 $("#Submit_To_Statistics").click(function(){
     // check if stat_hypo_test ca procede or not.
-console.log($("#independent_factor").val());
-console.log($("#repeated_factor").val());
 
-  if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){ // must have at least one factor.
-    alert("You haven't selected factor yet! Go to Study Design box to select factor first.");
-  }else if($("#independent_factor").val() === $("#repeated_factor").val()){ // cannot have same for independent_factor and repeated_factor
-    alert("Between Subject Factor CANNOT equal to Within Subject Factor");
-  }else if(!$("#independent_factor").val()===null && !$("#repeated_factor").val()===null){ // cannot handle three or more factor cases.
 
-    if(($("#independent_factor").val().length + $("#repeated_factor").val().length)>2){
-      alert("Currently, metabox can only handle two factor case or one factor case!");
-    }
 
+
+ if($("#independent_factor").val()===null){
+    ind = []
   }else{
-      var loadSpinner = showSpinner();
+    ind = $("#independent_factor").val()
+  }
+
+  if($("#repeated_factor").val()===null){
+    rep = []
+  }else{
+    rep = $("#repeated_factor").val()
+  }
+
+
+
+  // length should be 1 or 2
+
+  if(ind.length + rep.length === 0){
+    alert("You haven't select factor yet. Please select at Between Subject Factor or Within Subject Factor session.")
+  }else if(ind.length + rep.length > 2){
+    alert("Currently, metabox can only analysis two-way design, namely you can NOT have more than two factors intotal in Between Subject Factor and Within Subject Factor session")
+  }else if(arraysEqual(ind,rep)){
+    alert("Between Subject Factor can NOT equal th Within Subject Factor.")
+  }else{
+          var loadSpinner = showSpinner();
   // change the DATA. Remove the outlier.
   var req=ocpu.call("stat_rm_sample",{
     e:D.expression,p:D.phenotype,f:D.feature,sample_index : ""
@@ -231,9 +402,9 @@ console.log($("#repeated_factor").val());
       pData = obj.phenotype;
   var str = $("#Normalization_To_Be_Applied").val();
 
-  samplenormalization_method = str[0];
+  /*samplenormalization_method = str[0];
   datatransformation_method = str[1];
-  datascaling_method = str[2];
+  datascaling_method = str[2];*/
 
   var req = ocpu.call("stat_norm",{
     e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
@@ -267,11 +438,10 @@ console.log($("#repeated_factor").val());
     e_before:D.expression,
     p_before:D.phenotype,
     independent_factor_name:$("#independent_factor").val(),
-    repeated_factor_name:$("#repeated_factor").val()
+    repeated_factor_name:$("#repeated_factor").val(),
+    need_power:document.getElementById('power_analysis_needed').checked,
+    desired_power: pwr
   },function(session4){
-
-    console.log(session4)
-
     $("#StudyDesign").collapse('hide');
     $("#ViewData").collapse('hide');
     $("#visualization_body").collapse('hide');
@@ -365,6 +535,8 @@ session4.getFile("messages_hypo_test.txt", function(text){
 
 
 
+
+
 });
 
 
@@ -428,7 +600,7 @@ $(".Thefactor").on("change",function(){
             $("#Sample_Size_Table").text(outtxt);
                           hideSpinner(loadSpinner);
         });
-    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
+    }).fail(function(jqXHR){hideSpinner(loadSpinner); alert(jqXHR.responseText); });
   }
 
 })
@@ -456,15 +628,22 @@ $("#Donut_color").change(function(){
 // functions
 
 
-function listSelector(full_options,why_not_able,id,furtherlimit){
+function listSelector(full_options,why_not_able,id,furtherlimit, default_checked){
+
+  //listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
+
+
   // why_not_able = ["numeric","",]
     // selected_options = ["disabled","",...]
 var selector = '';
 if(why_not_able==null){
 
 for(var i = 0;i<full_options.length;i++){
-
-       selector += "<option>" + full_options[i] + "</option>";
+  if(full_options[i]===default_checked[0]){
+    selector += "<option selected>" + full_options[i] + "</option>";
+  }else{
+    selector += "<option>" + full_options[i] + "</option>";
+  }
 
 }
 
@@ -472,7 +651,14 @@ for(var i = 0;i<full_options.length;i++){
   if(furtherlimit==null){
 for(var i = 0;i<full_options.length;i++){
   if(why_not_able[i].length<2){
-       selector += "<option data-subtext= "+ why_not_able[i]+">" + full_options[i] + "</option>";
+
+  if(full_options[i]===default_checked[0]){
+    selector += "<option selected>" + full_options[i] + "</option>";
+  }else{
+    selector += "<option data-subtext= "+ why_not_able[i]+">" + full_options[i] + "</option>";
+  }
+
+
   }else{
     selector += "<option data-subtext="+ why_not_able[i]+" disabled>" + full_options[i] + "</option>";
   }
@@ -480,7 +666,15 @@ for(var i = 0;i<full_options.length;i++){
 }else{
   for(var i = 0;i<full_options.length;i++){
   if(why_not_able[i].length<2){
-       selector += "<option data-subtext= "+ why_not_able[i]+">" + full_options[i] + "</option>";
+
+    if(full_options[i]===default_checked[0]){
+      selector += "<option selected>" + full_options[i] + "</option>";
+    }else{
+      selector += "<option data-subtext= "+ why_not_able[i]+">" + full_options[i] + "</option>";
+    }
+
+
+
   }else{
     selector += "<option data-subtext="+ why_not_able[i]+" disabled>" + full_options[i] + "</option>";
   }
@@ -691,11 +885,11 @@ $(document).on("change","input[name='checkPhenotype']",function(){
        }
      }
 
-     listSelector(pData_column,why_not_able,"#independent_factor");
-     listSelector(pData_column,why_not_able,"#repeated_factor");
-     listSelector(pData_column,why_not_able,"#confounding_factor");
-     listSelector(pData_column,why_not_able,"#PCA_color");
-     listSelector(pData_column,why_not_able,"#Donut_color");
+     listSelector(pData_column,why_not_able,"#independent_factor",null,guess_independent_factor);
+     listSelector(pData_column,why_not_able,"#repeated_factor",null,guess_repeated_factor);
+     listSelector(pData_column,why_not_able,"#confounding_factor",null,"dfdasfdasfewrf");
+     listSelector(pData_column,why_not_able,"#PCA_color",null,guess_independent_factor);
+     listSelector(pData_column,why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
 
 });
 
@@ -808,8 +1002,8 @@ for (var i = 0, length = radios3.length; i < length; i++) {
       datascaling_method = ["None","Auto","Pareto","Range"][i]
     }
 }
-console.log(Loessdid);
-console.log($("#sample_to_be_removed").val().split(','));
+
+
 
 var req=ocpu.call("stat_norm",{
   e : D.expression,f : D.feature,p : D.phenotype,
