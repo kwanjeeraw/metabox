@@ -13,7 +13,7 @@
 #'@export
 #'
 #'
-stat_paired_t_test_power = function(e,p,dta, i, result_stat, sig.level = 0.05, desired_power = 0.8, factor_name,cl){
+stat_paired_t_test_power = function(e,f,p,dta, i, result_stat, sig.level = 0.05, desired_power = 0.8, factor_name,cl){
 
   sample_size = table(dta[,i])
   N = sum(sample_size)

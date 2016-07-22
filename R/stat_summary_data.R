@@ -18,6 +18,9 @@ stat_summary_data = function(DATA){
   fData = DATA$feature
   pData = DATA$phenotype
 
+
+
+
   type_of_each_colum_pData = sapply(pData, function(x){class(x)})
 
   pData_columns_num = sapply(pData, function(x){length(unique(x))})
@@ -33,9 +36,14 @@ stat_summary_data = function(DATA){
 
   why_not_able[which(colnames(pData)%in%"sampleID")] = "too_many_levels"
 
+
+  guess_factor = stat_guess_factor(DATA)
+  guess_independent_factor = guess_factor[2]
+  guess_repeated_factor = guess_factor[1]
+
   result = list(number_of_sample=nrow(pData),number_of_feature = nrow(fData),column_names_of_pData = colnames(pData),column_names_of_fData = colnames(fData),
                 ncol_of_p = ncol(pData), ncol_of_f = ncol(fData),
                 type_of_each_colum_pData = type_of_each_colum_pData, pData_columns_num = pData_columns_num,fData_columns_num=fData_columns_num,
-                why_not_able = why_not_able)
+                why_not_able = why_not_able, guess_independent_factor = guess_independent_factor, guess_repeated_factor = guess_repeated_factor)
   return(result)
 }

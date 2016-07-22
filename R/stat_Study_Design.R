@@ -24,15 +24,13 @@ stat_Study_Design = function(DATA, between_factor = NULL, within_factor = NULL){
     between_factor = NULL
   }
 
-  # if(!length(between_factor)==0){
-  #   Sample_Size = table(pData[,between_factor])
-  # }else if(!length(within_factor)==0){
-  #   Sample_Size = table(pData[,within_factor])
-  # }else if((length(within_factor)+length(between_factor))<4){
-    Sample_Size = table(pData[,c(between_factor,within_factor)])
-  # }else{
-  #   Sample_Size = "Too many factors you've selected. You can only select three factors in total."
-  # }
+
+
+
+  Sample_Size = tryCatch(table(pData[,c(between_factor,within_factor)]),
+                         error = function(err){
+                           "Waiting user to select factor."
+                         })
 
 
   result = Sample_Size

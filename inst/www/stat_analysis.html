@@ -26,6 +26,7 @@
   <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="js/plotly-latest.min.js"></script>
 
+
   <script type="text/javascript" src="bootstrap/js/raphael-min.js"></script>
 
   <script type="text/javascript" src="bootstrap/js/morris.min.js"></script>
@@ -68,7 +69,6 @@
 
 
 <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-
 
 
 <link href="bootstrap/css/bootstrap-editable.css" rel="stylesheet">
@@ -135,7 +135,7 @@
 <div class="row"><div class="col-lg-12">
 
 
-<a href="#" id="username" data-type="text" data-pk="1" data-url="/ocpu" data-title="Enter username">superuser</a>
+
 
 
   <div id="message"></div>
@@ -323,7 +323,7 @@
       <input type="radio" name="samplenormalization" id="samplenormalizationSample_specific" value="Sample_specific" class="normalization needSample_specific">
       Sample-specific Normalization
     </label>
-    <div id = "why_not_able_Sample_specific" style="display:inline"></div>
+    <!--<div id = "why_not_able_Sample_specific" style="display:inline"></div>-->
   </div>
     <div class="radio">
     <label>
@@ -337,7 +337,7 @@
       <input type="radio" name="samplenormalization" id="samplenormalizationloess" value="loess"   class="normalization needBatch needQC needtime_of_injection">
       Loess Normalization + Batch Median Correction
     </label>
-    <div id = "why_not_able_loess" style="display:inline"></div>
+    <!--  <div id = "why_not_able_loess" style="display:inline"></div>-->
   </div>
     <div class="radio">
   </div>
@@ -346,7 +346,7 @@
       <input type="radio" name="samplenormalization" id="samplenormalizationBatchMedian" value="BatchMedian"  class="normalization needBatch">
       Batch Median Correction
     </label>
-        <div id = "why_not_able_batch" style="display:inline"></div>
+       <!--   <div id = "why_not_able_batch" style="display:inline"></div>-->
   </div>
   </form>
  </fieldset><!--Sample Normalization-->
@@ -488,35 +488,40 @@
 <label><p class="text-warning">Normalization Applied</p></label><br>
 
 <div class="text-muted">
-  <p>Sample Normalization: <span id="samplenormalizationselected">mTIC</span></p>
-  <p>Data Transformation: <span id="datatransformationselected">log</span></p>
-  <p>Feature Transformation: <span id="featuretransformationselected">Pareto</span><span> Scaling</span></p>
+  <p>Sample Normalization: <a href="#" id="samplenormalizationselected" data-type="select" data-pk="mTIC" data-value="mTIC"></a></p>
+ <p>Data Transformation: <a href="#" id="datatransformationselected" data-type="select" data-pk="log" data-value="log"></a></p>
+<p>Feature Transformation: <a href="#" id="featuretransformationselected" data-type="select" data-pk="Pareto" data-value="Pareto"></a></p>
+
+
 </div>
-<select class="selectpicker" multiple id="Normalization_To_Be_Applied">
-  <optgroup label="Sample Normalizatoin" data-max-options="1">
-    <option>None</option>
-    <option class="needSample_specific">Sample_specific</option>
-    <option selected>mTIC</option>
-    <option value = "Loess" class="needBatch needQC needtime_of_injection">Loess Normalization + Batch Median Correction</option>
-    <option value = "Batch Median" class="needBatch">Batch Median Correction</option>
-  </optgroup>
-  <optgroup label="Data Transformation" data-max-options="1">
-    <option>None</option>
-    <option selected>log</option>
-    <option value = "power">power transformation</option>
-  </optgroup>
-  <optgroup label="Feature Normalization" data-max-options="1">
-    <option>None</option>
-    <option value = "Auto">Auto scaling</option>
-    <option  selected value = "Pareto">Pareto scaling</option>
-    <option value = "Range">Range scaling</option>
-  </optgroup>
-</select>
+
 
 
 
                                         </div>
             </li>
+
+<li class="list-group-item">
+  <div class="form-group">
+    <label><p class="text-info">Power Analysis</p></label>
+                                            <label class="checkbox-inline pull-right" >
+                                                <input type="checkbox" id = "power_analysis_needed" checked value = "TRUE"></label>
+    <div class="text-muted">
+
+      <p>Desired Power: <a href="#" id="desired_power" data-type="text" data-pk="1">80</a><span>%</span></p>
+
+    </div>
+
+
+
+  </div>
+</li>
+
+
+
+
+
+
 <li class="list-group-item"><button type="button" class="btn btn-outline btn-success btn-lg btn-block" id="Submit_To_Statistics">Submit!</button></li>
 
 
@@ -968,6 +973,7 @@
 
 
 
+      </div>
       </div>
       <!-- /.container-fluid -->
     </div>

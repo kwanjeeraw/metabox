@@ -154,8 +154,11 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
     }else{
       duplicatedID = F
     }
-    result <- list(expression = eData, feature = fData, phenotype = pData, duplicatedID=duplicatedID )
+    result <- list(expression = eData, feature = fData, phenotype = pData, duplicatedID=duplicatedID)
     # e = e_ori = eData; p = p_ori = pData; f = fData;
+
+
+
 
 
 

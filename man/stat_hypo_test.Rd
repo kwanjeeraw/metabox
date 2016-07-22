@@ -6,7 +6,7 @@
 \usage{
 stat_hypo_test(e, p, f, e_ori, p_ori, e_before, p_before,
   independent_factor_name = NULL, repeated_factor_name = NULL,
-  equal_variance_anova = F)
+  need_power = T, desired_power = NULL, equal_variance_anova = F)
 }
 \description{
 hypothesis test
