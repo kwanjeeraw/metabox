@@ -21,7 +21,7 @@ stat_hypo_test = function(e,p,f,
                      need_power = T,desired_power =  NULL,
                      equal_variance_anova = F){#For repeated study design, samples should match.
   library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(WRS2);library(outliers);library(pwr);
-
+  library("MetaMapp2016", lib.loc="~/R/win-library/3.2");
 
   if(as.numeric(desired_power)>100 | as.numeric(desired_power) < 0 | is.na(as.numeric(desired_power))){
     stop("desired_power must between 0 ~ 100")
