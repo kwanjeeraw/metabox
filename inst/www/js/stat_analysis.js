@@ -310,10 +310,14 @@ $('#samplenormalizationselected').editable({
             {value: 'Loess', text: 'Loess'},
             {value: 'Batch Median', text: 'Batch Median'}
         ],
+
         success: function(response, newValue) {
         samplenormalization_method = newValue//update backbone model
     }
     });
+
+
+
 
 
 var datatransformation_method = 'log';
@@ -362,12 +366,33 @@ $('#featuretransformationselected').editable({
 
 
 $("#Submit_To_Statistics").click(function(){
-    // check if stat_hypo_test ca procede or not.
+// check normalization method available or not.
 
+  /*samplenormalization_method = str[0];
+  datatransformation_method = str[1];
+  datascaling_method = str[2];*/
+console.log(nosample_specific);
+console.log(samplenormalization_method==='Sample_specific')
 
-
-
- if($("#independent_factor").val()===null){
+  if(nobatch){
+    if(samplenormalization_method==='Batch Median'){
+      alert("Data does not contain column batch. Batch Median normalization cannot be proceded.");
+            throw new Error("normalization method not right");
+    }
+  }
+  if(nosample_specific){
+    if(samplenormalization_method==='Sample_specific'){
+      alert("Data does not contain column Sample_specific_weight. Sample_specific normalization cannot be proceded.");
+      throw new Error("normalization method not right");
+    }
+  }
+  if(noloess){
+    if(samplenormalization_method==='Loess'){
+      alert("Data does not contain at least one of columns, batch, QC or time_of_injection. Loess normalization cannot be proceded.");
+            throw new Error("normalization method not right");
+    }
+  }
+   if($("#independent_factor").val()===null){
     ind = []
   }else{
     ind = $("#independent_factor").val()
@@ -402,9 +427,7 @@ $("#Submit_To_Statistics").click(function(){
       pData = obj.phenotype;
   var str = $("#Normalization_To_Be_Applied").val();
 
-  /*samplenormalization_method = str[0];
-  datatransformation_method = str[1];
-  datascaling_method = str[2];*/
+
 
   var req = ocpu.call("stat_norm",{
     e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
@@ -532,6 +555,10 @@ session4.getFile("messages_hypo_test.txt", function(text){
   });
     }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
   }
+
+
+
+
 
 
 
@@ -689,7 +716,9 @@ for(var i = 0;i<full_options.length;i++){
 $(id).html(selector).selectpicker('refresh');
 }
 
-
+var nobatch = false;
+var noloess = false;
+var nosample_specific=false;
 
 function decidenormalizationability(column_names_of_pData){
 
@@ -706,8 +735,8 @@ if($.inArray('batch', column_names_of_pData) == -1){
 
     $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column batch" ></i>');
 
-
-
+nobatch = true;
+noloess = true;
 }
 if($.inArray('Sample_specific_weight', column_names_of_pData) == -1){
 
@@ -719,6 +748,9 @@ if($.inArray('Sample_specific_weight', column_names_of_pData) == -1){
   }
 
 $("#why_not_able_Sample_specific").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column Sample_specific_weight" ></i>');
+
+nosample_specific = true;
+
 if($.inArray('QC', column_names_of_pData) == -1){
   var v = document.getElementsByClassName("needQC");
 
@@ -727,8 +759,11 @@ if($.inArray('QC', column_names_of_pData) == -1){
     v[i].disabled = true;
   }
     $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column QC" ></i>');
+    noloess = true;
 }
+
 if($.inArray('time_of_injection', column_names_of_pData) == -1){
+  noloess = true;
   var v = document.getElementsByClassName("needtime_of_injection");
 
 
@@ -736,11 +771,13 @@ if($.inArray('time_of_injection', column_names_of_pData) == -1){
     v[i].disabled = true;
   }
     $("#why_not_able_loess").html('<i class="fa fa-question pull-right" data-toggle="tooltip" data-placement="right" data-html="true" title="Need phenotype data contains column time_of_injection" ></i>');
-}
 
 }
 
 }
+
+}
+
 
 
 
