@@ -9,5 +9,6 @@
 getGraphDb <- function() UseMethod("getGraphDb")
 #'@export
 getGraphDb.default <- function(){
-  print(nld)
+  getDbInfo()
+  cat(database.location)
 }

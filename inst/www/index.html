@@ -38,6 +38,20 @@
   </script>
   <title>metabox</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
+  <!-- Embedded script calling R -->
+  <script>
+  $(function(){
+    //global var
+    var curr_session;
+    var req = ocpu.call("getGraphDb",{}, function(get_session) {//calls R function: getGraphDb
+      //assign to global var
+      curr_session = get_session;
+      curr_session.getStdout(function(outtxt){
+          $("#dbloc").text(outtxt);
+      });
+    }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
+  });
+  </script>
 </head>
 
 <body>
@@ -65,64 +79,21 @@
           <div class="col-lg-12">
             <div class="panel panel-success">
               <div class="panel-heading">
-                <h3 class="panel-title"><a data-toggle="collapse" data-target="#stat" href="#">Statistics</a></h3>
+                <h3 class="panel-title"><a data-toggle="collapse" data-target="#db" href="#">Database location</a></h3>
               </div>
-              <div id="stat" class="panel-body collapse in">
-                <!-- Table -->
-                <table class="table">
-                <thead>
-                    <tr>
-                      <th>Source</th>
-                      <th>Entity type</th>
-                      <th>Relationship type</th>
-                      <th>Version</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank">PubChem compounds</a></td>
-                      <td>Compound (174,138)</td>
-                      <td>-</td>
-                      <td>March 2016 (Chemical and drugs category)</td>
-                    </tr>
-                    <tr>
-                      <td><a href="http://www.uniprot.org/" target="_blank">UniProt</a></td>
-                      <td>Protein (Human 151,869 and Mouse 79,228)</td>
-                      <td>-</td>
-                      <td>March 2016 (Human and Mouse)</td>
-                    </tr>
-                    <tr>
-                      <td><a href="http://www.ensembl.org/" target="_blank">ENSEMBL</a></td>
-                      <td>Gene (Human 66,203 and Mouse 48,029)</td>
-                      <td>:CONVERSION (Human 73,816 and Mouse 49,317)</td>
-                      <td>GRCh38.p5 (Human), GRCh38.p4 (Mouse)</td>
-                    </tr>
-                    <tr>
-                      <td><a href="http://www.kegg.jp/" target="_blank">KEGG</a></td>
-                      <td>Compound (11,450), Pathway (Human 266 and Mouse 265)</td>
-                      <td>:ANNOTATION (Human 70,162 and Mouse 70,718), :BIOCHEMICAL_REACTION (114,427), :CATALYSIS (Human 154,292 and Mouse 169,684)</td>
-                      <td>78.0 (Human and Mouse)</td>
-                    </tr>
-                    <tr>
-                      <td><a href="http://mirtarbase.mbc.nctu.edu.tw/" target="_blank">miRTarBase</a></td>
-                      <td>MicroRNA (2,649)</td>
-                      <td>:CONTROL (319,817)</td>
-                      <td>6.1 (Human)</td>
-                    </tr>
-                    <tr>
-                      <td><a href="http://thebiogrid.org/" target="_blank">BioGRID</a></td>
-                      <td>-</td>
-                      <td>:GENETIC_ASSOCIATION (1,088), :MOLECULAR_BINDING (127,710)</td>
-                      <td>3.4.134 (Human)</td>
-                    </tr>
-                    <tr>
-                      <td><a href="http://www.pathwaycommons.org/" target="_blank">Pathway Commons</a></td>
-                      <td>-</td>
-                      <td>:CONTROL (98,252)</td>
-                      <td>7.0 (Human)</td>
-                    </tr>         
-                  </tbody>
-                </table>
+              <div id="db" class="panel-body collapse in">
+                <p>Your current database is set to the following location:</p>
+                <pre id="dbloc"></pre>
+                <p>Use the following steps to set a database location:
+                <ul>
+                  <li>Create a file database.R in the folder HOME/USER_NAME/SUBFOLDER_NAME/ <br>
+                  e.g. "Users/myname/Documents/database.R"</li>
+                  <li>Copy and paste the following line to the database.R <br>
+                  database.location = "URL OF YOUR DATABASE LOCATION" <br>
+                  e.g. database.location = "http://mylocation.com:7474/db/data/"</li>
+                  <li>Reload the web browser</li>
+                </ul>
+                </p>
               </div>
             </div>
           </div>

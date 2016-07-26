@@ -6,10 +6,10 @@
 #'@seealso \code{\link{getGraphDb}}
 #'@examples
 #'# Set database location to local server
-#'setGraphDb("http://localhost:7474/db/data/cypher")
+#'setGraphDb("http://localhost:7474/db/data/")
 #'@export
 setGraphDb <- function(url) UseMethod("setGraphDb")
 #'@export
 setGraphDb.default <- function(url){
-  assign("nld", url, envir = .GlobalEnv)
+  assign("database.location", url, envir = .GlobalEnv)
 }

@@ -1,3 +1,11 @@
+#'Set database location
+getDbInfo <- function(){
+  if(length(Sys.glob(file.path(Sys.getenv("HOME"),"*","database.R")))>0){
+    source(Sys.glob(file.path(Sys.getenv("HOME"),"*","database.R")))
+  }else{
+    assign("database.location", "http://localhost:7474/db/data/", envir = .GlobalEnv)
+  }
+}
 #'Execute query
 #'@description execute query using the function \code{\link{curlPerform}} from \pkg{RCurl} for sending HTTP request to the database.
 #'@return list or data frame. Return no data if found nothing.
@@ -15,7 +23,8 @@
 curlRequest <- function(cypher){
   h = RCurl::basicTextGatherer()
   tryCatch({
-    url = paste0(nld,"cypher")
+    getDbInfo()
+    url = paste0(database.location,"cypher")
     #url = paste0("http://localhost:7474/db/data/","cypher")
     RCurl::curlPerform(url=url,
                        userpwd = neu,
@@ -35,7 +44,8 @@ curlRequest <- function(cypher){
 curlRequest.TRANSACTION <- function(cypher){
   h = RCurl::basicTextGatherer()
   tryCatch({
-    url = paste0(nld,"transaction/commit")
+    getDbInfo()
+    url = paste0(database.location,"transaction/commit")
     #url = paste0("http://localhost:7474/db/data/","transaction/commit")
     body = paste0("{\"statements\":[{\"statement\":\"",cypher,"\",\"resultDataContents\":[\"graph\"]}]}")
     RCurl::curlPerform(url=url,
@@ -56,7 +66,8 @@ curlRequest.TRANSACTION <- function(cypher){
 curlRequest.TRANSACTION.row <- function(cypher){
   h = RCurl::basicTextGatherer()
   tryCatch({
-    url = paste0(nld,"transaction/commit")
+    getDbInfo()
+    url = paste0(database.location,"transaction/commit")
     #url = paste0("http://localhost:7474/db/data/","transaction/commit")
     body = paste0("{\"statements\":[{\"statement\":\"",cypher,"\",\"resultDataContents\":[\"row\"]}]}")
     RCurl::curlPerform(url=url,
@@ -109,7 +120,8 @@ curlRequest.URL.DFrame <- function(url){
 curlRequest.TRANSACTIONS <- function(listOfCypher){
   h = RCurl::basicTextGatherer()
   tryCatch({
-    url = paste0(nld,"transaction/commit")
+    getDbInfo()
+    url = paste0(database.location,"transaction/commit")
     #url = paste0("http://localhost:7474/db/data/","transaction/commit")
     #body = paste0("{\"statements\":[{\"statement\":\"",cypher,"\",\"resultDataContents\":[\"graph\"]}]}")
     body = paste0("{\"statements\":[",paste0(listOfCypher, collapse = ","),"]}")
