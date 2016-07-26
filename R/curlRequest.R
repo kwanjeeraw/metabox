@@ -1,7 +1,9 @@
 #'Set database location
 getDbInfo <- function(){
-  if(length(Sys.glob(file.path(Sys.getenv("HOME"),"*","database.R")))>0){
+  if(length(Sys.glob(file.path(Sys.getenv("HOME"),"*","database.R")))>0){#for mac and linux = /Users/myname/subfolder/database.R
     source(Sys.glob(file.path(Sys.getenv("HOME"),"*","database.R")))
+  }else if(length(Sys.glob(file.path(Sys.getenv("HOME"),"database.R")))>0){#for windows = = Drive:/Users/myname/Documents/database.R
+    source(Sys.glob(file.path(Sys.getenv("HOME"),"database.R")))
   }else{
     assign("database.location", "http://localhost:7474/db/data/", envir = .GlobalEnv)
   }
