@@ -1,10 +1,10 @@
-Package: mETABOX
+Package: metaboxdev
 Type: Package
-Title: mETABOX
+Title: metaboxdev
 Version: 1.0
-Date: 2016-07-20
+Date: 2016-04-08
 Authors@R: "Kwanjeera W <kwanich@ucdavid.edu> [aut, cre]"
-Description: mETABOX.
+Description: metaboxdev.
 Depends:
     R (>= 3.1.1)
 License: GNU GENERAL PUBLIC LICENSE Version 3
@@ -21,10 +21,8 @@ Imports:
     WGCNA,
     qpgraph,
     BioNet,
-    metabomapr,
     doParallel,
     data.tree,
     tm,
-    wordcloud,
-    ChemmineR
-RoxygenNote: 5.0.1.9000
+    wordcloud
+RoxygenNote: 5.0.1
