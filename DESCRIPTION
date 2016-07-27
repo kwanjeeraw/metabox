@@ -24,5 +24,11 @@ Imports:
     doParallel,
     data.tree,
     tm,
-    wordcloud
+    wordcloud,
+    userfriendlyscience,
+    ez,
+    FSA,
+    WRS2,
+    outliers,
+    openxlsx
 RoxygenNote: 5.0.1
