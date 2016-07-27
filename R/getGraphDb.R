@@ -9,6 +9,10 @@
 getGraphDb <- function() UseMethod("getGraphDb")
 #'@export
 getGraphDb.default <- function(){
-  getDbInfo()
-  cat(database.location)
+  if(foundDb()){
+    getDbInfo()
+    cat(database.location)
+  }else{
+    cat("No database found. Using BioNetwork and Pathway-based analyses will require database installation.")
+  }
 }
