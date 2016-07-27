@@ -59,7 +59,7 @@
 #'@export
 computeNodeEnrichment <- function(nodedata, pcol=NULL, nodetype="compound", annotation="pathway", internalid = TRUE, method="reporter", size=c(3,500)) UseMethod("computeNodeEnrichment")
 #'@export
-computeNodeEnrichment.default <- function (nodedata, pcol="", nodetype="compound", annotation="pathway", internalid = TRUE, method="reporter", size=c(3,500)){
+computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compound", annotation="pathway", internalid = TRUE, method="reporter", size=c(3,500)){
   out <- tryCatch(
     {
       tmparg <- try(nodetype <- match.arg(tolower(nodetype), c("compound","protein","gene","rna","dna"), several.ok = FALSE), silent = TRUE)
