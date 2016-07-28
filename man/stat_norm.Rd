@@ -4,10 +4,14 @@
 \alias{stat_norm}
 \title{normalization}
 \usage{
-stat_norm(e, f, p, sample_index, mTICdid, Loessdid, medFCdid, BatchMediandid,
-  mTIC, Loess, medFC, BatchMedian, sample_normalization = NULL,
-  data_transformation = NULL, data_scaling = NULL, log_para,
-  independent_factor_name_log, power_para, independent_factor_name_power)
+stat_norm(e, f, p, sample_index, mTICdid, mTICunchanged, Loessdid,
+  Loessunchanged, medFCdid, BatchMediandid, mTIC, Loess, medFC, BatchMedian,
+  sample_normalization = NULL, data_transformation = NULL,
+  data_scaling = NULL, sample_specific_weight = NULL,
+  sample_specific_multiplyordevide = "Multiply", KnownorUnknown = NULL,
+  QCIndicator = NULL, BatchIndicator = NULL, TimeIndicator = NULL,
+  Batchunchanged, log_para, independent_factor_name_log, power_para,
+  independent_factor_name_power)
 }
 \description{
 normalization

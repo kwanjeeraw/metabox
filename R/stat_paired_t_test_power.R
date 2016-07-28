@@ -13,7 +13,7 @@
 #'@export
 #'
 #'
-stat_paired_t_test_power = function(e,f,p,dta, i, result_stat, sig.level = 0.05, desired_power = 0.8, factor_name,cl){
+stat_paired_t_test_power = function(e,f,p,dta, i, sig.level = 0.05, desired_power = 0.8, factor_name,cl){
 
   sample_size = table(dta[,i])
   N = sum(sample_size)
@@ -21,14 +21,10 @@ stat_paired_t_test_power = function(e,f,p,dta, i, result_stat, sig.level = 0.05,
 
 
 
-  # which_col_Gsd = which(colnames(result_stat)%in%"Global Standard Deviation")
-  # which_mu1 = which(colnames(result_stat)%in%"Global Mean")+1
-  # which_mu2 = which_mu1 + 1
-
 
 
   power_sampleSize = parSapply(cl=cl,
-                               X = 1:nrow(result_stat),FUN = function(j,e,dta,result_stat,sig.level,df,N,desired_power,pwr.t.test){
+                               X = 1:ncol(e),FUN = function(j,e,dta,sig.level,df,N,desired_power,pwr.t.test){
                                  # for(j in 1:nrow(result_stat)){
                                  dta$value = e[,j]
                                  reshape = tryCatch(reshape(dta, idvar = "id", timevar = "repeated1", direction = "wide"),error=function(err){
@@ -48,15 +44,15 @@ stat_paired_t_test_power = function(e,f,p,dta, i, result_stat, sig.level = 0.05,
                                  ncp = d*sqrt(N)
 
 
-                                 size = tryCatch(pwr.t.test(d = d,sig.level=sig.level,power = desired_power,type = "paired", alternative =  "two.sided")$n*2,error = function(e){return("NA")})
+                                 size = tryCatch(pwr.t.test(d = d,sig.level=sig.level,power = desired_power,type = "paired", alternative =  "two.sided")$n*2,error = function(e){return("NA (Maybe Effect Size Too Small)")})
                                  # }
 
 
                                  return(c(pt(qt(sig.level,df,lower.tail = F),df,ncp,lower.tail = F),size))
-                               },e,dta,result_stat,sig.level,df,N,desired_power,pwr.t.test)
+                               },e,dta,sig.level,df,N,desired_power,pwr.t.test)
   power_sampleSize = t(power_sampleSize)
   power_sampleSize = data.frame(power_sampleSize)
-  colnames(power_sampleSize) = paste0(ifelse(colnames(dta)[i]=="repeated1",factor_name[1],factor_name[2]),"_",c("post_hoc_Power", paste0("Total_Sample_Size_Required_per_group_Given_Desired_Power_Equals_",desired_power*100,"_percent")))
+  colnames(power_sampleSize) = paste0(ifelse(colnames(dta)[i]=="repeated1",factor_name[1],factor_name[2]),"_",c("post_hoc_Power", paste0("Total_Sample_Size_at_Power_",desired_power*100,"_percent")))
 
 
 

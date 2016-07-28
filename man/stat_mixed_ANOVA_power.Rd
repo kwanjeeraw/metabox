@@ -4,8 +4,8 @@
 \alias{stat_mixed_ANOVA_power}
 \title{stat_mixed_ANOVA_power}
 \usage{
-stat_mixed_ANOVA_power(e, p, dta, result_stat, sig.level = 0.05,
-  desired_power = 0.8, factor_name, epsilon = 1, cl)
+stat_mixed_ANOVA_power(e, p, dta, sig.level = 0.05, desired_power = 0.8,
+  factor_name, epsilon = 1, cl)
 }
 \arguments{
 \item{result_stat:}{it must be the basic statistics result.}

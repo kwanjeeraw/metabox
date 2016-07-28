@@ -4,7 +4,7 @@
 \alias{stat_mTIC}
 \title{mTIC}
 \usage{
-stat_mTIC(e, f, p)
+stat_mTIC(e, f, p, KnownorUnknown)
 }
 \description{
 mTIC

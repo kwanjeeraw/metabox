@@ -4,7 +4,8 @@
 \alias{stat_one_way_repeated_ANOVA}
 \title{stat_one_way_repeated_ANOVA}
 \usage{
-stat_one_way_repeated_ANOVA(data, data2, i, sudo_matrix, factor_name, cl)
+stat_one_way_repeated_ANOVA(data, data2, i, sudo_matrix, factor_name, cl,
+  onewaySpher_Corr)
 }
 \description{
 stat_one_way_repeated_ANOVA

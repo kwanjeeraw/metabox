@@ -17,7 +17,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # t test
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two independent group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two independent group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
   # ANOVA
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\one way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
@@ -27,9 +27,9 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # paired t test
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two paired group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two paired group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
   # one way repeated ANOVA
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\one way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\one way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # two way repeated ANOVA 2*2
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
@@ -44,7 +44,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
 
 
   # metabolomics data for manuscript
-  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\manuscript\\mx 107155 _study 112912 TRDRP LC7 NYU Lung Tissue Miyamoto 10113.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\manuscript\\mx 107155 _study 112912 TRDRP LC7 NYU Lung Tissue Miyamoto 10113.xlsx"
   # gene data for manuscript
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\manuscript\\GeneExpression_GSE32863.xlsx"
 
@@ -53,24 +53,31 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\loessnorm.xlsx"
 
   # temp
-  # file = "C:\\Users\\Sili Fan\\Desktop\\test.xlsx"
-
-  if(is.null(from_example)){
+  # file = "C:\\Users\\Sili Fan\\Desktop\\WORK\\WCMC\\projects\\mx 271133_Nicolas Villarino_cat plasma_07-2016_submit\\mx 271133_Nicolas Villarino_cat plasma_07-2016_submit.xlsx"
+  library(data.table)
+  if(is.null(from_example) | length(from_example)==0 | is.na(from_example) | from_example=="undefined"){ # If user want to use the example data set.
     if(length(sheetIndex)==0 | sheetIndex==""){
       sheetIndex = 1
+      nosheetinput= T
     }else{
-      sheetIndex=as.numeric(sheetIndex)
+      nosheetinput = F
     }
 
     if(grepl("xlsx", file)){
-      d <- tryCatch(xlsx::read.xlsx2(file, sheetIndex = sheetIndex, stringsAsFactors = FALSE,header=F, ...),
-                    error = function(e){
-                      openxlsx::read.xlsx(file, sheet = sheetIndex,colNames = F)
-                    })
+        d <- openxlsx::read.xlsx(file, sheet = sheetIndex,colNames = FALSE)
     }else if(grepl("csv", file)){
       # file = "C:\\Users\\fansi\\Downloads\\val (18).csv"
-      d <- read.csv(file,header = T,stringsAsFactors = FALSE)
+      d <- data.table::fread(file)
     }
+
+    # d = data.table(d)
+
+    # as.numeric(names(table(sapply(d,function(x){sum(is.na(x))})[1:15]))[1]) #count number of NA in the first 15 columns. The most of the
+
+
+
+
+
 
 
     d[d==""] <- NA
@@ -101,10 +108,10 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
       }
     }
 
-    if(sum(!c("phenotype_index","sampleID","feature_index","KnownorUnknown")%in%c(colnames(pData),colnames(fData)))>0){
+    if(sum(!c("phenotype_index","sampleID","feature_index")%in%c(colnames(pData),colnames(fData)))>0){
       message = paste0("The data uploaded doesn't have ",
-                       paste(c("phenotype_index","sampleID","feature_index","KnownorUnknown")[!
-                                                                                                c("phenotype_index","sampleID","feature_index","KnownorUnknown")%in%c(colnames(pData),colnames(fData))],collapse = ", ")," and they are added automatically. You can examine them by ")
+                       paste(c("phenotype_index","sampleID","feature_index")[!
+                                                                                                c("phenotype_index","sampleID","feature_index")%in%c(colnames(pData),colnames(fData))],collapse = ", ")," and they are added automatically. You can examine them by ")
 
     }else{
       message = NULL
@@ -144,7 +151,11 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
     fData = fData[!constant_feature, ]
 
     if(is.null(message)){
-      message = "Success!"
+      if(nosheetinput){
+        message = paste0("Success!" )
+      }else{
+        message = paste0("Success!")
+      }
       writeLines(message,"messages.txt")
     }else{
       writeLines(message,"messages.txt")
@@ -154,6 +165,11 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
     }else{
       duplicatedID = F
     }
+
+    fData = fData[,!colnames(fData)%in%"mass_spec"]
+
+
+    rownames(pData) = as.character(1:nrow(pData))
     result <- list(expression = eData, feature = fData, phenotype = pData, duplicatedID=duplicatedID)
     # e = e_ori = eData; p = p_ori = pData; f = fData;
 

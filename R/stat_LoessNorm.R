@@ -15,31 +15,32 @@
 #'
 stat_LoessNorm = function(data = e, f, p,
                           loess.para = 0.75,auto.batch.detection = FALSE,
-                          robust = TRUE){
+                          robust = TRUE, QCIndicator, BatchIndicator, TimeIndicator){
   library(parallel);library(fANCOVA);
 
-  QC = p$QC=="TRUE"; batch = p$batch
+  if(sum(!p[,QCIndicator]%in%c("TRUE","FALSE"))>0){
+    stop("<strong>QC must be EITHER 'TRUE' or 'FALSE' only.</strong>")
+  }
+
+  QC = p[,QCIndicator]=="TRUE"; batch = p[,BatchIndicator]
   # ;KnownornotKnown = f$KnownorUnknown;
 
-  if("time_of_injection"%in%colnames(p)){
-    time = p$time_of_injection; rank = rank(p$time);
-  }else if("rank"%in%colnames(p)){
-    rank = p$rank; time = "fake"
-  }else{
-    stop("Your data must have either time or rank for phenotype information.")
-  }
+
+    time = as.numeric(p[,TimeIndicator]); rank = rank(time);
+    # p$time_of_injection = time
+
 
   data = data.frame(index = 1:nrow(data),time, rank, batch,QC, data)
   data.sort.time = data[order(rank),]#sort according to time and then detect if the diff of time is big. If big, then another batch.
   if(auto.batch.detection){
     data.sort.time = do.call("rbind",by(data.sort.time, data.sort.time$batch, FUN = function(x){
-      num.new.batch <<- sum(scale(diff(x$time))>1.96)
+      num.new.batch <- sum(scale(diff(x$time))>1.96)
       split.point = which(scale(diff(x$time))>1.96)
       x$new.batch = rep(letters[1:(num.new.batch+1)], diff(c(0,split.point,nrow(x))))
       return(x)
     }))
     data.sort.time = data.sort.time[order(data.sort.time$time),]
-    data.sort.time$batch.final = paste(data.sort.time$batch, data.sort.time$new.batch)
+    data.sort.time$batch.final = paste0(data.sort.time$batch,"_", data.sort.time$new.batch)
   }else{
     data.sort.time$batch.final = data.sort.time$batch
   }
@@ -47,12 +48,12 @@ stat_LoessNorm = function(data = e, f, p,
 
   # check if there are at least 4 QC in the batch!
   if(sum(by(data.sort.time$QC,data.sort.time$batch.final,sum)<4)>0){
-    stop(paste0("At least 4 QCs are needed for each batch!", names(by(data.sort.time$QC,data.sort.time$batch.final,sum))[by(data.sort.time$QC,data.sort.time$batch.final,sum)<4],
-                " do not have enough QC. You may try not to do auto.batch.detection if you selected it OR re-define the batch."))
+    stop(paste0("<strong>The QC is not enough!</strong> At least <strong>4</strong> QCs are needed for each batch!", names(by(data.sort.time$QC,data.sort.time$batch.final,sum))[by(data.sort.time$QC,data.sort.time$batch.final,sum)<4],
+                " do not have enough QC. You may try not to do auto.batch.detection if you selected it OR add more QC."))
   }
 
 
-  tf = t(f);colnames(tf) = f$compound;tf = data.frame(tf) # in order to have the colnames(data.sort.time) and f$compound matched.
+  tf = t(f);colnames(tf) = f$feature_index;tf = data.frame(tf) # in order to have the colnames(data.sort.time) and f$compound matched.
   cl <- makeCluster(detectCores(logical = TRUE))
   o=parSapply(cl = cl, which(colnames(data.sort.time)%in%colnames(tf)),
               FUN = function(i,data.sort.time,stat_median_correction, span,loess.as,robust){

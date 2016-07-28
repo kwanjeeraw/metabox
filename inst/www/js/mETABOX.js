@@ -180,15 +180,55 @@ function formatTableHeader(jsonData){
 //@param id id element
 //@param data array of json objects
 function drawTable(id, data) {
-    var dtTable = $(id).DataTable({
-      "destroy": true,
-      "scrollX": true,
-      "scrollY": 400,
-      "scrollCollapse": true,
-      "data": data,
-      "columns": formatTableHeader(data[0])
-    });
-    return dtTable;
+	
+	
+	
+	editor = new $.fn.dataTable.Editor( {
+        table: id,
+    } );
+	
+	
+	
+	
+	 $(id).DataTable( {
+		destroy: true,
+	    data: data,
+		"scrollX": true,
+		"scrollY": "450px",
+		"paging": false,
+		fixedColumns: true,
+		scrollCollapse: true,
+		columns: formatTableHeader(data[0]),
+		dom: 'Blfrtip',
+		lengthChange: false,
+       buttons: [
+        {
+            extend: 'csv',
+            text: 'download',
+			 name: 'csv'
+        }
+    ]
+    } );
+	
+  /* $(id).DataTable({
+      destroy: true,
+      scrollX: true,
+      scrollY: 400,
+      scrollCollapse: true,
+      data: data,
+      columns: formatTableHeader(data[0]),
+	  select:true,
+	  buttons: [
+            { extend: "create", editor: editor },
+            { extend: "edit",   editor: editor },
+            { extend: "remove", editor: editor },
+            "selectRows",
+            "selectColumns",
+            "selectCells",
+            "selectNone"
+        ]
+    });*/
+ 
 }
 
 //@function clear 2 tables e.g. network tables

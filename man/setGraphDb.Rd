@@ -14,7 +14,7 @@ set database location for the currently working environment.
 }
 \examples{
 # Set database location to local server
-setGraphDb("http://localhost:7474/db/data/cypher")
+setGraphDb("http://localhost:7474/db/data/")
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

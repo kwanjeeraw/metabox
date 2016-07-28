@@ -13,7 +13,7 @@
 #'@export
 #'
 #'
-stat_mixed_ANOVA_power = function(e,p,dta,result_stat, sig.level = 0.05, desired_power = 0.8,factor_name, epsilon = 1, cl){
+stat_mixed_ANOVA_power = function(e,p,dta,sig.level = 0.05, desired_power = 0.8,factor_name, epsilon = 1, cl){
 
   sample_size = as.numeric(table(dta$repeated1))
   m = length(sample_size)
@@ -29,19 +29,8 @@ stat_mixed_ANOVA_power = function(e,p,dta,result_stat, sig.level = 0.05, desired
 
 
 
-  which_col_Gmean = which(colnames(result_stat)%in%"Global Mean")
-  which_col_Gsd = which(colnames(result_stat)%in%"Global Standard Deviation")
 
 
-
-  which_col_IDPmean = 2:(2+k-1)
-  which_col_IDPsd = (which_col_Gsd+1):(which_col_Gsd+k)
-
-  which_col_rmean = (2+k):(2+k+m-1)
-  which_col_rsd = (which_col_Gsd+k+1):(which_col_Gsd+k+1+m-1)
-
-  which_col_intermean = (2+k+m):(2+k+m + k*m - 1)
-  which_col_intersd = (which_col_Gsd+k+1+m):ncol(result_stat)
 
 
   n_r = as.numeric(table(dta$repeated1))
@@ -49,67 +38,70 @@ stat_mixed_ANOVA_power = function(e,p,dta,result_stat, sig.level = 0.05, desired
   n_inter = as.numeric(table(dta[,c("variable1","repeated1")]))
 
   power_sampleSize = parSapply(cl=cl,
-                               X = 1:nrow(result_stat),FUN = function(j,e,dta,result_stat,m, N, n_r,n_IDP,n_inter,which_col_Gsd,which_col_Gmean,
-                                                                      which_col_IDPmean,which_col_rmean,which_col_intermean,
+                               X = 1:ncol(e),FUN = function(j,e,dta,m, N, n_r,n_IDP,n_inter,
                                                                       sig.level,df1_r,df2_r,df1_idp,df2_idp,df1_inter,df2_inter,desired_power,epsilon){
-                                 # for(j in 1:nrow(result_stat)){
+
                                  dta$value = e[,j]
-                                 reshape_r =reshape(dta[,c("value","repeated1","id")], idvar = "id", timevar = "repeated1", direction = "wide")
-                                 reshape_r = sapply(reshape_r,function(x){
-                                   as.numeric(as.character(x))
-                                 })
-                                 cor = cor(reshape_r)
-                                 rho = mean(cor[lower.tri(cor)])
+
+                                 Gmean = mean(dta$value,na.rm = T)
+                                 Gsd = sd(dta$value,na.rm = T)
+
+
+                                 rho = cor(dta$value,as.numeric(dta$repeated1))
                                  mu = m/(1-rho)
 
-                                 sigma_mu_r = sqrt(sum((result_stat[j,which_col_rmean] - result_stat[j,which_col_Gmean])^2 * n_r/N) )
-                                 sigma_r = result_stat[j,which_col_Gsd]
+                                 sigma_mu_r = sqrt(sum((by(dta$value, dta$repeated1,mean,na.rm = T) - Gmean)^2 * sample_size/N) )
+                                 sigma_r = Gsd
                                  f_r = sigma_mu_r/sigma_r
                                  ncp_r = f_r^2 * mu * N
 
                                  p.body_r = quote({
                                    ncp_r = f_r^2 * mu * N
-                                   pf(qf(sig.level,df1_r,df2_r,lower.tail = F),df1_r,df2_r,ncp_r,lower.tail = F)
+                                   df2 = (N-k)*(m-1)*epsilon
+                                   pf(qf(sig.level,df1_r,df2,lower.tail = F),df1_r,df2,ncp_r,lower.tail = F)
                                  })
 
-                                 size_r = tryCatch(uniroot(function(N) eval(p.body_r) - desired_power, c(2 +
-                                                                                                       1e-10, 1e+05))$root,error = function(e){return("NA")})
+                                 size_r = tryCatch(uniroot(function(N) eval(p.body_r) - desired_power, c(k +
+                                                                                                       1e-10, 1e+05))$root,error = function(e){return("NA(Maybe Effect Size Too Small)")})
 
 
 
 
-                                 sigma_mu_IDP = sqrt(sum((result_stat[j,which_col_IDPmean] - result_stat[j,which_col_Gmean])^2 * n_IDP/N) )
-                                 sigma_IDP = result_stat[j,which_col_Gsd]
+                                 sigma_mu_IDP = sqrt(sum((by(dta$value, dta$variable1, mean, na.rm = T) - Gmean)^2 * n_IDP/N) )
+                                 sigma_IDP = Gsd
                                  f_IDP = sigma_mu_IDP/sigma_IDP
                                  mu_IDP = m/(1+(m-1)*rho)
                                  ncp_IDP = f_IDP^2 * mu_IDP * N * epsilon
+
+
                                  p.body_IDP = quote({
                                    ncp_IDP = f_IDP^2 * mu_IDP * N * epsilon
-                                   pf(qf(sig.level,df1_idp,df2_idp,lower.tail = F),df1_idp,df2_idp,ncp_IDP,lower.tail = F)
+                                   df2 = N-k
+                                  pf(qf(sig.level,df1_idp,df2,lower.tail = F),df1_idp,df2,ncp_IDP,lower.tail = F)
                                  })
-                                 size_ind = tryCatch(uniroot(function(N) eval(p.body_IDP) - desired_power, c(2 +
-                                                                                                            1e-10, 1e+05))$root,error = function(e){return("NA")})
+                                 size_ind = tryCatch(uniroot(function(N) eval(p.body_IDP) - desired_power, c(k +
+                                                                                                            1e-10, 1e+05))$root,error = function(e){return("NA(Maybe Effect Size Too Small)")})
 
 
-                                 sigma_mu_inter = sqrt(sum((result_stat[j,which_col_intermean] - result_stat[j,which_col_Gmean])^2 * n_inter/N) )
-                                 sigma_inter = result_stat[j,which_col_Gsd]
+                                 sigma_mu_inter = sqrt(sum((by(dta$value, paste(dta$variable1,dta$repeated1, sep = "*"),mean,na.rm = T) - Gmean)^2 * n_inter/N) )
+                                 sigma_inter = Gsd
                                  f_inter = sigma_mu_inter/sigma_inter
                                  ncp_inter = f_inter^2 * mu * N * epsilon
                                  p.body_inter = quote({
                                    ncp_inter = f_inter^2 * mu * N * epsilon
-                                   pf(qf(sig.level,df1_inter,df2_inter,lower.tail = F),df1_inter,df2_inter,ncp_inter,lower.tail = F)
+                                   df2 = (N-k)*(m-1)*epsilon
+                                   pf(qf(sig.level,df1_inter,df2,lower.tail = F),df1_inter,df2,ncp_inter,lower.tail = F)
                                  })
-                                 size_inter = tryCatch(uniroot(function(N) eval(p.body_inter) - desired_power, c(2 +
-                                                                                                               1e-10, 1e+05))$root,error = function(e){return("NA")})
+                                 size_inter = tryCatch(uniroot(function(N) eval(p.body_inter) - desired_power, c(k +
+                                                                                                               1e-10, 1e+05))$root,error = function(e){return("NA(Maybe Effect Size Too Small)")})
 
-                                 # }
+
 
 
                                  return(c(inter = pf(qf(sig.level,df1_inter,df2_inter,lower.tail = F),df1_inter,df2_inter,ncp_inter,lower.tail = F),size_inter,
                                           ind = pf(qf(sig.level,df1_idp,df2_idp,lower.tail = F),df1_idp,df2_idp,ncp_IDP,lower.tail = F),size_ind,
                                           r = pf(qf(sig.level,df1_r,df2_r,lower.tail = F),df1_r,df2_r,ncp_r,lower.tail = F), size_r))
-                               },e,dta,result_stat,m, N, n_r,n_IDP,n_inter,which_col_Gsd,which_col_Gmean,
-                               which_col_IDPmean,which_col_rmean,which_col_intermean,
+                               },e,dta,m, N, n_r,n_IDP,n_inter,
                                sig.level,df1_r,df2_r,df1_idp,df2_idp,df1_inter,df2_inter,desired_power,epsilon)
 
 
@@ -117,8 +109,8 @@ stat_mixed_ANOVA_power = function(e,p,dta,result_stat, sig.level = 0.05, desired
   power_sampleSize = data.frame(power_sampleSize)
 
   colnames(power_sampleSize) = c("Interaction_term_power",paste0("Interaction_term_Size_Required_When_Desired_Power_is",desired_power*100,"_percent"),
-                                 paste0(factor_name[1],"_term_power"),paste0(factor_name[1],"Size_Required_When_Desired_Power_is",desired_power*100,"_percent"),
-                                 paste0(factor_name[2],"_term_power"),paste0(factor_name[2],"Size_Required_When_Desired_Power_is",desired_power*100,"_percent"))
+                                 paste0(factor_name[1],"_term_power"),paste0(factor_name[1],"Size_at_Power_",desired_power*100,"_percent"),
+                                 paste0(factor_name[2],"_term_power"),paste0(factor_name[2],"Size_at_Power_",desired_power*100,"_percent"))
 
   return(power_sampleSize)
 }

@@ -1,6 +1,9 @@
-$(document).ready(function(){//wait untile the document is fully loaded.
-var d;// This is unchangable untill modify on the experimental design part.
-var D;
+var editor;
+var samplenormalization_method = "None";
+var datatransformation_method = 'None';
+var datascaling_method = "None";
+var pwr = 80;
+var D;// This is unchangable untill modify on the experimental design part.
 var DATA;
 var eData;
 var pData;
@@ -15,13 +18,14 @@ var log_trans = [];
 var power_trans = [];
 var auto_scaling = [];var pareto_scaling = [];var range_scaling = [];
 var sample_index;
-var mTICdid = Loessdid = medFCdid = BatchMediandid = false;
+var mTICdid = false; var Loessdid = false; var medFCdid  = false; var BatchMediandid = false;
 var mTIC = Loess = medFC = BatchMedian = [];
 var mTIC_raw = []; var Loess_raw = []; var medFC_raw = []; var BatchMedian_raw = [];
 var e_ori = []; var p_ori = [];
 var session111;
 var fData_column;
 var pData_column;
+var pData_columns_num;
 var modified_dataset_download_address = [];
 var download_norm_data_adress = [];
 var res_url;
@@ -30,265 +34,105 @@ var type;
 var duplicatedID;
 var guess_independent_factor;
 var guess_repeated_factor;
+var PCA_score_plot = []
+var sample_specific_weight = "";
+var sample_specific_multiplyordevide = "";
+var KnownorUnknown = {value:''};
+var QCIndicator = ""; var BatchIndicator = ""; var TimeIndicator = "";
+var mTICunchanged = false;
+var Loessunchanged = false;
+var Batchunchanged = false;
+var pComponents;
 
 
+
+$(document).ready(function(){//wait untile the document is fully loaded.
+
+
+
+
+
+
+PCA_score_plot = Plotly.d3.select('#stat_PCA_plot')
+    .style({
+        width: 100 + '%',
+        height: 100 + '%'
+    }).node();
+
+
+
+
+$("#samplenormalizationSample_specific").click(function(){
+  select_samplenormalizationSample_specific(pData_column)
+})
+$("#samplenormalizationmTIC").click(function(){
+  select_samplenormalizationmTIC(fData_column)
+})
+$("#samplenormalizationloess").click(function(){
+  select_samplenormalizationloess(pData_column)
+})
+$("#samplenormalizationBatchMedian").click(function(){
+  select_samplenormalizationmBatchMedian(pData_column)
+})
+
+
+
+$("#success-message-alert").hide();
+$("#warning-message-alert").hide();
+$("#danger-message-alert").hide();
+
+
+
+
+  $('[data-toggle="tooltip"]').tooltip();
 
 //turn to inline mode
 $.fn.editable.defaults.mode = 'inline';
+$('#stat_load_data_para_SheetIndex').editable({
+   emptytext: "<p class='text-muted'>The <span class='text-danger'>first sheet</span> will be read as default. Click me to change.</p>"
+    });
+ $('#sample_to_be_removed').editable({
+        emptytext: 'No Sample to be Removed. Click me to add.',
+        title: 'Remove Sample'
+    });
 
-/*$('#username').editable({
-    type: 'text',
-    title: 'Enter username',
-    success: function(response, newValue) {
-        console.log(response)
-        console.log(newValue)//update backbone model
-    }
-});*/
+
+
+$("#para_method").editable({})
+$("#para_post_hoc").editable({})
+$("#non_para_method").editable({})
+$("#non_para_post_hoc").editable({})
+
+
+
+
 
 
 
 // load data.
-$("#inputUploadData").on("change", function(){
-  var loadSpinner = showSpinner();
-      var req=ocpu.call("stat_load_data",{
-        file: $("#inputUploadData")[0].files[0],
-        sheetIndex: $("#stat_load_data_para_SheetIndex").val()
-       // ,from_example:$('input[name="optionsRadiosInline"]:checked').val()
-      },function(session){
-        session.getObject(function(obj){
-          DATA = obj;
-          D = obj;
-          d = obj;
-          eData = obj.expression;
-          fData = obj.feature;
-          pData = obj.phenotype;
-          pDataTable = drawTable('#View_pData',obj.phenotype);
-          fDataTable = drawTable('#View_fData',obj.feature);
-          duplicatedID = obj.duplicatedID;
-          if(duplicatedID[0]){
-              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend"  value = "TRUE"></label></div>';
-          }
-          var req2 = ocpu.call("stat_summary_data",{
-            DATA:D
-          },function(session2){
-
-
-              session2.getObject(function(obj2){
-                $("#Sample_times_Metabolites").text(obj2.number_of_sample+" X "+obj2.number_of_feature);
-                $("#number_of_sample").text(obj2.number_of_sample);
-                $("#number_of_feature").text(obj2.number_of_feature);
-                $("#EFP").text(obj2.ncol_of_p + " / " + obj2.ncol_of_f);
-                pData_column = obj2.column_names_of_pData;
-                fData_column = obj2.column_names_of_fData;
-                why_not_able = obj2.why_not_able;
-
-
-                guess_independent_factor=obj2.guess_independent_factor;
-                guess_repeated_factor=obj2.guess_repeated_factor;
-
-
-                decidenormalizationability(obj2.column_names_of_pData);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor",null,"dfdasfdasfewrf");
-                listSelector(obj2.column_names_of_fData,null,"#boxplottitle",null,"dfdasfdasfewrf");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor",null,"dfdasfdasfewrf");
-
-
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor",null,guess_independent_factor);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor",null,guess_repeated_factor);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor",null,"dfdasfdasfewrf");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color",null,guess_independent_factor);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
-
-
-                  var req = ocpu.call("stat_Study_Design",{
-                    DATA:D,
-                    between_factor:guess_independent_factor,
-                    within_factor:guess_repeated_factor
-                    },function(session){
-                  session.getStdout(function(outtxt){
-                            $("#Sample_Size_Table").text(outtxt);
-                                          hideSpinner(loadSpinner);
-                        });
-                }).fail(function(jqXHR){hideSpinner(loadSpinner); alert(jqXHR.responseText); });
-
-                summaryPhenotype("#Summary_Phenotype_Data",obj2.column_names_of_pData,obj2.pData_columns_num);
-                summaryFeature("#Summary_Feature_Data",obj2.column_names_of_fData,obj2.fData_columns_num);
-                e_after_sample_normalization = e_after_transformation = e_after_scaling = eData;
-
-
-                $("#showafterupload").collapse('show');
-                $("#draw_boxplot_div").collapse('show');
-                $("#visualization_body").collapse('show');
-
-              plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
-                         // hideSpinner(loadSpinner);
-              });
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);hideSpinner(loadSpinner);});
-          var req3 = ocpu.call("stat_get_modified_data",{
-            DATA:D
-          },function(session3){
-            modified_dataset_download_address = session3.getLoc() + "R/.val/csv";
-         session.getFile("messages.txt", function(text){
-          if(text.length>10){
-           warningmsg(text);
-          }else{
-           successmsg(text);
-          }
-
-$("#UploadData").collapse('toggle');
-
-$(".disableafterupload").attr("disabled", true);
-
-$(".alertToRefresh").html("If you want to upload a new file, please refresh the page first.");
-
-
-$("#StudyDesign").collapse('show');
-$("#ViewData").collapse('show');
-
-        });
-
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
-
-        });
-
-
-      }).fail(function(error){
-      errormsg(1 + error.responseText);hideSpinner(loadSpinner);
-    });
-
-});// load data.
+$("#inputUploadData").on("change", uploaddata)// load data.
 // use example data.
 $("input[name='optionsRadiosInline']").on("click", function(){
   document.getElementById('submit_example_data').style.visibility = 'visible';
 })
 
-$("#submit_example_data").on("click", function(){
-  var loadSpinner = showSpinner();
-      var req=ocpu.call("stat_load_data",{
-        file: $("#inputUploadData")[0].files[0],
-        sheetIndex: $("#stat_load_data_para_SheetIndex").val(),
-        from_example:$('input[name="optionsRadiosInline"]:checked').val()
-      },function(session){
-
-        session.getObject(function(obj){
-          DATA = obj;
-          D = obj;
-          d = obj;
-          eData = obj.expression;
-          fData = obj.feature;
-          pData = obj.phenotype;
-          pDataTable = drawTable('#View_pData',obj.phenotype);
-          fDataTable = drawTable('#View_fData',obj.feature);
-          duplicatedID = obj.duplicatedID;
-
-          if(duplicatedID[0]){
-              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend" value = "TRUE"></label></div>';
-          }
-          var req2 = ocpu.call("stat_summary_data",{
-            DATA:D
-          },function(session2){
+$("#submit_example_data").on("click", uploaddata);// load data.
 
 
-              session2.getObject(function(obj2){
-                $("#Sample_times_Metabolites").text(obj2.number_of_sample+" X "+obj2.number_of_feature);
-                $("#number_of_sample").text(obj2.number_of_sample);
-                $("#number_of_feature").text(obj2.number_of_feature);
-                $("#EFP").text(obj2.ncol_of_p + " / " + obj2.ncol_of_f);
-                pData_column = obj2.column_names_of_pData;
-                fData_column = obj2.column_names_of_fData;
-                why_not_able = obj2.why_not_able;
-                guess_independent_factor=obj2.guess_independent_factor;
-                guess_repeated_factor=obj2.guess_repeated_factor;
 
 
-                decidenormalizationability(obj2.column_names_of_pData);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor",null,"dfdasfdasfewrf");
-                listSelector(obj2.column_names_of_fData,null,"#boxplottitle",null,"dfdasfdasfewrf");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#powerparaautoindependent_factor",null,"dfdasfdasfewrf");
+$('#desired_power').editable({
+  title: 'Enter Power Desired (0-100)',
+  success: function(response, newValue) {pwr = newValue}
+});
 
 
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor",null,guess_independent_factor);
-
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor",null,guess_repeated_factor);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor",null,"dfdasfdasfewrf");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color",null,guess_independent_factor);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
-
-                var req = ocpu.call("stat_Study_Design",{
-                    DATA:D,
-                    between_factor:guess_independent_factor,
-                    within_factor:guess_repeated_factor
-                    },function(session){
-                  session.getStdout(function(outtxt){
-                            $("#Sample_Size_Table").text(outtxt);
-                                          hideSpinner(loadSpinner);
-                        });
-                }).fail(function(jqXHR){hideSpinner(loadSpinner); alert(jqXHR.responseText); });
-
-
-                summaryPhenotype("#Summary_Phenotype_Data",obj2.column_names_of_pData,obj2.pData_columns_num);
-                summaryFeature("#Summary_Feature_Data",obj2.column_names_of_fData,obj2.fData_columns_num);
-                e_after_sample_normalization = e_after_transformation = e_after_scaling = eData;
-                $("#showafterupload").collapse('show');
-                $("#draw_boxplot_div").collapse('show');
-                $("#visualization_body").collapse('show');
-              plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
-                          hideSpinner(loadSpinner);
-              });
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
-          var req3 = ocpu.call("stat_get_modified_data",{
-            DATA:D
-          },function(session3){
-            modified_dataset_download_address = session3.getLoc() + "R/.val/csv";
-         session.getFile("messages.txt", function(text){
-          if(text.length>10){
-           warningmsg(text);
-          }else{
-           successmsg(text);
-          }
-
-$("#UploadData").collapse('toggle');
-$(".disableafterupload").attr("disabled", true);
-$(".alertToRefresh").html("If you want to upload a new file, please refresh the page (F5) first.");
-$("#StudyDesign").collapse('show');
-$("#ViewData").collapse('show');
-        });
-          }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);hideSpinner(loadSpinner);});
-        });
-      }).fail(function(error){
-      errormsg(1 + error.responseText);hideSpinner(loadSpinner);
-    });
-
-});// load data.
-
-function arraysEqual(a, b) {
-  if (a === b) return true;
-  if (a == null || b == null) return false;
-  if (a.length != b.length) return false;
-
-  // If you don't care about the order of the elements inside
-  // the array, you should sort both arrays here.
-
-  for (var i = 0; i < a.length; ++i) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
-var pwr = 80;
-   $('#desired_power').editable({
-        title: 'Enter Power Desired (0-100)',
-        success: function(response, newValue) {
-        pwr = newValue
-    }
-    });
-
-
-var samplenormalization_method = 'mTIC';
+var samplenormalizationselected = 'None';
 $('#samplenormalizationselected').editable({
         showbuttons: false,
         unsavedclass: null,
         type: 'select',
+        value:'None',
         inputclass: 'input-medium privacy-select',
         source: [
             {value: 'None', text: 'None'},
@@ -299,7 +143,8 @@ $('#samplenormalizationselected').editable({
         ],
 
         success: function(response, newValue) {
-        samplenormalization_method = newValue//update backbone model
+        samplenormalizationselected = newValue//update backbone model
+
     }
     });
 
@@ -307,11 +152,27 @@ $('#samplenormalizationselected').editable({
 
 
 
-var datatransformation_method = 'log';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 $('#datatransformationselected').editable({
         showbuttons: false,
         unsavedclass: null,
         type: 'select',
+        value:'None',
         inputclass: 'input-medium privacy-select',
         source: [
             {value: 'None', text: 'None'},
@@ -324,13 +185,11 @@ $('#datatransformationselected').editable({
     });
 
 
-
-
-var datascaling_method = 'log';
 $('#featuretransformationselected').editable({
         showbuttons: false,
         unsavedclass: null,
         type: 'select',
+        value:'None',
         inputclass: 'input-medium privacy-select',
         source: [
             {value: 'None', text: 'None'},
@@ -349,36 +208,10 @@ $('#featuretransformationselected').editable({
 
 
 
-
-
-
 $("#Submit_To_Statistics").click(function(){
 // check normalization method available or not.
+    allow = true;
 
-  /*samplenormalization_method = str[0];
-  datatransformation_method = str[1];
-  datascaling_method = str[2];*/
-console.log(nosample_specific);
-console.log(samplenormalization_method==='Sample_specific')
-
-  if(nobatch){
-    if(samplenormalization_method==='Batch Median'){
-      alert("Data does not contain column batch. Batch Median normalization cannot be proceded.");
-            throw new Error("normalization method not right");
-    }
-  }
-  if(nosample_specific){
-    if(samplenormalization_method==='Sample_specific'){
-      alert("Data does not contain column Sample_specific_weight. Sample_specific normalization cannot be proceded.");
-      throw new Error("normalization method not right");
-    }
-  }
-  if(noloess){
-    if(samplenormalization_method==='Loess'){
-      alert("Data does not contain at least one of columns, batch, QC or time_of_injection. Loess normalization cannot be proceded.");
-            throw new Error("normalization method not right");
-    }
-  }
    if($("#independent_factor").val()===null){
     ind = []
   }else{
@@ -396,152 +229,27 @@ console.log(samplenormalization_method==='Sample_specific')
   // length should be 1 or 2
 
   if(ind.length + rep.length === 0){
-    alert("You haven't select factor yet. Please select at Between Subject Factor or Within Subject Factor session.")
+    bootbox.alert("You haven't select factor yet. Please select at Between Subject Factor or Within Subject Factor session.");
   }else if(ind.length + rep.length > 2){
-    alert("Currently, metabox can only analysis two-way design, namely you can NOT have more than two factors intotal in Between Subject Factor and Within Subject Factor session")
+    bootbox.alert("Currently, metabox can only analysis two-way design, namely you can NOT have more than two factors intotal in Between Subject Factor and Within Subject Factor session");
   }else if(arraysEqual(ind,rep)){
-    alert("Between Subject Factor can NOT equal th Within Subject Factor.")
+    bootbox.alert("Between Subject Factor can NOT equal th Within Subject Factor.");
   }else{
-          var loadSpinner = showSpinner();
-  // change the DATA. Remove the outlier.
-  var req=ocpu.call("stat_rm_sample",{
-    e:D.expression,p:D.phenotype,f:D.feature,sample_index : ""
-  },function(session){
-    session.getObject(function(obj){
-      DATA = obj;
-      eData = obj.expression;
-      fData = obj.feature;
-      pData = obj.phenotype;
-  var str = $("#Normalization_To_Be_Applied").val();
 
+if(samplenormalizationselected==="Sample_specific"){
 
+select_samplenormalizationSample_specific(pData_column)
 
-  var req = ocpu.call("stat_norm",{
-    e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
-  sample_index:$("#Samples_To_Be_Deleted").val().split(','),
-  mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
-  mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
-  sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
-  //selected_phenotype_by_check:selected_phenotype_by_check, selected_feature_by_check:selected_feature_by_check,
+}else if(samplenormalizationselected === "mTIC"){
 
-  log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log : $('#logparaautoindependent_factor').val(),
-  power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power : $('#powerparaautoindependent_factor').val()
+  select_samplenormalizationmTIC(fData_column)
+}else if(samplenormalizationselected === "Loess"){
 
-  },function(session_norm){
+  select_samplenormalizationloess(pData_column)
+}else if(samplenormalizationselected === 'Batch Median'){
 
-    session_norm.getObject(function(obj2){
-
-    eData = obj2.expression;
-    fData = obj2.feature;
-    pData = obj2.phenotype;
-    e_ori = obj2.expression_only_rm_outlier;
-    p_ori = obj2.phenotype_only_rm_outlier;
-
-
-
-    var req=ocpu.call("stat_hypo_test",{
-    e:eData,
-    f:fData,
-    p:pData,
-    e_ori:e_ori,
-    p_ori:p_ori,
-    e_before:D.expression,
-    p_before:D.phenotype,
-    independent_factor_name:$("#independent_factor").val(),
-    repeated_factor_name:$("#repeated_factor").val(),
-    need_power:document.getElementById('power_analysis_needed').checked,
-    desired_power: pwr
-  },function(session4){
-    $("#StudyDesign").collapse('hide');
-    $("#ViewData").collapse('hide');
-    $("#visualization_body").collapse('hide');
-    $("#Statistics_Result_panel").collapse('show');
-              hideSpinner(loadSpinner);
-              session4.getObject(function(obj3){
-                stat_result = obj3;
-
-                if(typeof stat_result[0]==="string"){
-                  alert(stat_result);
-                }else{
-
-                $("#continue_analysis").collapse('show');
-
-
-              Stat_Result = drawTable('#Statistics_Result',obj3);
-                            download_address = session4.getLoc() + "R/.val/csv";
-              $("#download_statistical_result_button").empty();
-              var r= $('<a download = "file.csv" href='+download_address+' class="btn btn-primary btn-lg active" role="button">Download Statistical Analysis Result</a>');
-              $("#download_statistical_result_button").append(r);
-
-
-              rsession = session4.getLoc();
-            var res_url = rsession +"files/colnames.json";
-$.getJSON(res_url).success(function(obj){
-
-                if(obj.indexOf("PubChem")!==-1 ) {
-                type = "compound";
-
-            		} else if (obj.indexOf("ensembl")!==-1 ) {
-            		  type = "ensembl";
-
-
-            		} else if (obj.indexOf("uniprot")!==-1 ) {
-            		  type = "uniprot";
-
-            		}else{
-            		  type = "nothing"
-            		}
-
-
-});
-// decide if it has which compound and disable certain thing!
-
-
-
-
-/*!!            var targeturl = "/ocpu/library/mETABOX/www/similarity.html?varname="
-            $.getJSON(res_url)
-            		.success (function (response) {
-            		if(response.indexOf("PubChem")!==-1 ) {
-            		  var test_arr = response.map(function (x) { if (x.match("p_value")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
-            		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'&rsess='+rsession+'&idtype=compound" target="_blank">'+y+' </a></li>');
-            		  });
-            		} else if (response.indexOf("ensembl")!==-1 ) {
-            		  var test_arr = response.map(function (x) { if (x.match("p_value")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
-            		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'&rsess='+rsession+'&idtype=gene" target="_blank">'+y+' </a></li>');
-            		  });
-
-            		} else if (response.indexOf("uniprot")!==-1 ) {
-            		  var test_arr = response.map(function (x) { if (x.match("p_value")) {return x}}).filter(function(n){ return n != undefined }).map(function (y)                 {
-            		    $("#testlist").append('<li> <a class = "btn btn-primary" href="'+targeturl+y+'&rsess='+rsession+'&idtype=protein" target="_blank">'+y+' </a></li>');
-            		  });
-
-            		} else {
-            		  alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
-
-            		}
-            });*/
-                }
-               });
-
-
-session4.getFile("messages_hypo_test.txt", function(text){
-          if(text.length>10){
-           warningmsg(text);
-          }
-
-
-        });
-
-    }).fail(function(jqXHR){hideSpinner(loadSpinner);alert(jqXHR.responseText); });
-
-
-
-  });
-  }).fail(function(jqXHR){ hideSpinner(loadSpinner);alert(jqXHR.responseText);});
-  });
-    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
-  }
+  select_samplenormalizationmBatchMedian(pData_column)
+}
 
 
 
@@ -551,46 +259,18 @@ session4.getFile("messages_hypo_test.txt", function(text){
 
 
 
-});
 
-
-
-
-
-$("#enrBtn").click(function(){
-  if(type==="nothing"){
-alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
-  }else{
-      window.location = 'enrichmentrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
 
 
-$("#overrepBtn").click(function(){
-    if(type==="nothing"){
-alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
-  }else{
-      window.location = 'overreprsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
-  }
-});
 
-$("#cloudBtn").click(function(){
-    if(type==="nothing"){
-alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
-  }else{
-      window.location = 'wordcloudrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
-  }
 
-});
 
-$("#SltBtn").click(function(){
-    if(type!=="compound"){
-alert("No compound id found in the table. Cannot proceed to the next step for MetaBox workflow.");
-  }else{
-      window.location = 'similarityrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
-  }
-});
+
+
+
 
 
 
@@ -599,34 +279,73 @@ $("#PCA_plot_para_submit").click(function(){
     plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
 })
 
-
 $(".Thefactor").on("change",function(){
     if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
     $("#Sample_Size_Table").text("Waiting user to select factor.")
+    $("#stat_method").text("Nothing is selected");
   }else{
     var loadSpinner = showSpinner();
-    var req = ocpu.call("stat_Study_Design",{
-    DATA:D,
-    between_factor:$("#independent_factor").val(),
-    within_factor:$("#repeated_factor").val()
-    },function(session){
-  session.getStdout(function(outtxt){
-            $("#Sample_Size_Table").text(outtxt);
-                          hideSpinner(loadSpinner);
+                     var req = ocpu.call("stat_Study_Design",{
+                    DATA:D,
+                    between_factor:$("#independent_factor").val(),
+                    within_factor:$("#repeated_factor").val()
+                    },function(session4){
+                  session4.getStdout(function(outtxt){
+                            $("#Sample_Size_Table").text(outtxt);
+                                        hideSpinner(loadSpinner);
+                        });
+                      session4.getFile("stat_method.txt", function(text){
+
+
+if(text.includes("one way ANOVA")){
+  onewayANOVAdescription();
+}else if(text.includes("independent t test")){
+  ttestdescription();
+}else if(text.includes("two way ANOVA")){
+  twowayANOVAdescription();
+}else if(text.includes("one way repeated ANOVA")){
+  onewayrepeatedANOVAdescription();
+}else if(text.includes("paired t test")){
+  pairedttestdescription();
+}else if(text.includes("two way repeated anova")){
+  twowayrepeatedANOVAdescription();
+}else if(text.includes("mixed two way anova")){
+  mixedANOVAdescription();
+}
+loadxeditable_elements();
+
+hideSpinner(loadSpinner);
         });
-    }).fail(function(jqXHR){hideSpinner(loadSpinner); alert(jqXHR.responseText); });
+}).fail(function(jqXHR){hideSpinner(loadSpinner); bootbox.alert(jqXHR.responseText); });
   }
+
 
 })
 
 
 
 
-var PCA_score_plot = Plotly.d3.select('#stat_PCA_plot')
-    .style({
-        width: 100 + '%',
-        height: 100 + '%'
-    }).node();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -641,73 +360,52 @@ $("#Donut_color").change(function(){
 
 // functions
 
-
-function listSelector(full_options,why_not_able,id,furtherlimit, default_checked){
-
-  //listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor");
-
-
-  // why_not_able = ["numeric","",]
-    // selected_options = ["disabled","",...]
-var selector = '';
-if(why_not_able==null){
-
-for(var i = 0;i<full_options.length;i++){
-  if(full_options[i]===default_checked[0]){
-    selector += "<option selected>" + full_options[i] + "</option>";
+$("#enrBtn").click(function(){
+  if(type==="nothing"){
+bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-    selector += "<option>" + full_options[i] + "</option>";
+      window.location = 'subnetwork.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
-}
+});
 
-}else{
-  if(furtherlimit==null){
-for(var i = 0;i<full_options.length;i++){
-  if(why_not_able[i].length<2){
-
-  if(full_options[i]===default_checked[0]){
-    selector += "<option selected>" + full_options[i] + "</option>";
+$("#overrepBtn").click(function(){
+    if(type==="nothing"){
+bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-    selector += "<option data-subtext= "+ why_not_able[i]+">" + full_options[i] + "</option>";
+      //window.location = 'overrepanalysis.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      var rsess1 = rsession.replace("localhost","128.120.143.234");
+      window.open('http://128.120.143.215:3104/ocpu/library/metaboxdev/www/overreprsess.html?rsess='+rsess1 + '&idtype='+type, '_blank');
+  }
+});
+
+$("#cloudBtn").click(function(){
+    if(type==="nothing"){
+bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
+  }else{
+      window.location = 'wordcloud.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
+});
 
+$("#SltBtn").click(function(){
+    if(type!=="compound"){
+bootbox.alert("No compound id found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-    selector += "<option data-subtext="+ why_not_able[i]+" disabled>" + full_options[i] + "</option>";
+      window.location = 'similarity.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      //window.open('http://128.120.143.208:1200/ocpu/library/MetaMapp2016/www/similarity.html?rsess='+rsession + '&idtype='+type, '_blank');
   }
-}
-}else{
-  for(var i = 0;i<full_options.length;i++){
-  if(why_not_able[i].length<2){
-
-    if(full_options[i]===default_checked[0]){
-      selector += "<option selected>" + full_options[i] + "</option>";
-    }else{
-      selector += "<option data-subtext= "+ why_not_able[i]+">" + full_options[i] + "</option>";
-    }
-
-
-
-  }else{
-    selector += "<option data-subtext="+ why_not_able[i]+" disabled>" + full_options[i] + "</option>";
-  }
-
-}
-}
-}
+});
 
 
 
 
-$(id).html(selector).selectpicker('refresh');
-}
 
 var nobatch = false;
 var noloess = false;
 var nosample_specific=false;
 
-function decidenormalizationability(column_names_of_pData){
+/*function decidenormalizationability(column_names_of_pData){
 
 if($.inArray('batch', column_names_of_pData) == -1){
 
@@ -763,125 +461,22 @@ if($.inArray('time_of_injection', column_names_of_pData) == -1){
 
 }
 
-}
+}*/
 
 
 
 
-function plotPCAScore(e1,f1,p1){
-var loadSpinner = showSpinner();
-$(".normalization").prop('disabled', true);
-  var rep=ocpu.call("stat_PCA_plot",{
-        e:e1,
-        f:f1,
-        p:p1,
-        color:$('#PCA_color').val(),
-        sample_information_selection:selected_phenotype_by_check,
-        Ellipse : $("#PCA_Ellipse").is(":checked"), dot_size : $("#PCA_dot_size").val(),
-        IDtrend:$("#PCA_IDtrend").is(":checked")
-      },function(session){
-session.getObject(function(obj){
-Plotly.newPlot(PCA_score_plot, eval(obj.data[0]),JSON.parse(obj.layout[0]));
-$(".normalization").prop('disabled', false);
-decidenormalizationability(pData_column);
-
-PCA_score_plot.on('plotly_selected',function(eventData){
-  selected = [];
-  eventData.points.forEach(function(pt){
-    selected.push(pt.x);
-  });
-
-  var rep=ocpu.call("stat_get_index_from_PCA",{
-    e:e1,
-    p:p1,
-    f:f1,
-    selected_sample:selected
-  },function(session){
-    session.getObject(function(obj){
-  sample_index = obj.result;
-  $("#sample_selected").text(sample_index);
-    });
-  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
-
-$("#morris-donut-chart").html("");
-plotDonut(e1,f1,p1,selected);
-});});}).done(function(){
-  hideSpinner(loadSpinner);
-}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});}
 
 
 
 
-function plotDonut(e1,f1,p1,select){
-  var loadSpinner = showSpinner();
-var rep=ocpu.call("stat_Donut_plot",{
-e:e1,
-f:f1,
-p:p1,
-p_column:$('#Donut_color').val(),
-selected_sample : select
-  },function(session){
-    session.getObject(function(obj){
-Morris.Donut({
-        element: 'morris-donut-chart',
-        data: eval(obj.data[0]),
-        resize: true
-});
-    });
-
-  }).done(function(){ hideSpinner(loadSpinner);}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
-
-}
 
 
 
 
-summaryPhenotype = function(id,columns,columns_num){
-var text = '<ul class="list-group">';
 
-for(var i = 0;i<columns.length;i++){
-  if(columns[i] === "phenotype_index" || columns[i] === "sampleID" ||columns[i] === "batch" ||columns[i] === "Sample_specific_weight" ||columns[i] === "QC"||
-  columns[i]==="time_of_injection"||columns[i]=="rank"){
-       text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkPhenotype" checked type="checkbox" disabled readonly></div></li>';
-  }else{
-       text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkPhenotype" checked type="checkbox"></div></li>';
-  }
 
-}
-text = text + '</ul>';
-$(id).html(text);
-$('.toggleone').bootstrapToggle({
-  size:"mini",
-  onstyle:"default" ,
-  offstyle:"default",
-  on:"<i class='fa fa-check-circle'></i>",
-  off:"<i class='fa fa-times-circle'></i>"
-}
-);
-};
 
-summaryFeature = function(id,columns,columns_num){
-var text = '<ul class="list-group">';
-
-for(var i = 0;i<columns.length;i++){
-  if(columns[i] === "feature_index" || columns[i] === "KnownorUnknown" || columns[i]==="PubChem" || columns[i]==="ensembl"||columns[i]==="uniprot"){
-       text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkFeature" checked type="checkbox" disabled readonly></div></li>';
-  }else{
-    text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkFeature" checked type="checkbox"></div></li>';
-  }
-
-}
-text = text + '</ul>';
-$(id).html(text);
-$('.toggleone').bootstrapToggle({
-  size:"mini",
-  onstyle:"default" ,
-  offstyle:"default",
-  on:"<i class='fa fa-check-circle'></i>",
-  off:"<i class='fa fa-times-circle'></i>"
-}
-);
-};
 
 
 
@@ -940,7 +535,7 @@ $(document).on("change","input[name='checkFeature']",function(){
               session.getObject(function(obj){
 
               $("#Statistics_Result").empty()
-             Stat_Result = drawTable('#Statistics_Result',obj);
+             Stat_Result = drawTable('#Statistics_Result',obj, "Univariate Statistical Result","feature_index");
                });
 
 
@@ -967,46 +562,20 @@ window.onresize = function() {
 
 
 
-function successmsg(text){
-  $("#message").empty().append('<div class="alert alert-success alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text+ + '</div>');
-}
-function warningmsg(text){
-  $("#message").empty().append('<div class="alert alert-warning alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text + '<a download = "file.csv" href='+modified_dataset_download_address+' role="button">downloading the data set with elements added.</a></div>');
-}
 
 
 
-
-function errormsg(text){
-  $("#message").empty().append('<div class="alert alert-danger alert-dismissable"><a href="#" class="close" data-dismiss="alert">&times;</a>' + text + '</div>');
-}
-
-// Other Utility
-
-// after click remove_sample, some samples would be removed for visualization.
-/*$("#remove_sample").click(function(){
-var loadSpinner = showSpinner();
-
-  var req = ocpu.call("stat_rm_sample",{
-    e:D.expression,p:D.phenotype,f:D.feature,sample_index:""
-  },function(session){
-    session.getObject(function(obj){
-      apply_normalization();
-mTICdid = Loessdid = medFCdid = BatchMediandid = false;
-    });
-  }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText);});
-});*/
 
 // Normalization
 
 
-var samplenormalization_method;
-var datatransformation_method;
-var datascaling_method;
+
 
 
 
 apply_normalization = function(){
+
+
     var loadSpinner = showSpinner();
 var radios1 = document.getElementsByName('samplenormalization');
 for (var i = 0, length = radios1.length; i < length; i++) {
@@ -1035,6 +604,10 @@ var req=ocpu.call("stat_norm",{
   mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
   mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
   sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
+  sample_specific_weight : sample_specific_weight,sample_specific_multiplyordevide : sample_specific_multiplyordevide,
+  KnownorUnknown:KnownorUnknown.value,mTICunchanged:mTICunchanged,
+  Loessunchanged:Loessunchanged,QCIndicator:QCIndicator,BatchIndicator:BatchIndicator,TimeIndicator:TimeIndicator,
+  Batchunchanged:Batchunchanged,
   log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log:$('#logparaautoindependent_factor').val(),
   power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power:$('#powerparaautoindependent_factor').val()
 },function(session){
@@ -1049,7 +622,7 @@ var req=ocpu.call("stat_norm",{
     },function(session2){
         download_norm_data_adress = session2.getLoc() + "R/.val/csv";
       $("#download_norm_data").empty();
-              var r= $('<a download = "file.csv" href='+download_norm_data_adress+' class="btn btn-success btn-sm btn-outline  btn-circle" role="button"><i class="glyphicon glyphicon-download-alt"></i></a>');
+              var r= $('<a id = "download_visualization_norm" download = "file.csv" href='+download_norm_data_adress+' class="btn btn-success btn-sm btn-outline" role="button"><i class="glyphicon glyphicon-download-alt"></i> Download Normalized Data</a>');
 
               $("#download_norm_data").append(r);
     })
@@ -1060,18 +633,106 @@ var req=ocpu.call("stat_norm",{
   });
 }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
 
+
+
+
 };
 
 
 $(".normalization").change(function(event){// able the applynormalization button.
-$("#applynormalization").prop( "disabled", false);
+
+$("#applynormalization").removeClass("disabled");
+if(!$("#samplenormalizationSample_specific").is(':checked')){
+  $( "#samplenormalizationSample_specific_column" ).text("");
+}
+if(!$("#samplenormalizationmTIC").is(':checked')){
+  $( "#mTIC_column" ).text("");
+}
+if(!$("#samplenormalizationloess").is(':checked')){
+  $( "#Loess_column" ).text("");
+}
+if(!$("#samplenormalizationBatchMedian").is(':checked')){
+  $( "#Batch_column" ).text("");
+}
+
+
+
+
+
+
 });
 
 
 $(".applynormalization").on("click",function(event){
-  apply_normalization();
-  $("#applynormalization").prop( "disabled", true);
+   if ($(this).hasClass('disabled')) {
+        smallerrormsg(text = '<strong>Please select a new normalization that is different from the current one.</strong>',time = 5000);
+    }else{
+        apply_normalization();
+        $("#applynormalization").addClass("disabled");
+    }
+
+
 });
+
+
+
+/*var ex1 = {
+    attr1: "initial value of attr1",
+    attr2: "initial value of attr2"
+};
+
+//defining a 'watcher' for an attribute
+watch(ex1, "attr1", function(){
+    alert("attr1 changes!");
+});
+
+//when changing the attribute its watcher will be invoked
+ex1.attr1 = "other value";*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1105,7 +766,12 @@ Object.values = function(object) {
 
 
 
-
+$("#repeated_factor").click(function(){
+  if($("#repeated_factor").val() == null){
+document.getElementById("boxplot_factor_order").disabled = true;
+document.getElementById("boxplot_factor_order").placeholder = "Only Available for Within Subject Study Design..";
+}
+})
 
 
 // download boxplots.
@@ -1113,10 +779,10 @@ Object.values = function(object) {
 $("#draw_boxplot").click(function(){
 // print the boxplot_order_option
   if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
-    alert("You haven't selected factor yet!  Go to Study Design box to select factor first.");
+    bootbox.alert("You haven't selected factor yet!  Go to Study Design box to select factor first.");
 
   }else if($("#independent_factor").val() === $("#repeated_factor").val()){
-    alert("Between Subject Factor CANNOT equal to Within Subject Factor");
+    bootbox.alert("Between Subject Factor CANNOT equal to Within Subject Factor");
 
   }else{
 
@@ -1147,10 +813,10 @@ var title_of_boxplots;
 var download_boxplot_address;
 $("#draw_boxplot_submit").click(function(){
   if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
-    alert("You haven't selected factor yet! Close me and go to Study Design box to select factor first.");
+    bootbox.alert("You haven't selected factor yet! Close me and go to Study Design box to select factor first.");
 
   }else if($("#independent_factor").val() === $("#repeated_factor").val()){
-    alert("Between Subject Factor CANNOT equal to Within Subject Factor");
+    bootbox.alert("Between Subject Factor CANNOT equal to Within Subject Factor");
 
   }else{
 
@@ -1176,7 +842,7 @@ $("#draw_boxplot_submit").click(function(){
 
 
   }).fail(function(){
-    alert("R returned an error: " + req.responseText);
+    bootbox.alert("R returned an error: " + req.responseText);
     }).done(function(){
  hideSpinner(loadSpinner);
     });
@@ -1184,13 +850,6 @@ $("#draw_boxplot_submit").click(function(){
 
 })
 
-$("#Normalization_To_Be_Applied").on("change",function(){
-  var v = $("#Normalization_To_Be_Applied").val();
-$( "#samplenormalizationselected" ).text( v[0] );
-$( "#datatransformationselected" ).text( v[1] );
-$( "#featuretransformationselected" ).text( v[2] );
-
-})
 
 
 
@@ -1208,6 +867,9 @@ $("input[name = 'powerpara']").click(function(){
    $("#powerparaautoindependent_factor_div").collapse('hide');
   }
 })
+
+
+
 
 
 

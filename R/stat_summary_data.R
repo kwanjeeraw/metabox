@@ -19,12 +19,14 @@ stat_summary_data = function(DATA){
   pData = DATA$phenotype
 
 
-
-
   type_of_each_colum_pData = sapply(pData, function(x){class(x)})
 
   pData_columns_num = sapply(pData, function(x){length(unique(x))})
   fData_columns_num = sapply(fData, function(x){length(unique(x))})
+
+  pComponents = sapply(pData, unique)
+  fComponents = sapply(fData, unique)
+
 
   why_not_able = vector()
   for(i in 1:ncol(pData)){
@@ -41,7 +43,7 @@ stat_summary_data = function(DATA){
   guess_independent_factor = guess_factor[2]
   guess_repeated_factor = guess_factor[1]
 
-  result = list(number_of_sample=nrow(pData),number_of_feature = nrow(fData),column_names_of_pData = colnames(pData),column_names_of_fData = colnames(fData),
+  result = list(pComponents = pComponents,fComponents =fComponents,number_of_sample=nrow(pData),number_of_feature = nrow(fData),column_names_of_pData = colnames(pData),column_names_of_fData = colnames(fData),
                 ncol_of_p = ncol(pData), ncol_of_f = ncol(fData),
                 type_of_each_colum_pData = type_of_each_colum_pData, pData_columns_num = pData_columns_num,fData_columns_num=fData_columns_num,
                 why_not_able = why_not_able, guess_independent_factor = guess_independent_factor, guess_repeated_factor = guess_repeated_factor)

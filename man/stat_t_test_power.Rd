@@ -4,8 +4,8 @@
 \alias{stat_t_test_power}
 \title{stat_t_test_power}
 \usage{
-stat_t_test_power(dta, i, result_stat, sig.level = 0.05,
-  desired_power = 0.8, independent_factor_name, cl)
+stat_t_test_power(e, dta, i, sig.level = 0.05, desired_power = 0.8,
+  independent_factor_name, cl)
 }
 \arguments{
 \item{result_stat:}{it must be the basic statistics result.}

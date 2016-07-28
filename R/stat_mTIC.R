@@ -13,7 +13,7 @@
 #'@export
 #'
 #'
-stat_mTIC = function(e,f,p){
+stat_mTIC = function(e,f,p,KnownorUnknown){
 
   if("QC"%in%colnames(p)){# QC must have negative sampleID!
     if(sum(p$sampleID[p$QC=="TRUE"]>0)>0){
@@ -22,7 +22,7 @@ stat_mTIC = function(e,f,p){
   }
 
   means = sapply(unique(p$sampleID)[unique(p$sampleID)>0],function(id){
-    mean(unlist(e[p$sampleID%in%id,f$KnownorUnknown=="TRUE"]))
+    mean(unlist(e[p$sampleID%in%id,f[,KnownorUnknown]=="TRUE"]))
   })
   M = mean(means)
 

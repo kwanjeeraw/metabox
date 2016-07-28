@@ -4,7 +4,7 @@
 \alias{stat_repeated_ANOVA_power}
 \title{stat_repeated_ANOVA_power}
 \usage{
-stat_repeated_ANOVA_power(e, p, f, dta, i, result_stat, sig.level = 0.05,
+stat_repeated_ANOVA_power(e, p, f, dta, i, sig.level = 0.05,
   desired_power = 0.8, factor_name, epsilon = 1, k = 1, cl)
 }
 \arguments{

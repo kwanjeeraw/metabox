@@ -5,7 +5,8 @@
 \title{stat_LoessNorm}
 \usage{
 stat_LoessNorm(data = e, f, p, loess.para = 0.75,
-  auto.batch.detection = FALSE, robust = TRUE)
+  auto.batch.detection = FALSE, robust = TRUE, QCIndicator, BatchIndicator,
+  TimeIndicator)
 }
 \description{
 stat_LoessNorm

@@ -4,7 +4,8 @@
 \alias{stat_t_test}
 \title{normalization}
 \usage{
-stat_t_test(data, data2, i, cl)
+stat_t_test(data, data2, i, cl, ttestmethod, ttestFDRmethod,
+  nonpara_ttestmethod, nonpara_ttestFDRmethod)
 }
 \description{
 normalization

@@ -4,7 +4,7 @@
 \alias{stat_ANOVA_power}
 \title{stat_ANOVA_power}
 \usage{
-stat_ANOVA_power(dta, i, result_stat, sig.level = 0.05, desired_power = 0.8,
+stat_ANOVA_power(e, dta, i, sig.level = 0.05, desired_power = 0.8,
   independent_factor_name, cl)
 }
 \arguments{
