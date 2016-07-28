@@ -12,7 +12,7 @@
 formatNodeOutput <- function(node, returnas){
   attb = data.frame() #data frame of node attributes
   if(length(node) <= 30000){
-    #cat("Formating and returning approximately ", length(node),"nodes ...\n")
+    cat("Formating and returning approximately ", length(node),"nodes ...\n")
     attb = plyr::rbind.fill(lapply(node, function(x) formatNode.TRANSACTION.ALL(x$graph$nodes)))
     attb = unique(attb)
     attb = as.data.frame(lapply(attb, unlist), stringsAsFactors = FALSE)#convert df of list

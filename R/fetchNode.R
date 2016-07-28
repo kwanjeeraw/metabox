@@ -70,18 +70,18 @@ fetchNode.default <- function(txtinput, nodetype, searchby="neo4jid", exactmatch
     }
     querystring = gsub("label", nodetype, querystring)
     querystring = paste(querystring,"RETURN DISTINCT node")
-    #cat("Querying node ...\n")
+    cat("Querying node ...\n")
     if(!doPar){
       if(len <= maxkw){
         qstring = gsub("keyword", paste0("['",paste0(txtinput, collapse = "','"),"']"), querystring)
-#cat(qstring,"\n")
+cat(qstring,"\n")
         nodes = curlRequest.TRANSACTION(cypher=qstring)
       }else{
         cat("Split queries for more than 500 nodes ...\n")
         subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
         nodes = foreach(i=1:length(subinp), .combine=c) %dopar% {
           qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
-#cat(qstring,"\n")
+cat(qstring,"\n")
           curlRequest.TRANSACTION(cypher=qstring)
         }
       }
@@ -89,7 +89,7 @@ fetchNode.default <- function(txtinput, nodetype, searchby="neo4jid", exactmatch
       cat("Register parallel computing ...\nWarning: querying a large number of nodes will take long time. \n")
       nodes = foreach(i=1:length(txtinput), .combine=c) %dopar% {
         qstring = gsub("keyword", txtinput[i], querystring)
-#cat(qstring,"\n")
+cat(qstring,"\n")
         curlRequest.TRANSACTION(cypher=qstring)
       }
     }
