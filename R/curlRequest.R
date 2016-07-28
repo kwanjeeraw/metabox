@@ -58,8 +58,8 @@ curlRequest.TRANSACTION <- function(cypher){
                        verbose = FALSE
     )
     result <- jsonlite::fromJSON(h$value(), simplifyDataFrame=FALSE)$results[[1]]$data
-    #on.exit(close(url))
-    #return(result)
+    return(result)
+    on.exit(flush(url))
   }, error = function(err) {
     message(err)
     result <- list() #return empty if not found
