@@ -251,7 +251,7 @@ select_samplenormalizationSample_specific(pData_column)
   select_samplenormalizationmBatchMedian(pData_column)
 }else{
   applystatistics();
-}
+}//.
 
 
 
