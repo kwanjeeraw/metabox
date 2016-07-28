@@ -68,8 +68,8 @@
           //Table output
           if(object.overrepresentation.length > 0){
             clear3Table(ndtable=nodeTable, edtable=edgeTable, pwtable=ptwTable, nid='#nodes', eid='#edges', pid='#pathways', hasResult=true);
-            nodeTable = drawTable('#nodes',object.nodes);
-            edgeTable = drawTable('#edges',object.edges);
+            nodeTable = drawTableNw('#nodes',object.nodes);
+            edgeTable = drawTableNw('#edges',object.edges);
             ptwTable = drawPieTable('#pathways',object.overrepresentation);
           }else{
             clear3Table(ndtable=nodeTable, edtable=edgeTable, pwtable=ptwTable, nid='#nodes', eid='#edges', pid='#pathways', hasResult=false);

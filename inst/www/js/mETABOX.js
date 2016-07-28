@@ -231,6 +231,21 @@ function drawTable(id, data) {
  
 }
 
+//@function draw table
+//@param id id element
+//@param data array of json objects
+function drawTableNw(id, data) {
+    var dtTable = $(id).DataTable({
+      "destroy": true,
+      "scrollX": true,
+      "scrollY": 400,
+      "scrollCollapse": true,
+      "data": data,
+      "columns": formatTableHeader(data[0])
+    });
+    return dtTable;
+}
+
 //@function clear 2 tables e.g. network tables
 //@param ndtable, edtable dataTable object
 //@param nid, eid table id

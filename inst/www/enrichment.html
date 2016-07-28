@@ -71,7 +71,7 @@
                  inputTable.destroy();
                  $('#inputdt').empty();
                }
-              inputTable = drawTable('#inputdt',object);
+              inputTable = drawTableNw('#inputdt',object);
             });//getObject
           }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
         });//fileinput
@@ -99,10 +99,10 @@
                 $('#edges').empty();
                 $('#pathways').empty();
                 $('#annopairs').empty();
-                nodeTable = drawTable('#nodes',object.nodes);
-                edgeTable = drawTable('#edges',object.edges);
+                nodeTable = drawTableNw('#nodes',object.nodes);
+                edgeTable = drawTableNw('#edges',object.edges);
                 ptwTable = drawPieTable('#pathways',object.enrichment);
-                annopairTable = drawTable('#annopairs',object.pairs);
+                annopairTable = drawTableNw('#annopairs',object.pairs);
               }else{
                 if (nodeTable != undefined) {
                   nodeTable.clear().draw();

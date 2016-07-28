@@ -63,7 +63,7 @@
              inputTable.destroy();
              $('#inputdt').empty();
            }
-          inputTable = drawTable('#inputdt',object);
+          inputTable = drawTableNw('#inputdt',object);
         });//getObject
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//fileinput
@@ -76,7 +76,7 @@
            inputTable.destroy();
            $('#inputdt').empty();
          }
-        inputTable = drawTable('#inputdt',example);
+        inputTable = drawTableNw('#inputdt',example);
       });//get example object
     });//exinput
     $("#computeBtn").click(function(){
@@ -95,8 +95,8 @@
           //Table output
           if (object.enrichment.length > 0) {
             clear3Table(ndtable=nodeTable, edtable=edgeTable, pwtable=ptwTable, nid='#nodes', eid='#edges', pid='#pathways', hasResult=true); 
-            nodeTable = drawTable('#nodes',object.nodes);
-            edgeTable = drawTable('#edges',object.edges);
+            nodeTable = drawTableNw('#nodes',object.nodes);
+            edgeTable = drawTableNw('#edges',object.edges);
             ptwTable = drawPieTable('#pathways',object.enrichment);
           }else{
             clear3Table(ndtable=nodeTable, edtable=edgeTable, pwtable=ptwTable, nid='#nodes', eid='#edges', pid='#pathways', hasResult=false);

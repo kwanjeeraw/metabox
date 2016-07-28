@@ -68,7 +68,7 @@
            inputTable.destroy();
            $('#inputdt').empty();
         }
-        inputTable = drawTable('#inputdt',data);//statinput
+        inputTable = drawTableNw('#inputdt',data);//statinput
         $("#computeBtn").click(function(){
           var loadSpinner = showSpinner();    
           var txtinput = data;
@@ -83,8 +83,8 @@
               //Table output
               if (object.edges.length > 0) {
                 clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=true);
-                nodeTable = drawTable('#nodes',object.nodes);
-                edgeTable = drawTable('#edges',object.edges);
+                nodeTable = drawTableNw('#nodes',object.nodes);
+                edgeTable = drawTableNw('#edges',object.edges);
               }else{
                 clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=false);
               }
@@ -110,7 +110,7 @@
           if (cld_object.wordcloud.length > 0) {
             clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=true);
             fnTable = drawPieTable('#wordcld',cld_object.wordcloud);
-            annopairTable = drawTable('#annopairs',cld_object.pairs);
+            annopairTable = drawTableNw('#annopairs',cld_object.pairs);
           }else{
             clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=false);
           }
@@ -140,7 +140,7 @@
           if (cld_object.overrepresentation.length > 0) {
             clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=true);
             fnTable = drawPieTable('#wordcld',cld_object.overrepresentation);
-            annopairTable = drawTable('#annopairs',cld_object.pairs);
+            annopairTable = drawTableNw('#annopairs',cld_object.pairs);
           }else{
             clear2Table(ndtable=fnTable, edtable=annopairTable, nid='#wordcld', eid='#annopairs', hasResult=false);
           }

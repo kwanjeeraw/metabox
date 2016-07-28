@@ -58,7 +58,7 @@
              inputTable.destroy();
              $('#inputdt').empty();
           }
-          inputTable = drawTable('#inputdt',object);
+          inputTable = drawTableNw('#inputdt',object);
         });//getObject
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//fileinput
@@ -85,7 +85,7 @@
               nodeTable.destroy();
             }
             $('#nodes').empty();
-            nodeTable = drawTable('#nodes',robj);
+            nodeTable = drawTableNw('#nodes',robj);
           }else{
             if (nodeTable != undefined) {
               nodeTable.clear().draw();
