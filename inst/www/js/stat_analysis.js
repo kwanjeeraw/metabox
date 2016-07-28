@@ -249,6 +249,8 @@ select_samplenormalizationSample_specific(pData_column)
 }else if(samplenormalizationselected === 'Batch Median'){
 
   select_samplenormalizationmBatchMedian(pData_column)
+}else{
+  applystatistics();
 }
 
 
