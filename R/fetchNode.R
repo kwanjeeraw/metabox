@@ -70,7 +70,7 @@ fetchNode.default <- function(txtinput, nodetype, searchby="neo4jid", exactmatch
     }
     querystring = gsub("label", nodetype, querystring)
     querystring = paste(querystring,"RETURN DISTINCT node")
-    cat("Querying node ...\n")
+    #cat("Querying node ...\n")
     if(!doPar){
       if(len <= maxkw){
         qstring = gsub("keyword", paste0("['",paste0(txtinput, collapse = "','"),"']"), querystring)
