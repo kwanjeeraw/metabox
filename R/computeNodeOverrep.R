@@ -62,8 +62,6 @@ computeNodeOverrep.default <- function (txtinput, nodetype="compound", annotatio
         stop("argument 'annotation' is not valid, choose one from the list: pathway,mesh")
       }
       require('dplyr')#load dplyr for opencpu
-      require('doParallel') #load doParallel for opencpu
-      doParallel::registerDoParallel(cores = 2)
       nodetype = Hmisc::capitalize(nodetype)
       if (class(txtinput) == "data.frame") {#get result from statistical analysis
         if(!is.null(txtinput$PubChem)){
