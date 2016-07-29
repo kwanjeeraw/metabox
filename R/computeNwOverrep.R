@@ -64,8 +64,6 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
         stop("argument 'annotation' is not valid, choose one from the list: pathway,mesh")
       }
       require('dplyr')#load dplyr for opencpu
-      require('doParallel') #load doParallel for opencpu
-      doParallel::registerDoParallel(cores = 2)
       if(tolower(annotation) == 'pathway' && foundDb()){#pathway enrichment
         cat("Querying database ...\n")
         if(internalid){
@@ -85,11 +83,14 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
             ntypels = ntypels[ntypels!="Pathway"] #list of nodetype
             if(length(ntypels) > 1){#more than one node types
               cat("Performing overrepresentation analysis ...\n")
-              ntypestat = foreach(i=1:length(ntypels), .combine=rbind) %dopar% {#get db stat
-                qstring = paste0('MATCH (:Pathway)-[r:ANNOTATION]->(n:',ntypels[i],') RETURN count(DISTINCT n)')#get db stat
-                totEnt = data.frame(nl=ntypels[i], row=curlRequest.TRANSACTION.row(qstring), stringsAsFactors = FALSE) #total no. of entities
-              }
-              overDF = foreach(i=1:nrow(subanno), .combine=rbind) %dopar% {#overrepresentation analysis
+#               ntypestat = foreach(i=1:length(ntypels), .combine=rbind) %dopar% {#get db stat
+#                 qstring = paste0('MATCH (:Pathway)-[r:ANNOTATION]->(n:',ntypels[i],') RETURN count(DISTINCT n)')#get db stat
+#                 totEnt = data.frame(nl=ntypels[i], row=curlRequest.TRANSACTION.row(qstring), stringsAsFactors = FALSE) #total no. of entities
+#               }
+              ntypestat = lapply(ntypels, function (x) data.frame(nl=x, row=curlRequest.TRANSACTION.row(paste0('MATCH (:Pathway)-[r:ANNOTATION]->(n:',x,') RETURN count(DISTINCT n)')), stringsAsFactors = FALSE))
+              ntypestat = do.call(rbind, lapply(ntypestat, data.frame, stringsAsFactors=FALSE)) #total no. of entities
+              overDF = data.frame(stringsAsFactors = F)
+              for(i in 1:nrow(subanno)){#overrepresentation analysis
                 totEnt = ntypestat[ntypestat$nl == subanno$nodelabel[i],2]
                 qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',subanno$nodelabel[i],') where ID(from) = ',subanno$id[i],' RETURN toString(ID(from)), labels(to), count(to)')
                 annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, col.names = c('id','nodelabel','count'), stringsAsFactors = FALSE) #get annotation info from db
@@ -97,6 +98,7 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
                 pval = phyper(subanno$count[i]-1, annosize$count, blackAnno, nrow(nodelist), lower.tail = F) #hypergeometric test
                 hyp = data.frame(id=as.character(subanno$id[i]), p=pval, no_of_entities=subanno$count[i],
                                  annotation_size=annosize$count, background_size=totEnt, nodelabel=subanno$nodelabel[i], stringsAsFactors = FALSE)
+                overDF = rbind(overDF,hyp)
               }
               overDF$p_adj = p.adjust(overDF$p, method = "BH") #adjust raw p-values
               #format output table

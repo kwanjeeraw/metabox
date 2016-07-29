@@ -40,8 +40,6 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
       if (class(tmparg) == "try-error") {
         stop("argument 'searchby' is not valid, choose one from the list: grinnid,name,neo4jid,synonyms,description,properties,xref")
       }
-      require('doParallel') #load doParallel for opencpu
-      doParallel::registerDoParallel(cores = 2)
       if(!is.null(dim(x))){#dataframe input
         txtinput = unique(stringr::str_trim(unlist(x[,1]))) #remove whiteline, duplicate
         isDF = ifelse(ncol(x) > 1, TRUE, FALSE)
@@ -54,17 +52,24 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
       cat("Converting ids ...\n")
       cat("Register parallel computing ...\nWarning: querying a large number of nodes will take long time. \n")
       if(isDF){#return all input data
-        nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
+#         nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
+#           res = formatNode.LIST(x=txtinput[i],y=nodetype,z=searchby)[,1:2] #get input attributes: id and gid
+#           data.frame(txtinput[i], res, x[i,2:ncol(x)], stringsAsFactors = FALSE) #combine with the rest of input
+#         }
+        nodes = data.frame(stringsAsFactors = F)
+        for(i in 1:length(txtinput)){
           res = formatNode.LIST(x=txtinput[i],y=nodetype,z=searchby)[,1:2] #get input attributes: id and gid
-          data.frame(txtinput[i], res, x[i,2:ncol(x)], stringsAsFactors = FALSE) #combine with the rest of input
+          nodes = rbind(nodes,data.frame(txtinput[i], res, x[i,2:ncol(x)], stringsAsFactors = FALSE)) #combine with the rest of input
         }
         colnames(nodes) = c("input","neo4jid","grinnid",colnames(x)[2:ncol(x)])
         row.names(nodes) = NULL
       }else{#list input
-        nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
-          res = formatNode.LIST(txtinput[i],y=nodetype,z=searchby)[,1:2] #get input attributes: id and gid
-          data.frame(txtinput[i], res, stringsAsFactors = FALSE)
-        }
+#         nodes = foreach(i=1:length(txtinput), .combine=rbind) %dopar% {
+#           res = formatNode.LIST(txtinput[i],y=nodetype,z=searchby)[,1:2] #get input attributes: id and gid
+#           data.frame(txtinput[i], res, stringsAsFactors = FALSE)
+#         }
+        nodes = lapply(txtinput, function (x) data.frame(x, formatNode.LIST(x,y=nodetype,z=searchby)[,1:2], stringsAsFactors = FALSE))
+        nodes = do.call(rbind, lapply(nodes, data.frame, stringsAsFactors=FALSE)) #total no. of entities
         colnames(nodes) = c("input","neo4jid","grinnid")
         row.names(nodes) = NULL
       }
