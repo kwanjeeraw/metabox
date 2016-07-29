@@ -39,8 +39,6 @@ fetchNode.default <- function(txtinput, nodetype, searchby="neo4jid", exactmatch
     if (class(tmparg) == "try-error") {
       stop("argument 'searchby' is not valid, choose one from the list: grinnid,name,synonyms,description,properties,xref,datasource")
     }
-    require('doParallel') #load doParallel for opencpu
-    doParallel::registerDoParallel(cores = 2)
     #construct query
     txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
     len = length(txtinput)
@@ -70,28 +68,32 @@ fetchNode.default <- function(txtinput, nodetype, searchby="neo4jid", exactmatch
     }
     querystring = gsub("label", nodetype, querystring)
     querystring = paste(querystring,"RETURN DISTINCT node")
-    cat("Querying node ...\n")
+    cat("Querying group of nodes ...\n")
     if(!doPar){
       if(len <= maxkw){
         qstring = gsub("keyword", paste0("['",paste0(txtinput, collapse = "','"),"']"), querystring)
 cat(qstring,"\n")
         nodes = curlRequest.TRANSACTION(cypher=qstring)
       }else{
-        cat("Split queries for more than 500 nodes ...\n")
-        subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
-        nodes = foreach(i=1:length(subinp), .combine=c) %dopar% {
-          qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
-cat(qstring,"\n")
-          curlRequest.TRANSACTION(cypher=qstring)
-        }
+        cat("Split queries for more than 500 nodes ...\nWarning: querying a large number of nodes will take long time. \n")
+#        subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
+#         nodes = foreach(i=1:length(subinp), .combine=c) %dopar% {
+#           qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
+# cat(qstring,"\n")
+#           curlRequest.TRANSACTION(cypher=qstring)
+#         }
+        nodes = lapply(txtinput, function (x) curlRequest.TRANSACTION(cypher=gsub("keyword", paste0("['",paste0(x, collapse = "','"),"']"), querystring)))
+        nodes = unlist(nodes, recursive = F)
       }
     }else{
-      cat("Register parallel computing ...\nWarning: querying a large number of nodes will take long time. \n")
-      nodes = foreach(i=1:length(txtinput), .combine=c) %dopar% {
-        qstring = gsub("keyword", txtinput[i], querystring)
-cat(qstring,"\n")
-        curlRequest.TRANSACTION(cypher=qstring)
-      }
+      cat("Querying each node ...\nWarning: querying a large number of nodes will take long time. \n")
+#       nodes = foreach(i=1:length(txtinput), .combine=c) %dopar% {
+#         qstring = gsub("keyword", txtinput[i], querystring)
+# cat(qstring,"\n")
+#         curlRequest.TRANSACTION(cypher=qstring)
+#       }
+      nodes = lapply(txtinput, function (x) curlRequest.TRANSACTION(cypher=gsub("keyword", x, querystring)))
+      nodes = unlist(nodes, recursive = F)
     }
   formatNodeOutput(nodes,returnas)
   },error = function(e) {
