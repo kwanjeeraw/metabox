@@ -83,7 +83,7 @@ cat(qstring,"\n")
 #           curlRequest.TRANSACTION(cypher=qstring)
 #         }
         nodes = lapply(txtinput, function (x) curlRequest.TRANSACTION(cypher=gsub("keyword", paste0("['",paste0(x, collapse = "','"),"']"), querystring)))
-        nodes = unlist(nodes, recursive = F)
+        nodes = unlist(nodes, recursive = FALSE)
       }
     }else{
       cat("Querying each node ...\nWarning: querying a large number of nodes will take long time. \n")
@@ -93,7 +93,7 @@ cat(qstring,"\n")
 #         curlRequest.TRANSACTION(cypher=qstring)
 #       }
       nodes = lapply(txtinput, function (x) curlRequest.TRANSACTION(cypher=gsub("keyword", x, querystring)))
-      nodes = unlist(nodes, recursive = F)
+      nodes = unlist(nodes, recursive = FALSE)
     }
   formatNodeOutput(nodes,returnas)
   },error = function(e) {
