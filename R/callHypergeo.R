@@ -10,7 +10,7 @@ callHypergeo.pathway <- function(edgelist, nodelist, member, nodetype, inputsize
 #     hyp = data.frame(id=as.character(edgelist$id[i]), p=pval, no_of_entities=edgelist$count[i],
 #                      annotation_size=annosize$count, background_size=totEnt, stringsAsFactors = FALSE)
 #   }
-  resDF = data.frame(stringsAsFactors = F)
+  resDF = data.frame(stringsAsFactors = FALSE)
   for(i in 1:nrow(edgelist)){#overrepresentation analysis
     qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',nodetype,') where ID(from) = ',edgelist$id[i],' RETURN toString(ID(from)), labels(to), count(to)')
     annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, col.names = c('id','nodelabel','count'), stringsAsFactors = FALSE) #get annotation info from db
@@ -45,7 +45,7 @@ callHypergeo.mesh <- function(edgelist, nodelist, size, inputsize){
 #       hyp = data.frame(id=as.character(subanno$id[i]), p=pval, no_of_entities=subanno$count[i],
 #                        annotation_size=subanno$annotation_size[i], background_size=totEnt, stringsAsFactors = FALSE)
 #     }
-    resDF = data.frame(stringsAsFactors = F)
+    resDF = data.frame(stringsAsFactors = FALSE)
     for(i in 1:nrow(subanno)){#overrepresentation analysis
       blackAnno = totEnt - subanno$annotation_size[i] #no. of entities not in the annotation term
       pval = phyper(subanno$count[i]-1, subanno$annotation_size[i], blackAnno, inputsize, lower.tail = F) #hypergeometric test

@@ -56,7 +56,7 @@ convertId.default <- function(x, nodetype, searchby="xref", exactmatch=TRUE, ret
 #           res = formatNode.LIST(x=txtinput[i],y=nodetype,z=searchby)[,1:2] #get input attributes: id and gid
 #           data.frame(txtinput[i], res, x[i,2:ncol(x)], stringsAsFactors = FALSE) #combine with the rest of input
 #         }
-        nodes = data.frame(stringsAsFactors = F)
+        nodes = data.frame(stringsAsFactors = FALSE)
         for(i in 1:length(txtinput)){
           res = formatNode.LIST(x=txtinput[i],y=nodetype,z=searchby)[,1:2] #get input attributes: id and gid
           nodes = rbind(nodes,data.frame(txtinput[i], res, x[i,2:ncol(x)], stringsAsFactors = FALSE)) #combine with the rest of input

@@ -89,7 +89,7 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
 #               }
               ntypestat = lapply(ntypels, function (x) data.frame(nl=x, row=curlRequest.TRANSACTION.row(paste0('MATCH (:Pathway)-[r:ANNOTATION]->(n:',x,') RETURN count(DISTINCT n)')), stringsAsFactors = FALSE))
               ntypestat = do.call(rbind, lapply(ntypestat, data.frame, stringsAsFactors=FALSE)) #total no. of entities
-              overDF = data.frame(stringsAsFactors = F)
+              overDF = data.frame(stringsAsFactors = FALSE)
               for(i in 1:nrow(subanno)){#overrepresentation analysis
                 totEnt = ntypestat[ntypestat$nl == subanno$nodelabel[i],2]
                 qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',subanno$nodelabel[i],') where ID(from) = ',subanno$id[i],' RETURN toString(ID(from)), labels(to), count(to)')
