@@ -69,8 +69,6 @@ fetchNetworkByGID.default <- function(from=NULL, to=NULL, fromtype, totype, relt
       if (class(tmparg) == "try-error") {
         stop("argument 'reltype' is not valid, choose one from the list: annotation,biochemical_reaction,catalysis,control,conversion,genetic_association,molecular_binding")
       }
-      require('doParallel') #load doParallel for opencpu
-      doParallel::registerDoParallel(cores = 2)
       #construct query
       maxkw = 500 #maximum keywords
       fromtype = Hmisc::capitalize(fromtype)
@@ -102,24 +100,29 @@ fetchNetworkByGID.default <- function(from=NULL, to=NULL, fromtype, totype, relt
 cat(qstring,"\n")
           paths = curlRequest.TRANSACTION(cypher=qstring)
         }else{
-          cat("Split queries for more than 500 nodes ...\n")
-          subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
-          paths = foreach(i=1:length(subinp), .combine=c) %dopar% {
-            qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
-cat(qstring,"\n")
-            curlRequest.TRANSACTION(cypher=qstring)
-          }
+          cat("Split queries for more than 500 nodes ...\nWarning: querying a large number of nodes will take long time. \n")
+#           subinp = split(txtinput, ceiling(seq_along(txtinput)/maxkw)) #split keywords
+#           paths = foreach(i=1:length(subinp), .combine=c) %dopar% {
+#             qstring = gsub("keyword", paste0("['",paste0(unlist(subinp[i]), collapse = "','"),"']"), querystring)
+# cat(qstring,"\n")
+#             curlRequest.TRANSACTION(cypher=qstring)
+#           }
+          paths = lapply(txtinput, function (x) curlRequest.TRANSACTION(cypher=gsub("keyword", paste0("['",paste0(x, collapse = "','"),"']"), querystring)))
+          paths = unlist(paths, recursive = FALSE)
         }
       }else{
-        cat("Register parallel computing ...\nWarning: querying a large network will take long time. \n")
-        path = foreach(i=1:length(from), .combine=rbind) %dopar% {
-          foreach(j=1:length(to)) %dopar% {
-            qstring = gsub("keyfrom", from[i], querystring)
-            qstring = gsub("keyto", to[j], qstring)
-            cat(qstring,"\n")
-            curlRequest.TRANSACTION(cypher=qstring)
-          }
-        }
+        cat("Querying from combination of nodes ...\nWarning: querying a large number of nodes will take long time. \n")
+#         path = foreach(i=1:length(from), .combine=rbind) %dopar% {
+#           foreach(j=1:length(to)) %dopar% {
+#             qstring = gsub("keyfrom", from[i], querystring)
+#             qstring = gsub("keyto", to[j], qstring)
+#             cat(qstring,"\n")
+#             curlRequest.TRANSACTION(cypher=qstring)
+#           }
+#         }
+#         paths = unlist(path, recursive = FALSE)
+        ft = expand.grid(from,to)
+        path = apply(ft, 1, function (x) curlRequest.TRANSACTION(cypher=gsub("keyfrom", x[1], gsub("keyto", x[2], querystring))))
         paths = unlist(path, recursive = FALSE)
       }
       formatNetworkOutput(paths,returnas)

@@ -33,13 +33,12 @@ fetchRelationship <- function(url, returnas="dataframe") UseMethod("fetchRelatio
 fetchRelationship.default <- function(url, returnas="dataframe"){
   out <- tryCatch(
   {
-    require('doParallel')
-    doParallel::registerDoParallel(cores = 2)
     rel = curlRequest.URL(url)
     reldf = data.frame(t(sapply(rel,c)))
     #cat("Format and returning relationship of size ",nrow(reldf)," ...\n")
-    pathls = foreach(i=1:nrow(reldf), .combine=rbind) %dopar% {
-      formatPathOutput(reldf[i,])
+    pathls = data.frame(stringsAsFactors = FALSE)
+    for(i in 1:nrow(reldf)){
+      pathls = rbind(pathls,formatPathOutput(reldf[i,]))
     }
     ## output
     switch(returnas,
