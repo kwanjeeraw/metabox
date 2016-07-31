@@ -1,11 +1,13 @@
-# mETABOX
+# metabox installation method.
+
+In R, run following code.
 
 ```r
 if (!require("devtools"))
   install.packages("devtools")
-devtools::install_github("kwanjeeraw/mETABOX")
+devtools::install_github("kwanjeeraw/metabox")
 
-library(mETABOX)
+library(metabox)
 library(opencpu)
-opencpu$browse('library/mETABOX/www') 
+opencpu$browse('library/metabox/www') 
 ```
