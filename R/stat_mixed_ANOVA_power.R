@@ -108,7 +108,7 @@ stat_mixed_ANOVA_power = function(e,p,dta,sig.level = 0.05, desired_power = 0.8,
   power_sampleSize = t(power_sampleSize)
   power_sampleSize = data.frame(power_sampleSize)
 
-  colnames(power_sampleSize) = c("Interaction_term_power",paste0("Interaction_term_Size_Required_When_Desired_Power_is",desired_power*100,"_percent"),
+  colnames(power_sampleSize) = c("Interaction_term_power",paste0("Interaction_term_Size_Required_at_Power_",desired_power*100,"_percent"),
                                  paste0(factor_name[1],"_term_power"),paste0(factor_name[1],"Size_at_Power_",desired_power*100,"_percent"),
                                  paste0(factor_name[2],"_term_power"),paste0(factor_name[2],"Size_at_Power_",desired_power*100,"_percent"))
 
