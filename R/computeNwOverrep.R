@@ -93,7 +93,8 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
               for(i in 1:nrow(subanno)){#overrepresentation analysis
                 totEnt = ntypestat[ntypestat$nl == subanno$nodelabel[i],2]
                 qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',subanno$nodelabel[i],') where ID(from) = ',subanno$id[i],' RETURN toString(ID(from)), labels(to), count(to)')
-                annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, col.names = c('id','nodelabel','count'), stringsAsFactors = FALSE) #get annotation info from db
+                annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, stringsAsFactors = FALSE) #get annotation info from db
+                colnames(annosize) = c('id','nodelabel','count')
                 blackAnno = totEnt - annosize$count #no. of entities not in the annotation term
                 pval = phyper(subanno$count[i]-1, annosize$count, blackAnno, nrow(nodelist), lower.tail = F) #hypergeometric test
                 hyp = data.frame(id=as.character(subanno$id[i]), p=pval, no_of_entities=subanno$count[i],

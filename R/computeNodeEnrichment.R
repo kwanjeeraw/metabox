@@ -126,7 +126,8 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
           ptwls = unique(era$id) #list of pathways
           ptwstat = lapply(ptwls, function(x){#get total number of annotated nodes of a pathway
             qstring = paste0('MATCH (from:Pathway)-[r:ANNOTATION]->(to:',nodetype,') where ID(from) = ',x,' RETURN toString(ID(from)), labels(to), count(to)')
-            annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, col.names = c('id','nodelabel','annotation_size'), stringsAsFactors = FALSE) #get annotation info from db
+            annosize = as.data.frame(curlRequest.TRANSACTION.row(qstring)[[1]]$row, stringsAsFactors = FALSE) #get annotation info from db
+            colnames(annosize) = c('id','nodelabel','annotation_size')
             annosize
           })
           ptwstat = plyr::ldply(ptwstat, data.frame)
