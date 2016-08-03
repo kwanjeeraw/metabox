@@ -14,7 +14,7 @@ function JSONToTabConvertor(JSONData,ShowHeader) {
         }
         row = row.slice(0, -1);
         //append Label row with line break
-        CSV += row + '\n';
+        CSV += row + '\r\n';
     }
     //1st loop is to extract each row
     for (var i = 0; i < arrData.length; i++) {
@@ -25,7 +25,7 @@ function JSONToTabConvertor(JSONData,ShowHeader) {
         }
         row = row.slice(0, -1);
         //add a line break after each row
-        CSV += row + '\n';
+        CSV += row + '\r\n';
     }
     if (CSV == '') {        
         alert("Invalid data");
