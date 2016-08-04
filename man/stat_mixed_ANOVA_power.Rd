@@ -5,7 +5,7 @@
 \title{stat_mixed_ANOVA_power}
 \usage{
 stat_mixed_ANOVA_power(e, p, dta, sig.level = 0.05, desired_power = 0.8,
-  factor_name, epsilon = 1, cl)
+  factor_name, epsilon = 0.5, cl)
 }
 \arguments{
 \item{result_stat:}{it must be the basic statistics result.}
