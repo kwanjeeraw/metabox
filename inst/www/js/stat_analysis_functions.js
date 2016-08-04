@@ -66,9 +66,10 @@ uploaddata = function(){
 
 
 if(text.includes("one way ANOVA")){
-  onewayANOVAdescription();
+  ANOVA_disc();
 }else if(text.includes("independent t test")){
-  ttestdescription();
+  //ttestdescription();
+  t_test_disc();
 }else if(text.includes("two way ANOVA")){
   twowayANOVAdescription();
 }else if(text.includes("one way repeated ANOVA")){
@@ -80,7 +81,11 @@ if(text.includes("one way ANOVA")){
 }else if(text.includes("mixed two way anova")){
   mixedANOVAdescription();
 }
+
+
+
 loadxeditable_elements();
+
 
 hideSpinner(loadSpinner);
         });
@@ -135,32 +140,12 @@ $("#ViewData").collapse('show');
 }
 
 
-
+var Stat_Result = {}
 
 
 
 
 applystatistics = function(){
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   var loadSpinner = showSpinner();
   // change the DATA. Remove the outlier.
   var req=ocpu.call("stat_rm_sample",{
@@ -172,15 +157,14 @@ applystatistics = function(){
       eData = obj.expression;
       fData = obj.feature;
       pData = obj.phenotype;
-  var str = $("#Normalization_To_Be_Applied").val();
-
 
 
   var req = ocpu.call("stat_norm",{
     e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
-  sample_index:$("#Samples_To_Be_Deleted").val().split(','),
+  sample_index:$("#Samples_To_Be_Deleted").text().split(','),
   mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
   mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
+
   sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
   sample_specific_weight : sample_specific_weight,sample_specific_multiplyordevide : sample_specific_multiplyordevide,
   KnownorUnknown:KnownorUnknown.value,mTICunchanged:mTICunchanged,Batchunchanged:Batchunchanged,
@@ -198,8 +182,6 @@ applystatistics = function(){
     e_ori = obj2.expression_only_rm_outlier;
     p_ori = obj2.phenotype_only_rm_outlier;
 
-console.log(ttestmethod.value+ttestFDRmethod.value+nonpara_ttestmethod.value+nonpara_ttestFDRmethod.value);
-
     var req=ocpu.call("stat_hypo_test",{
     e:eData,
     f:fData,
@@ -212,11 +194,11 @@ console.log(ttestmethod.value+ttestFDRmethod.value+nonpara_ttestmethod.value+non
     repeated_factor_name:$("#repeated_factor").val(),
     need_power:document.getElementById('power_analysis_needed').checked,
     desired_power: pwr,
+ttestmethod : ttestmethod, ttestcorrection : ttestcorrection, nonparattestmethod : nonparattestmethod, nonparattestcorrection : nonparattestcorrection
 
 
 
-
-                     onewayANOVAmethod:onewayANOVAmethod.value,nonpara_onewayANOVAmethod:nonpara_onewayANOVAmethod.value,onewayANOVAposthocmethod:onewayANOVAposthocmethod.value,nonpara_onewayANOVAposthocmethod:nonpara_onewayANOVAposthocmethod.value,
+ /*                    onewayANOVAmethod:onewayANOVAmethod.value,nonpara_onewayANOVAmethod:nonpara_onewayANOVAmethod.value,onewayANOVAposthocmethod:onewayANOVAposthocmethod.value,nonpara_onewayANOVAposthocmethod:nonpara_onewayANOVAposthocmethod.value,
 
                      ttestmethod:ttestmethod.value,ttestFDRmethod:ttestFDRmethod.value,nonpara_ttestmethod:nonpara_ttestmethod.value,nonpara_ttestFDRmethod:nonpara_ttestFDRmethod.value,
 
@@ -241,7 +223,7 @@ console.log(ttestmethod.value+ttestFDRmethod.value+nonpara_ttestmethod.value+non
 
                      maineffectpairedttestposthocmethod2 : maineffectpairedttestposthocmethod2.value,nonpara_maineffectpairedttestposthocmethod2 : nonpara_maineffectpairedttestposthocmethod2.value
 
-
+*/
 
   },function(session4){
     //$("#StudyDesign").collapse('hide');
@@ -258,20 +240,20 @@ console.log(ttestmethod.value+ttestFDRmethod.value+nonpara_ttestmethod.value+non
                 $("#continue_analysis").collapse('show');
 
 
-
-
-
               session4.getObject(function(obj3){
 
-              $("#Statistics_Result").empty()
-             Stat_Result = drawTable('#Statistics_Result',obj3, "Univariate Statistical Result","feature_index","600px");
-allow = false;
+            $("#Statistics_Result").empty()
+
+
+
+            drawTable('#Statistics_Result',obj3, "Univariate Statistical Result","feature_index","600px");
+
+
 
 
                });
 
-              //Stat_Result = drawTable('#Statistics_Result',obj3, "Univariate Statistical Result","feature_index");
-                            download_address = session4.getLoc() + "R/.val/csv";
+             download_address = session4.getLoc() + "R/.val/csv";
               $("#download_statistical_result_button").empty();
               var r= $('<a download = "file.csv" href='+download_address+' class="btn btn-primary btn-lg active" role="button">Download Statistical Analysis Result</a>');
               $("#download_statistical_result_button").append(r);
@@ -320,6 +302,12 @@ session4.getFile("messages_hypo_test.txt", function(text){
   });
     }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
 }
+
+
+
+
+
+
 function select_samplenormalizationSample_specific(pData_column){
 $("#applynormalization").removeClass("disabled");
   select_body = '<option>'+pData_column[0]+'</option>'
@@ -331,6 +319,7 @@ $("#applynormalization").removeClass("disabled");
     select = select_start+select_body+select_end
 
 bootbox.dialog({
+   closeButton: false,
                 title: "Which Column is Weight Facotr?",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12"> ' +
@@ -357,12 +346,33 @@ bootbox.dialog({
                             sample_specific_weight = $('#weight').val();
                             sample_specific_multiplyordevide = $("input[name='multiplyordevide']:checked").val()
                           $( "#samplenormalizationSample_specific_column" ).text("using " + sample_specific_weight );
-
+console.log(samplenormalization_method)
                           samplenormalization_method = 'Sample_specific'
-                          if(allow){
-                            applystatistics();
-                          }
+                          //$("#samplenormalizationmethod").text(samplenormalization_method);
+                          $("#applynormalization").removeClass("disabled");
                         }
+                    },
+                    cancel:{
+                      label:"Cancel",
+                      callback:function(){
+                        if(samplenormalization_method=="None"){
+                          $("#samplenormalizationnone").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Sample_specific"){
+$("#samplenormalizationSample_specific").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="mTIC"){
+$("#samplenormalizationmTIC").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Loess"){
+$("#samplenormalizationloess").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Batch Median"){
+$("#samplenormalizationBatchMedian").prop("checked", true)
+                        }
+
+
+                      }
                     }
                 }
             }
@@ -398,7 +408,7 @@ $("#applynormalization").removeClass("disabled");
     select_end3 = '</select>';
     select3 = select_start3+select_body3+select_end3;
 
-bootbox.dialog({
+bootbox.dialog({   closeButton: false,
                 title: "Which Column is QC, Batch and Time Indicator?",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12"> ' +
@@ -430,11 +440,31 @@ console.log($('#QCindicator').val());
                           $( "#Loess_column" ).text("QC: " + QCIndicator +"; Batch: "+BatchIndicator + "; Time: " +TimeIndicator +".");
 
                           samplenormalization_method = 'Loess'
-                          if(allow){
-                            applystatistics();
-                          }
-
+//$("#samplenormalizationmethod").text(samplenormalization_method);
+$("#applynormalization").removeClass("disabled");
                         }
+                    },
+                    cancel:{
+                      label:"Cancel",
+                      callback:function(){
+                        if(samplenormalization_method=="None"){
+                          $("#samplenormalizationnone").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Sample_specific"){
+$("#samplenormalizationSample_specific").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="mTIC"){
+$("#samplenormalizationmTIC").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Loess"){
+$("#samplenormalizationloess").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Batch Median"){
+$("#samplenormalizationBatchMedian").prop("checked", true)
+                        }
+
+
+                      }
                     }
                 }
             }
@@ -456,7 +486,7 @@ $("#applynormalization").removeClass("disabled");
     select_end = '</select>';
     select = select_start+select_body+select_end;
 
-bootbox.dialog({
+bootbox.dialog({   closeButton: false,
                 title: "Which Column is Batch Indicator?",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12"> ' +
@@ -474,13 +504,35 @@ bootbox.dialog({
                           Batchunchanged = BatchIndicator===$('#BatchIndicator').val();//if later equals the KnownorKnown, this means that nothing changed so the mTIC did should stays the same.
                             BatchIndicator = $('#BatchIndicator').val();
                           $( "#Batch_column" ).text("Batch Indicator: " + BatchIndicator);
+
                           samplenormalization_method = 'Batch Median'
-                          if(allow){
-                            applystatistics();
-                          }
+//$("#samplenormalizationmethod").text(samplenormalization_method);
+$("#applynormalization").removeClass("disabled");
                         }
                     }
-                }
+                },
+                    cancel:{
+                      label:"Cancel",
+                      callback:function(){
+                        if(samplenormalization_method=="None"){
+                          $("#samplenormalizationnone").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Sample_specific"){
+$("#samplenormalizationSample_specific").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="mTIC"){
+$("#samplenormalizationmTIC").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Loess"){
+$("#samplenormalizationloess").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Batch Median"){
+$("#samplenormalizationBatchMedian").prop("checked", true)
+                        }
+
+
+                      }
+                    }
             }
         );
 }
@@ -496,7 +548,7 @@ $("#applynormalization").removeClass("disabled");
     select_end = '</select>';
     select = select_start+select_body+select_end
 
-bootbox.dialog({
+bootbox.dialog({   closeButton: false,
                 title: "Which Column is Known/Unknown Indicator?",
                 message: '<div class="row">  ' +
                     '<div class="col-md-12"> ' +
@@ -515,18 +567,51 @@ bootbox.dialog({
                             KnownorUnknown.value = $('#mTICindicator').val();
                           $( "#mTIC_column" ).text("Known/Unknown Indicator: " + KnownorUnknown.value );
 
-                          samplenormalization_method = 'mTIC'
-                          if(allow){
-                            applystatistics();
-                          }
 
+                          samplenormalization_method = 'mTIC'
+//$("#samplenormalizationmethod").text(samplenormalization_method);
+$("#applynormalization").removeClass("disabled");
                         }
 
+                    },
+                    cancel:{
+                      label:"Cancel",
+                      callback:function(){
+                        if(samplenormalization_method=="None"){
+                          $("#samplenormalizationnone").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Sample_specific"){
+$("#samplenormalizationSample_specific").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="mTIC"){
+$("#samplenormalizationmTIC").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Loess"){
+$("#samplenormalizationloess").prop("checked", true)
+                        }
+                        if(samplenormalization_method=="Batch Median"){
+$("#samplenormalizationBatchMedian").prop("checked", true)
+                        }
+
+
+                      }
                     }
                 }
             }
         );
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -548,7 +633,7 @@ function formatTableFields(jsonData){
     }
     return colnames;
 }
-
+var table = $('#Statistics_Result').DataTable();
 //@function draw table
 //@param id id element
 //@param data array of json objects
@@ -561,9 +646,10 @@ function drawTable(id, data, filename,idSrc,tableheight="450px") {
         fields: formatTableFields(data[0])
     } );
 
+	table.destroy();
+$(id).empty();
 
-
-	 $(id).DataTable( {
+	 table = $(id).DataTable( {
 	   dom: 'Blfrtip',
 		destroy: true,
 
@@ -869,415 +955,6 @@ function errormsg(text){
 
 
 
-
-
-
-
-    /*$('#status').editable({
-        value: 2,
-        source: [
-              {value: 1, text: 'Active'},
-              {value: 2, text: 'Blocked'},
-              {value: 3, text: 'Deleted'}
-           ],
-        success: function(response, newValue) {
-        a = newValue//update backbone model
-    }
-    });
-    $('#status').click(function(){
-    console.log(a);
-    })*/
-
-var onewayANOVAmethod = {value : 'Welch ANOVA'};
-var nonpara_onewayANOVAmethod = {value : 'H test'};
-var onewayANOVAposthocmethod = {value : 'games.howell'};
-var nonpara_onewayANOVAposthocmethod = {value : 'Dunn'};
-var ttestmethod = {value : 'Welch t test'};
-var ttestFDRmethod = {value : 'fdr'};
-var nonpara_ttestmethod = {value : 'U test'};
-var nonpara_ttestFDRmethod = {value : 'fdr'};
-var twowayANOVAmethod = {value:"Two Way ANOVA"}
-var maineffectANOVAmethod1 = {value:"Welch ANOVA"}
-var maineffectANOVAmethod2 = {value:"Welch ANOVA"}
-var maineffectANOVAposthocmethod1 = {value:"games.howell"}
-var maineffectANOVAposthocmethod2 = {value:"games.howell"}
-var simplemaineffectANOVAmethod1 = {value:"Welch ANOVA"}
-var simplemaineffectANOVAmethod2 = {value:"Welch ANOVA"}
-var simplemaineffectANOVAposthocmethod1 = {value:"games.howell"}
-var simplemaineffectANOVAposthocmethod2 = {value:"games.howell"}
-var nonpara_maineffectANOVAmethod1 = {value:"H test"}
-var nonpara_maineffectANOVAmethod2 = {value:"H test"}
-var nonpara_maineffectANOVAposthocmethod1 = {value:"games.howell"}
-var nonpara_maineffectANOVAposthocmethod2 = {value:"games.howell"}
-var nonpara_simplemaineffectANOVAmethod1 = {value:"H test"}
-var nonpara_simplemaineffectANOVAmethod2 = {value:"H test"}
-var nonpara_simplemaineffectANOVAposthocmethod1 = {value:"games.howell"}
-var nonpara_simplemaineffectANOVAposthocmethod2 = {value:"games.howell"}
-var maineffectttestmethod1 = {value:"Welch t test"}
-var maineffectttestmethod2 = {value:"Welch t test"}
-var maineffectttestposthocmethod1 = {value:"fdr"}
-var maineffectttestposthocmethod2 = {value:"fdr"}
-var simplemaineffectttestmethod1 = {value:"Welch t test"}
-var simplemaineffectttestmethod2 = {value:"Welch t test"}
-var simplemaineffectttestposthocmethod1 = {value:"fdr"}
-var simplemaineffectttestposthocmethod2 = {value:"fdr"}
-var nonpara_maineffectttestmethod1 = {value:"U test"}
-var nonpara_maineffectttestmethod2 = {value:"U test"}
-var nonpara_maineffectttestposthocmethod1 = {value:"fdr"}
-var nonpara_maineffectttestposthocmethod2 = {value:"fdr"}
-var nonpara_simplemaineffectttestmethod1 = {value:"U test"}
-var nonpara_simplemaineffectttestmethod2 = {value:"U test"}
-var nonpara_simplemaineffectttestposthocmethod1 = {value:"fdr"}
-var nonpara_simplemaineffectttestposthocmethod2 = {value:"fdr"}
-
-var twowayrepeatedANOVAmethod = {value:"Two Way Repeated ANOVA"}
-var maineffectrepeatedANOVAmethod1 = {value:"rANOVA"}
-var maineffectrepeatedANOVAmethod2 = {value:"rANOVA"}
-var maineffectrepeatedANOVAposthocmethod1 = {value:"paired+bonf"}
-var maineffectrepeatedANOVAposthocmethod2 = {value:"paired+bonf"}
-var simplemaineffectrepeatedANOVAmethod1 = {value:"rANOVA"}
-var simplemaineffectrepeatedANOVAmethod2 = {value:"rANOVA"}
-var simplemaineffectrepeatedANOVAposthocmethod1 = {value:"paired+bonf"}
-var simplemaineffectrepeatedANOVAposthocmethod2 = {value:"paired+bonf"}
-var nonpara_maineffectrepeatedANOVAmethod1 = {value:"friedman"}
-var nonpara_maineffectrepeatedANOVAmethod2 = {value:"friedman"}
-var nonpara_maineffectrepeatedANOVAposthocmethod1 = {value:"nonpara_paired+bonf"}
-var nonpara_maineffectrepeatedANOVAposthocmethod2 = {value:"nonpara_paired+bonf"}
-var nonpara_simplemaineffectrepeatedANOVAmethod1 = {value:"friedman"}
-var nonpara_simplemaineffectrepeatedANOVAmethod2 = {value:"friedman"}
-var nonpara_simplemaineffectrepeatedANOVAposthocmethod1 = {value:"nonpara_paired+bonf"}
-var nonpara_simplemaineffectrepeatedANOVAposthocmethod2 = {value:"nonpara_paired+bonf"}
-var maineffectpairedttestmethod1 = {value:"paired t test"}
-var maineffectpairedttestmethod2 = {value:"paired t test"}
-var maineffectpairedttestposthocmethod1 = {value:"fdr"}
-var maineffectpairedttestposthocmethod2 = {value:"fdr"}
-var simplemaineffectpairedttestmethod1 = {value:"paired t test"}
-var simplemaineffectpairedttestmethod2 = {value:"paired t test"}
-var simplemaineffectpairedttestposthocmethod1 = {value:"fdr"}
-var simplemaineffectpairedttestposthocmethod2 = {value:"fdr"}
-var nonpara_maineffectpairedttestmethod1 = {value:"Wil test"}
-var nonpara_maineffectpairedttestmethod2 = {value:"Wil test"}
-var nonpara_maineffectpairedttestposthocmethod1 = {value:"fdr"}
-var nonpara_maineffectpairedttestposthocmethod2 = {value:"fdr"}
-var nonpara_simplemaineffectpairedttestmethod1 = {value:"Wil test"}
-var nonpara_simplemaineffectpairedttestmethod2 = {value:"Wil test"}
-var nonpara_simplemaineffectpairedttestposthocmethod1 = {value:"fdr"}
-var nonpara_simplemaineffectpairedttestposthocmethod2 = {value:"fdr"}
-var mainSpher_Corr1 = {value:"GG"}
-var mainSpher_Corr2 = {value:"GG"}
-var simplemainSpher_Corr1 = {value:"GG"}
-var simplemainSpher_Corr2 = {value:"GG"}
-
-
-var onewayrepeatedANOVAmethod = {value:"rANOVA"}
-var onewayrepeatedANOVAposthocmethod = {value:"paired+bonf"}
-var onewaySpher_Corr = {value:"GG"}
-var nonpara_onewayrepeatedANOVAmethod = {value:"friedman"}
-var nonpara_onewayrepeatedANOVAposthocmethod = {value:"nonpara_paired+bonf"}
-
-var pairedttestmethod = {value:"paired t test"}
-var pairedttestFDRmethod = {value:"fdr"}
-var nonpara_pairedttestmethod = {value:"Wil test"}
-var nonpara_pairedttestFDRmethod = {value:"fdr"}
-// method specification.
-// id = method_description.
-
-
-onewayANOVAdescription = function(){
-
-$("#method_description").html(
-'Use <a href="#" id="onewayANOVAmethod" data-type="select"  data-title="Select ANOVA method"></a>'+
-' on <strong>' +$("#independent_factor").val()+ '</strong>. '+
-'<br>Use <a href="#" id="onewayANOVAposthocmethod" data-type="select"  data-title="Select post hoc method"></a>'+
-' to compare two-group combination of <strong>' + pComponents[$("#independent_factor").val()[0]].join(",")+"</strong>. " +
-
-'<br> Use '+
-'<a href="#" id="nonpara_onewayANOVAmethod" data-type="select" data-title="Select non-parametric ANOVA method"></a>, a non-parametric  test, ' +
-' on <strong>' +$("#independent_factor").val()+ '</strong>. '+
-'<br>Use <a href="#" id="nonpara_onewayANOVAposthocmethod" data-type="select"  data-title="Select non-parametric post hoc method"></a>'+
-' to compare two-group combination of <strong>' + pComponents[$("#independent_factor").val()[0]].join(",")+"</strong>. "
-)
-
-
-
-
-}
-
-ttestdescription = function(){
-
-$("#method_description").html(
-'Use <a href="#" id="ttestmethod" data-type="select"  data-title="Select t test method"></a>'+
-' on <strong>' +$("#independent_factor").val()+ '</strong>' +
-' to compare <strong>'+
-pComponents[$("#independent_factor").val()[0]].join("</strong> and <strong>")+"</strong>. " +
-
-'<br>Use <a href="#" id="ttestFDRmethod" data-type="select"  data-title="Select FDR correction method"></a>'+
-' to correct for multiple comparisons.' +
-
-'<br> Use non-parametric  test, '+
-'<a href="#" id="nonpara_ttestmethod" data-type="select" data-title="Select non-parametric t test method"></a>' +
-' on <strong>' +$("#independent_factor").val()+ '</strong>'+
-' to compare <strong>'+
-pComponents[$("#independent_factor").val()[0]].join("</strong> and <strong>") +"</strong>. "+
-'<br>Use <a href="#" id="nonpara_ttestFDRmethod" data-type="select" data-title="Select FDR correction method"></a> on non-parametric test result' +
-' to correct for the multiple comparisons.'
-)
-
-
-}
-
-twowayANOVAdescription = function(){
-
-
-
-/*'Subjects were classified into <strong>'+
-pComponents[$("#independent_factor").val()[0]].join("</strong> and <strong>")+"</strong>. " +*/
-// Main Effect
-if(pComponents[$("#independent_factor").val()[0]].length>2){
-  Main_Effect1 = '<br>Use <a href="#" id="maineffectANOVAmethod1" data-type="select"  data-title="Select ANOVA method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.'+
-  ' Then use post hoc analysis procedure <a href="#" id="maineffectANOVAposthocmethod1" data-type="select"  data-title="Select post hoc method for first main effect"></a>'+
-'<br>Use non-parametric test, <a href="#" id="nonpara_maineffectANOVAmethod1" data-type="select"  data-title="Select non-parametric ANOVA method for first main effect"></a>' + ' on main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.'+
-  ' Then use post hoc anlaysis procedure of <a href="#" id="nonpara_maineffectANOVAposthocmethod1" data-type="select"  data-title="Select non-parametric post hoc method for first main effect"></a>'
-}else{
-  Main_Effect1 = '<br> Use <a href="#" id="maineffectttestmethod1" data-type="select"  data-title="Select t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.'+
-  ' Then use <a href="#" id="maineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first main effect"></a>'+' to ajust the false discovery rate (FDR).'+
-'<br>Use non-parametric test <a href="#" id="nonpara_maineffectttestmethod1" data-type="select"  data-title="Select non-parametric t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>' +
-  ' Then use <a href="#" id="nonpara_maineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first main effect"></a>'+ ' to ajust the false discovery rate (FDR).'
-}
-
-if(pComponents[$("#independent_factor").val()[0]].length>2){
-  Simple_Main_Effect1 = '<br> Use <a href="#" id="simplemaineffectANOVAmethod1" data-type="select"  data-title="Select ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong> controlling at each level of ' + $("#independent_factor").val()[1] + "," +
-  ' followed by post hoc analysis procedure <a href="#" id="simplemaineffectANOVAposthocmethod1" data-type="select"  data-title="Select post hoc method for first simple main effect"></a>'+
-'<br>Use non-parametric test <a href="#" id="nonpara_simplemaineffectANOVAmethod1" data-type="select"  data-title="Select non-parametric ANOVA method for first simple main effect"></a>' + 'on simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong> controlling at each level of '+$("#independent_factor").val()[1] + "." +
-  ' followed by post hoc analysis procedure <a href="#" id="nonpara_simplemaineffectANOVAposthocmethod1" data-type="select"  data-title="Select non-parametric post hoc method for first simple main effect"></a>'
-}else{
-  Simple_Main_Effect1 = '<br> Use <a href="#" id="simplemaineffectttestmethod1" data-type="select"  data-title="Select t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong> at each level of ' +$("#independent_factor").val()[1] +
-  ', followed by <a href="#" id="simplemaineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '+
-
-'<br>Use non parametric test, <a href="#" id="nonpara_simplemaineffectttestmethod1" data-type="select"  data-title="Select non-parametric t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.' +
-  ' followed by <a href="#" id="nonpara_simplemaineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '
-
-}
-
-
-
-
-if(pComponents[$("#independent_factor").val()[1]].length>2){
-  Main_Effect2 = '<br>Use <a href="#" id="maineffectANOVAmethod2" data-type="select"  data-title="Select ANOVA method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[1] + '</strong>.'+
-  ' Then use post hoc analysis procedure <a href="#" id="maineffectANOVAposthocmethod2" data-type="select"  data-title="Select post hoc method for first main effect"></a>'+
-'<br>Use non-parametric test, <a href="#" id="nonpara_maineffectANOVAmethod2" data-type="select"  data-title="Select non-parametric ANOVA method for first main effect"></a>' + ' on main effect of <strong>' + $("#independent_factor").val()[1] + '</strong>.'+
-  ' Then use post hoc anlaysis procedure of <a href="#" id="nonpara_maineffectANOVAposthocmethod2" data-type="select"  data-title="Select non-parametric post hoc method for first main effect"></a>'
-}else{
-  Main_Effect2 = '<br> Use <a href="#" id="maineffectttestmethod2" data-type="select"  data-title="Select t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[1] + '</strong>.'+
-  ' Then use <a href="#" id="maineffectttestposthocmethod2" data-type="select"  data-title="Select FDR for first main effect"></a>'+' to ajust the false discovery rate (FDR).'+
-'<br>Use non-parametric test <a href="#" id="nonpara_maineffectttestmethod2" data-type="select"  data-title="Select non-parametric t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[1] + '</strong>' +
-  ' Then use <a href="#" id="nonpara_maineffectttestposthocmethod2" data-type="select"  data-title="Select FDR for first main effect"></a>'+ ' to ajust the false discovery rate (FDR).'
-}
-
-if(pComponents[$("#independent_factor").val()[1]].length>2){
-  Simple_Main_Effect2 = '<br> Use <a href="#" id="simplemaineffectANOVAmethod2" data-type="select"  data-title="Select ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#independent_factor").val()[1] + '</strong> controlling at each level of ' + $("#independent_factor").val()[1] + "," +
-  ' followed by post hoc analysis procedure <a href="#" id="simplemaineffectANOVAposthocmethod2" data-type="select"  data-title="Select post hoc method for first simple main effect"></a>'+
-'<br>Use non-parametric test <a href="#" id="nonpara_simplemaineffectANOVAmethod2" data-type="select"  data-title="Select non-parametric ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#independent_factor").val()[1] + '</strong> controlling at each level of '+$("#independent_factor").val()[1] + "." +
-  ' followed by post hoc analysis procedure <a href="#" id="nonpara_simplemaineffectANOVAposthocmethod2" data-type="select"  data-title="Select non-parametric post hoc method for first simple main effect"></a>'
-}else{
-  Simple_Main_Effect2 = '<br> Use <a href="#" id="simplemaineffectttestmethod2" data-type="select"  data-title="Select t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#independent_factor").val()[1] + '</strong> at each level of ' +$("#independent_factor").val()[2] +
-  ', followed by <a href="#" id="simplemaineffectttestposthocmethod2" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '+
-
-'<br>Use non parametric test, <a href="#" id="nonpara_simplemaineffectttestmethod2" data-type="select"  data-title="Select non-parametric t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#independent_factor").val()[1] + '</strong>.' +
-  ' followed by <a href="#" id="nonpara_simplemaineffectttestposthocmethod2" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '
-}
-
-$("#method_description").html(
-'Use <a href="#" id="twowayANOVAmethod" data-type="select"  data-title="Select two way ANOVA method"></a>'+
-' for <strong>Interaction term</strong> between <strong>' + $("#independent_factor").val()[0]+ '</strong> and <strong>'+$("#independent_factor").val()[1]+'</strong>. ' +
-Main_Effect1 + Simple_Main_Effect1 +  Main_Effect2 + Simple_Main_Effect2)
-}
-
-
-
-
-twowayrepeatedANOVAdescription = function(){
-
-
-/*'Subjects were classified into <strong>'+
-pComponents[$("#repeated_factor").val()[0]].join("</strong> and <strong>")+"</strong>. " +*/
-// Main Effect
-if(pComponents[$("#repeated_factor").val()[0]].length>2){
-  Main_Effect1 = '<br>Use <a href="#" id="maineffectrepeatedANOVAmethod1" data-type="select"  data-title="Select repeated ANOVA method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.'+
-  ' with a <a href="#" id="mainSpher_Corr1" data-type="select"  data-title="Correct for sphericity"></a> correction.'+
-'<br>Use non-parametric test, <a href="#" id="nonpara_maineffectrepeatedANOVAmethod1" data-type="select"  data-title="Select non-parametric repeated ANOVA method for first main effect"></a>' + ' on main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.'+
-  ' Then use post hoc anlaysis procedure of <a href="#" id="nonpara_maineffectrepeatedANOVAposthocmethod1" data-type="select"  data-title="Select non-parametric post hoc method for first main effect"></a>'
-}else{
-  Main_Effect1 = '<br> Use <a href="#" id="maineffectpairedttestmethod1" data-type="select"  data-title="Select t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.'+
-  ' Then use <a href="#" id="maineffectpairedttestposthocmethod1" data-type="select"  data-title="Select FDR for first main effect"></a>'+' to ajust the false discovery rate (FDR).'+
-'<br>Use non-parametric test <a href="#" id="nonpara_maineffectpairedttestmethod1" data-type="select"  data-title="Select non-parametric t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>' +
-  ' Then use <a href="#" id="nonpara_maineffectpairedttestposthocmethod1" data-type="select"  data-title="Select FDR for first main effect"></a>'+ ' to ajust the false discovery rate (FDR).'
-}
-
-if(pComponents[$("#repeated_factor").val()[0]].length>2){
-  Simple_Main_Effect1 = '<br> Use <a href="#" id="simplemaineffectrepeatedANOVAmethod1" data-type="select"  data-title="Select repeated ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong> controlling at each level of ' + $("#repeated_factor").val()[1] + "," +
-  ' with a <a href="#" id="simplemainSpher_Corr1" data-type="select"  data-title="Correct for sphericity"></a> correction.'+
-'<br>Use non-parametric test <a href="#" id="nonpara_simplemaineffectrepeatedANOVAmethod1" data-type="select"  data-title="Select non-parametric repeated ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong> controlling at each level of '+$("#repeated_factor").val()[1] + ", " +
-  ' followed by post hoc analysis procedure <a href="#" id="nonpara_simplemaineffectrepeatedANOVAposthocmethod1" data-type="select"  data-title="Select non-parametric post hoc method for first simple main effect"></a>'
-}else{
-  Simple_Main_Effect1 = '<br> Use <a href="#" id="simplemaineffectpairedttestmethod1" data-type="select"  data-title="Select t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong> at each level of ' +$("#repeated_factor").val()[1] +
-  ', followed by <a href="#" id="simplemaineffectpairedttestposthocmethod1" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '+
-
-'<br>Use non parametric test, <a href="#" id="nonpara_simplemaineffectpairedttestmethod1" data-type="select"  data-title="Select non-parametric t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.' +
-  ' followed by <a href="#" id="nonpara_simplemaineffectpairedttestposthocmethod1" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '
-
-}
-
-
-
-
-if(pComponents[$("#repeated_factor").val()[1]].length>2){
-  Main_Effect2 = '<br>Use <a href="#" id="maineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select repeated ANOVA method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong>.'+
-  ' with a <a href="#" id="mainSpher_Corr2" data-type="select"  data-title="Correct for sphericity"></a> correction.'+
-'<br>Use non-parametric test, <a href="#" id="nonpara_maineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select non-parametric repeated ANOVA method for first main effect"></a>' + ' on main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong>.'+
-  ' Then use post hoc anlaysis procedure of <a href="#" id="nonpara_maineffectrepeatedANOVAposthocmethod2" data-type="select"  data-title="Select non-parametric post hoc method for first main effect"></a>'
-}else{
-  Main_Effect2 = '<br> Use <a href="#" id="maineffectpairedttestmethod2" data-type="select"  data-title="Select t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong>.'+
-  ' Then use <a href="#" id="maineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first main effect"></a>'+' to ajust the false discovery rate (FDR).'+
-'<br>Use non-parametric test <a href="#" id="nonpara_maineffectpairedttestmethod2" data-type="select"  data-title="Select non-parametric t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong>' +
-  ' Then use <a href="#" id="nonpara_maineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first main effect"></a>'+ ' to ajust the false discovery rate (FDR).'
-}
-
-if(pComponents[$("#repeated_factor").val()[1]].length>2){
-  Simple_Main_Effect2 = '<br> Use <a href="#" id="simplemaineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select repeated ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong> controlling at each level of ' + $("#repeated_factor").val()[1] + "," +
-  ' with a <a href="#" id="simplemainSpher_Corr2" data-type="select"  data-title="Correct for sphericity"></a> correction.'+
-'<br>Use non-parametric test <a href="#" id="nonpara_simplemaineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select non-parametric repeated ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong> controlling at each level of '+$("#repeated_factor").val()[1] + ", " +
-  ' followed by post hoc analysis procedure <a href="#" id="nonpara_simplemaineffectrepeatedANOVAposthocmethod2" data-type="select"  data-title="Select non-parametric post hoc method for first simple main effect"></a>'
-}else{
-  Simple_Main_Effect2 = '<br> Use <a href="#" id="simplemaineffectpairedttestmethod2" data-type="select"  data-title="Select t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong> at each level of ' +$("#repeated_factor").val()[1] +
-  ', followed by <a href="#" id="simplemaineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '+
-
-'<br>Use non parametric test, <a href="#" id="nonpara_simplemaineffectpairedttestmethod2" data-type="select"  data-title="Select non-parametric t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#repeated_factor").val()[1] + '</strong>.' +
-  ' followed by <a href="#" id="nonpara_simplemaineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '
-
-}
-
-
-
-
-$("#method_description").html(
-'Use <a href="#" id="twowayrepeatedANOVAmethod" data-type="select"  data-title="Select two way repeated ANOVA method"></a>'+
-' for <strong>Interaction term</strong> between <strong>' + $("#repeated_factor").val()[0]+ '</strong> and <strong>'+$("#repeated_factor").val()[1]+'</strong>. ' +
-Main_Effect1 + Simple_Main_Effect1 +  Main_Effect2 + Simple_Main_Effect2)
-
-
-}
-
-
-
-
-
-
-
-pairedttestdescription = function(){
-
-$("#method_description").html(
-'Use <a href="#" id="pairedttestmethod" data-type="select"  data-title="Select paired t test method"></a>'+
-' on <strong>' +$("#repeated_factor").val()+ '</strong>' +
-' to compare <strong>'+
-pComponents[$("#repeated_factor").val()[0]].join("</strong> and <strong>")+"</strong>. " +
-
-'<br>Use <a href="#" id="pairedttestFDRmethod" data-type="select"  data-title="Select FDR correction method"></a>'+
-' to correct for multiple comparisons.' +
-
-'<br> Use non-parametric  test, '+
-'<a href="#" id="nonpara_pairedttestmethod" data-type="select" data-title="Select non-parametric paired t test method"></a>' +
-' on <strong>' +$("#repeated_factor").val()+ '</strong>'+
-' to compare <strong>'+
-pComponents[$("#repeated_factor").val()[0]].join("</strong> and <strong>") +"</strong>. "+
-'<br>Use <a href="#" id="nonpara_pairedttestFDRmethod" data-type="select" data-title="Select FDR correction method"></a> on non-parametric test result' +
-' to correct for the multiple comparisons.'
-)
-
-
-}
-onewayrepeatedANOVAdescription = function(){
-$("#method_description").html(
-'Use <a href="#" id="onewayrepeatedANOVAmethod" data-type="select"  data-title="Select repeated ANOVA method"></a>'+
-' on <strong>' +$("#repeated_factor").val()+ '</strong> with '+'<a href="#" id="onewaySpher_Corr" data-type="select"  data-title="Shericity Correction Method"></a>' + ' correction. Then use <a href="#" id="onewayrepeatedANOVAposthocmethod" data-type="select"  data-title="Select (repeated) post hoc method"></a>'+
-' to perform paire-wise compairson.'+
-
-'<br> Use non-parametric test, '+
-'<a href="#" id="nonpara_onewayrepeatedANOVAmethod" data-type="select" data-title="Select non-parametric repeated ANOVA method"></a>, a non-parametric  test, ' +
-' on <strong>' +$("#repeated_factor").val()+ '</strong>. Then use <a href="#" id="nonpara_onewayrepeatedANOVAposthocmethod" data-type="select"  data-title="Select non-parametric (repeated) post hoc method"></a>'+
-' to perform paire-wise compairson.'
-)
-};
-
-
-
-
-
-
-mixedANOVAdescription = function(){
-
-
-
-/*'Subjects were classified into <strong>'+
-pComponents[$("#independent_factor").val()[0]].join("</strong> and <strong>")+"</strong>. " +*/
-// Main Effect
-if(pComponents[$("#independent_factor").val()[0]].length>2){
-  Main_Effect1 = '<br>Use <a href="#" id="maineffectANOVAmethod1" data-type="select"  data-title="Select ANOVA method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.'+
-  ' Then use post hoc analysis procedure <a href="#" id="maineffectANOVAposthocmethod1" data-type="select"  data-title="Select post hoc method for first main effect"></a>'+
-'<br>Use non-parametric test, <a href="#" id="nonpara_maineffectANOVAmethod1" data-type="select"  data-title="Select non-parametric ANOVA method for first main effect"></a>' + ' on main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.'+
-  ' Then use post hoc anlaysis procedure of <a href="#" id="nonpara_maineffectANOVAposthocmethod1" data-type="select"  data-title="Select non-parametric post hoc method for first main effect"></a>'
-}else{
-  Main_Effect1 = '<br> Use <a href="#" id="maineffectttestmethod1" data-type="select"  data-title="Select t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.'+
-  ' Then use <a href="#" id="maineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first main effect"></a>'+' to ajust the false discovery rate (FDR).'+
-'<br>Use non-parametric test <a href="#" id="nonpara_maineffectttestmethod1" data-type="select"  data-title="Select non-parametric t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>' +
-  ' Then use <a href="#" id="nonpara_maineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first main effect"></a>'+ ' to ajust the false discovery rate (FDR).'
-}
-
-if(pComponents[$("#independent_factor").val()[0]].length>2){
-  Simple_Main_Effect1 = '<br> Use <a href="#" id="simplemaineffectANOVAmethod1" data-type="select"  data-title="Select ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong> controlling at each level of ' + $("#independent_factor").val()[1] + "," +
-  ' followed by post hoc analysis procedure <a href="#" id="simplemaineffectANOVAposthocmethod1" data-type="select"  data-title="Select post hoc method for first simple main effect"></a>'+
-'<br>Use non-parametric test <a href="#" id="nonpara_simplemaineffectANOVAmethod1" data-type="select"  data-title="Select non-parametric ANOVA method for first simple main effect"></a>' + 'on simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong> controlling at each level of '+$("#independent_factor").val()[1] + "." +
-  ' followed by post hoc analysis procedure <a href="#" id="nonpara_simplemaineffectANOVAposthocmethod1" data-type="select"  data-title="Select non-parametric post hoc method for first simple main effect"></a>'
-}else{
-  Simple_Main_Effect1 = '<br> Use <a href="#" id="simplemaineffectttestmethod1" data-type="select"  data-title="Select t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong> at each level of ' +$("#independent_factor").val()[1] +
-  ', followed by <a href="#" id="simplemaineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '+
-
-'<br>Use non parametric test, <a href="#" id="nonpara_simplemaineffectttestmethod1" data-type="select"  data-title="Select non-parametric t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#independent_factor").val()[0] + '</strong>.' +
-  ' followed by <a href="#" id="nonpara_simplemaineffectttestposthocmethod1" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '
-
-}
-
-
-if(pComponents[$("#repeated_factor").val()[0]].length>2){
-  Main_Effect2 = '<br>Use <a href="#" id="maineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select repeated ANOVA method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.'+
-  ' with a <a href="#" id="mainSpher_Corr2" data-type="select"  data-title="Correct for sphericity"></a> correction.'+
-'<br>Use non-parametric test, <a href="#" id="nonpara_maineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select non-parametric repeated ANOVA method for first main effect"></a>' + ' on main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.'+
-  ' Then use post hoc anlaysis procedure of <a href="#" id="nonpara_maineffectrepeatedANOVAposthocmethod2" data-type="select"  data-title="Select non-parametric post hoc method for first main effect"></a>'
-}else{
-  Main_Effect2 = '<br> Use <a href="#" id="maineffectpairedttestmethod2" data-type="select"  data-title="Select t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.'+
-  ' Then use <a href="#" id="maineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first main effect"></a>'+' to ajust the false discovery rate (FDR).'+
-'<br>Use non-parametric test <a href="#" id="nonpara_maineffectpairedttestmethod2" data-type="select"  data-title="Select non-parametric t test method for first main effect"></a>' + ' for the main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>' +
-  ' Then use <a href="#" id="nonpara_maineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first main effect"></a>'+ ' to ajust the false discovery rate (FDR).'
-}
-
-if(pComponents[$("#repeated_factor").val()[0]].length>2){
-  Simple_Main_Effect2 = '<br> Use <a href="#" id="simplemaineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select repeated ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong> controlling at each level of ' + $("#repeated_factor").val()[0] + "," +
-  ' with a <a href="#" id="simplemainSpher_Corr2" data-type="select"  data-title="Correct for sphericity"></a> correction.'+
-'<br>Use non-parametric test <a href="#" id="nonpara_simplemaineffectrepeatedANOVAmethod2" data-type="select"  data-title="Select non-parametric repeated ANOVA method for first simple main effect"></a>' + ' on simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong> controlling at each level of '+$("#repeated_factor").val()[0] + ", " +
-  ' followed by post hoc analysis procedure <a href="#" id="nonpara_simplemaineffectrepeatedANOVAposthocmethod2" data-type="select"  data-title="Select non-parametric post hoc method for first simple main effect"></a>'
-}else{
-  Simple_Main_Effect2 = '<br> Use <a href="#" id="simplemaineffectpairedttestmethod2" data-type="select"  data-title="Select t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong> at each level of ' +$("#repeated_factor").val()[0] +
-  ', followed by <a href="#" id="simplemaineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '+
-
-'<br>Use non parametric test, <a href="#" id="nonpara_simplemaineffectpairedttestmethod2" data-type="select"  data-title="Select non-parametric t test method for first simple main effect"></a>' + ' for the simple main effect of <strong>' + $("#repeated_factor").val()[0] + '</strong>.' +
-  ' followed by <a href="#" id="nonpara_simplemaineffectpairedttestposthocmethod2" data-type="select"  data-title="Select FDR for first simple main effect"></a> to adjust the false discovery rate (FDR). '
-
-}
-$("#method_description").html(
-'Use <a href="#" id="mixedANOVAmethod" data-type="select"  data-title="Select two way ANOVA method"></a>'+
-' on <strong>Interaction term</strong> between </strong>' + $("#independent_factor").val()[0]+ '</strong> and <strong>'+$("#repeated_factor").val()[0]+'</strong>. ' +
-Main_Effect1 + Simple_Main_Effect1 +  Main_Effect2 + Simple_Main_Effect2)
-}
 
 
 

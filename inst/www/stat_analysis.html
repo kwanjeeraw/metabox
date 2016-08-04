@@ -96,7 +96,7 @@
     <script type="text/javascript" src="js/jszip.min.js"></script>
     <script type="text/javascript" src="js/stat_FileSaver.min.js"></script>
     <script type="text/javascript" src="js/stat_canvas-toBlob.js"></script>
-
+<script type="text/javascript" src="js/stat_analysis_stat_method_option.js"></script>
 <!--draggable. for boxplot.
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>-->
@@ -364,8 +364,8 @@
                                     <i class="fa fa-search fa-3x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
-                                    <div  style="font-size: 30px;">Visualization</div>
-                                    <div>PCA to detect outlier</div>
+                                    <div  style="font-size: 30px;">Data Processing</div>
+                                    <div>Visualize Processing Procedures Using PCA</div>
                                 </div>
                             </div>
                         </div>
@@ -381,7 +381,7 @@
       <div class="panel-heading">
                             <div class="row">
                                       <i class="fa fa-gears"></i>
- Data Processing
+
 
                             </div>
      </div>
@@ -590,7 +590,7 @@
                         <div class="panel-heading">
                             <div class="row">
                                 <div class="col-xs-3">
-                                    <i class="fa fa-comments fa-3x"></i>
+                                    <i class="glyphicon glyphicon-stats fa-3x"></i>
                                 </div>
                                 <div class="col-xs-9 text-right">
                                   <p  style="font-size: 30px;">Univariate Statistics</p>
@@ -622,7 +622,7 @@
           <li class="list-group-item">
                                                     <div class="form-group">
                                             <label><p class="text-danger">Excluded Samples</p></label>
-                                            <input class="form-control" placeholder="None" id="Samples_To_Be_Deleted">
+                                            <p id="Samples_To_Be_Deleted"><p>
                                         </div>
             </li>
           <li class="list-group-item">
@@ -630,10 +630,12 @@
 <label><p class="text-warning">Normalization Applied</p></label><br>
 
 <div class="text-muted">
-<p>Sample Normalization: <a href="#" id="samplenormalizationselected" data-type="select" ></a></p>
-<p>Data Transformation: <a href="#" id="datatransformationselected" data-type="select" ></a></p>
-<p>Feature Transformation: <a href="#" id="featuretransformationselected" data-type="select" ></a></p>
-
+<p>Sample Normalization: <strong><span id = "samplenormalizationmethod">None</span></strong><span id="samplenormalizationSample_specific_column2" class="text-muted pull-right" style = "font-style: italic"></span><span id="mTIC_column2" class="text-muted pull-right" style = "font-style: italic"></span><span id="Loess_column2" class="text-muted pull-right" style = "font-style: italic"></span><span id="Batch_column2" class="text-muted pull-right" style = "font-style: italic"></span></p>
+<!--<a href="#" id="samplenormalizationselected" data-type="select" ></a>-->
+<p>Data Transformation: <strong><span id = "datatransformationmethod">None</span></strong></p>
+<!--<a href="#" id="datatransformationselected" data-type="select" ></a>-->
+<p>Feature Normalization: <strong><span id = "featurenormalizationmethod">None</span></strong></p>
+<!--<a href="#" id="featuretransformationselected" data-type="select" ></a>-->
 
 </div>
 
@@ -740,11 +742,12 @@
   <div class="col-lg-10">
       <ul class="nav nav-tabs">
           <li class="active"><a href="#UnivStat_Result" data-toggle="tab">Stat Table</a></li>
-          <li><a href="#UnivStat_Result_Report" data-toggle="tab">Report</a></li>
+         <!-- <li><a href="#UnivStat_Result_Report" data-toggle="tab">Report</a></li>-->
       </ul>
       <div class="tab-content">
         <div class="tab-pane fade in active" id="UnivStat_Result">
-          <div id="method_description"></div>
+          <div id="method_description_para"></div><br>
+          <div id="method_description_non_para"></div>
                      <table id="Statistics_Result"   class="table table-striped table-bordered" cellspacing="0" width="100%"></table>
                     <div id="download_statistical_result_button"></div>
                       <div id="continue_analysis" class="pull-right" hidden>

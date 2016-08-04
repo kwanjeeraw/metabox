@@ -14,12 +14,74 @@
 #'
 #'
 stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
-                              onewayANOVAmethod,onewayANOVAposthocmethod,nonpara_onewayANOVAmethod,nonpara_onewayANOVAQposthocmethod){#factor_name: make the result a better column name.
+                              ANOVAmethod,ANOVAposthoc,nonparaANOVAmethod,nonparaANOVAposthoc){#factor_name: make the result a better column name.
 
 
-  if(onewayANOVAmethod == "None"){
+  if(ANOVAmethod == 'none'){
+
+    para = matrix(NA,nrow = sum(1:(length(unique(data2[,i]))-1))+1,ncol = ncol(e))
+
+  }else{
+    ANOVAmethod = ANOVAmethod == "ANOVA" # if true, then equal variance.
+
+    para  = parSapply(cl, 1:ncol(data), FUN = function(j,data2,data,stat_friedman_test_with_post_hoc,
+                                                    stat_cure_Dunn_format,stat_combine_vector_1by1,i,
+                                                    posthocTGH,dunnTest,ANOVAmethod,ANOVAposthoc){
+      data2$value = data[,j]
+      p_value = oneway.test(data2$value ~ data2[,i], var.equal = ANOVAmethod)$p.value
+
+      post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[[ANOVAposthoc]][,3]
+      temp = data.frame(post.hoc)
+      rownames(temp) = gsub(":", " - ", rownames(temp))
+
+      c(p_value = p_value, post.hoc)
+    },data2,data,stat_friedman_test_with_post_hoc,
+    stat_cure_Dunn_format,stat_combine_vector_1by1,i,
+    posthocTGH,dunnTest,ANOVAmethod,ANOVAposthoc)
+  }
+
+  if(nonparaANOVAmethod == 'none'){
+
+  }else{
+
+    post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']][,3]
+    temp = data.frame(post.hoc)
+    rownames(temp) = gsub(":", " - ", rownames(temp)) #last three lines are for the correction of the format of the Dunn procedure.
+
+
+
+
+    nonpara  = parSapply(cl, 1:ncol(data), FUN = function(j,data2,data,stat_friedman_test_with_post_hoc,
+                                                          stat_cure_Dunn_format,stat_combine_vector_1by1,i,
+                                                          posthocTGH,dunnTest,temp){
+      data2$value = data[,j]
+      p_value_nonPara = kruskal.test(data2$value ~ data2[,i])$p.value
+
+      x = data.frame(dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res[,c(1,4)],row.names =1)
+      post.hoc_nonPara =stat_cure_Dunn_format(x = x,sudo_matrix,temp = temp)[,1]
+
+      c(p_value = p_value_nonPara, post.hoc_nonPara)
+    },data2,data,stat_friedman_test_with_post_hoc,
+    stat_cure_Dunn_format,stat_combine_vector_1by1,i,
+    posthocTGH,dunnTest,temp)
+    rownames(nonpara) = c(paste0("non_parametric_interaction_p_value"),names(post.hoc))
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  if(onewayANOVAmethod == "none"){
     result = data.frame(no_parametricANOVA_applied = rep(NA,ncol(data)))
-    return(result)
   }else{
     onewayANOVAmethod = onewayANOVAmethod=='ANOVA' #(otherwise use Welch ANOVA)
   }

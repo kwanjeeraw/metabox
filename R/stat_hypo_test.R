@@ -19,35 +19,46 @@ stat_hypo_test = function(e,p,f,
                      independent_factor_name = NULL, repeated_factor_name = NULL,
                      need_power = T,desired_power =  NULL,
 
+                     ttestmethod = NULL, ttestcorrection = NULL, nonparattestmethod = NULL, nonparattestcorrection = NULL,
+                     ANOVAmethod = NULL, ANOVAposthoc = NULL, nonparaANOVAmethod = NULL, nonparaANOVAposthoc = NULL
 
 
-                     onewayANOVAmethod=NULL,nonpara_onewayANOVAmethod=NULL,onewayANOVAposthocmethod=NULL,nonpara_onewayANOVAposthocmethod=NULL,
 
-                     ttestmethod=NULL,ttestFDRmethod=NULL,nonpara_ttestmethod=NULL,nonpara_ttestFDRmethod=NULL,
 
-                     twowayANOVAmethod=NULL,maineffectANOVAmethod1=NULL,maineffectANOVAposthocmethod1=NULL,maineffectANOVAmethod2=NULL,maineffectANOVAposthocmethod2=NULL,
-                     simplemaineffectANOVAmethod1=NULL,simplemaineffectANOVAposthocmethod1=NULL,simplemaineffectANOVAmethod2=NULL,simplemaineffectANOVAposthocmethod2=NULL,
-                     nonpara_maineffectANOVAmethod1=NULL,nonpara_maineffectANOVAposthocmethod1=NULL,nonpara_maineffectANOVAmethod2=NULL,nonpara_maineffectANOVAposthocmethod2=NULL,
-                     nonpara_simplemaineffectANOVAmethod1=NULL,nonpara_simplemaineffectANOVAposthocmethod1=NULL,nonpara_simplemaineffectANOVAmethod2=NULL,nonpara_simplemaineffectANOVAposthocmethod2=NULL,
-                     maineffectttestmethod1=NULL,maineffectttestposthocmethod1=NULL,maineffectttestmethod2=NULL,maineffectttestposthocmethod2=NULL,
-                     simplemaineffectttestmethod1=NULL,simplemaineffectttestposthocmethod1=NULL,simplemaineffectttestmethod2=NULL,simplemaineffectttestposthocmethod2=NULL,
-                     nonpara_maineffectttestmethod1=NULL,nonpara_maineffectttestposthocmethod1=NULL,nonpara_maineffectttestmethod2=NULL,nonpara_maineffectttestposthocmethod2=NULL,
-                     nonpara_simplemaineffectttestmethod1=NULL,nonpara_simplemaineffectttestposthocmethod1=NULL,nonpara_simplemaineffectttestmethod2=NULL,nonpara_simplemaineffectttestposthocmethod2=NULL,
 
-                     onewayrepeatedANOVAmethod = "rANOVA",onewayrepeatedANOVAposthocmethod = "paired+bonf",onewaySpher_Corr = NULL,
-                     nonpara_onewayrepeatedANOVAmethod = "rANOVA",nonpara_onewayrepeatedANOVAposthocmethod = "nonpara_paired+bonf",
 
-                     pairedttestmethod = "paired t test", pairedttestFDRmethod = NULL, nonpara_pairedttestmethod = "Wil test", nonpara_pairedttestFDRmethod = NULL,
-
-                     mainSpher_Corr1 = NULL,mainSpher_Corr2 = NULL,simplemainSpher_Corr1 = NULL,simplemainSpher_Corr2 = NULL,
-                     simplemaineffectpairedttestposthocmethod1 = NULL, simplemaineffectpairedttestposthocmethod2 = NULL, nonpara_simplemaineffectpairedttestposthocmethod1 = NULL,
-                     nonpara_simplemaineffectpairedttestposthocmethod2 = NULL,
-                     maineffectpairedttestposthocmethod1 = NULL,nonpara_maineffectpairedttestposthocmethod1 = NULL,
-
-                     maineffectpairedttestposthocmethod2 = NULL,nonpara_maineffectpairedttestposthocmethod2 = NULL
+                     # onewayANOVAmethod=NULL,nonpara_onewayANOVAmethod=NULL,onewayANOVAposthocmethod=NULL,nonpara_onewayANOVAposthocmethod=NULL,
+                     #
+                     # ttestmethod=NULL,ttestFDRmethod=NULL,nonpara_ttestmethod=NULL,nonpara_ttestFDRmethod=NULL,
+                     #
+                     # twowayANOVAmethod=NULL,maineffectANOVAmethod1=NULL,maineffectANOVAposthocmethod1=NULL,maineffectANOVAmethod2=NULL,maineffectANOVAposthocmethod2=NULL,
+                     # simplemaineffectANOVAmethod1=NULL,simplemaineffectANOVAposthocmethod1=NULL,simplemaineffectANOVAmethod2=NULL,simplemaineffectANOVAposthocmethod2=NULL,
+                     # nonpara_maineffectANOVAmethod1=NULL,nonpara_maineffectANOVAposthocmethod1=NULL,nonpara_maineffectANOVAmethod2=NULL,nonpara_maineffectANOVAposthocmethod2=NULL,
+                     # nonpara_simplemaineffectANOVAmethod1=NULL,nonpara_simplemaineffectANOVAposthocmethod1=NULL,nonpara_simplemaineffectANOVAmethod2=NULL,nonpara_simplemaineffectANOVAposthocmethod2=NULL,
+                     # maineffectttestmethod1=NULL,maineffectttestposthocmethod1=NULL,maineffectttestmethod2=NULL,maineffectttestposthocmethod2=NULL,
+                     # simplemaineffectttestmethod1=NULL,simplemaineffectttestposthocmethod1=NULL,simplemaineffectttestmethod2=NULL,simplemaineffectttestposthocmethod2=NULL,
+                     # nonpara_maineffectttestmethod1=NULL,nonpara_maineffectttestposthocmethod1=NULL,nonpara_maineffectttestmethod2=NULL,nonpara_maineffectttestposthocmethod2=NULL,
+                     # nonpara_simplemaineffectttestmethod1=NULL,nonpara_simplemaineffectttestposthocmethod1=NULL,nonpara_simplemaineffectttestmethod2=NULL,nonpara_simplemaineffectttestposthocmethod2=NULL,
+                     #
+                     # onewayrepeatedANOVAmethod = "rANOVA",onewayrepeatedANOVAposthocmethod = "paired+bonf",onewaySpher_Corr = NULL,
+                     # nonpara_onewayrepeatedANOVAmethod = "rANOVA",nonpara_onewayrepeatedANOVAposthocmethod = "nonpara_paired+bonf",
+                     #
+                     # pairedttestmethod = "paired t test", pairedttestFDRmethod = NULL, nonpara_pairedttestmethod = "Wil test", nonpara_pairedttestFDRmethod = NULL,
+                     #
+                     # mainSpher_Corr1 = NULL,mainSpher_Corr2 = NULL,simplemainSpher_Corr1 = NULL,simplemainSpher_Corr2 = NULL,
+                     # simplemaineffectpairedttestposthocmethod1 = NULL, simplemaineffectpairedttestposthocmethod2 = NULL, nonpara_simplemaineffectpairedttestposthocmethod1 = NULL,
+                     # nonpara_simplemaineffectpairedttestposthocmethod2 = NULL,
+                     # maineffectpairedttestposthocmethod1 = NULL,nonpara_maineffectpairedttestposthocmethod1 = NULL,
+                     #
+                     # maineffectpairedttestposthocmethod2 = NULL,nonpara_maineffectpairedttestposthocmethod2 = NULL
 
                      ){#For repeated study design, samples should match.
-  library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(WRS2);library(outliers);library(pwr);
+
+
+
+
+
+  library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(WRS2);library(outliers);library(pwr);library(reshape2);
 
   if(as.numeric(desired_power)>100 | as.numeric(desired_power) < 0 | is.na(as.numeric(desired_power))){
     stop("desired_power must between 0 ~ 100")
@@ -170,12 +181,9 @@ if(length(independent_factor_name)==0){
           num_factor_variable = length(unique(dta$variable1))
           sudo_matrix = matrix(nrow = num_factor_variable,ncol = num_factor_variable)#helping for cure the format issue with dunnTest().
 
-          result = stat_one_way_ANOVA(data = e,data2 = dta,i = 2,sudo_matrix,factor_name,cl,
-                                      onewayANOVAmethod,onewayANOVAposthocmethod,nonpara_onewayANOVAmethod,nonpara_onewayANOVAposthocmethod)
 
 
-          f$'outlier_exist?' = stat_test_outlier(e,f,p,factor_name)
-          result = data.frame(f,result,check.names = F)
+
           result_stat = matrix(nrow = ncol(e),ncol = 1 + 1 + (length(unique(dta[,2])))* 2) # global mean, sd. and mean and sd for each group.
           for(i in 1:ncol(e)){
             dta$value = e_ori[,i]
@@ -185,8 +193,17 @@ if(length(independent_factor_name)==0){
             result_stat[i,((1+length(unique(dta[,2])))+2):ncol(result_stat)] = by(dta$value, dta[,2],sd,na.rm = T)
           }
           result_stat = data.frame(result_stat,check.names = F)
+
           colnames(result_stat) = c("Global Mean", paste("Mean of", names( by(dta$value, dta[,2],mean,na.rm = T))),
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
+
+
+
+
+          result = stat_one_way_ANOVA(data = e,data2 = dta,i = 2,sudo_matrix,factor_name,cl,
+                                      ANOVAmethod,ANOVAposthoc,nonparaANOVAmethod,nonparaANOVAposthoc)
+          f$'outlier_exist?' = stat_test_outlier(e,f,p,factor_name)
+          result = data.frame(f,result,check.names = F)
           result = cbind(result,result_stat)
 
           if(need_power){
@@ -197,10 +214,7 @@ if(length(independent_factor_name)==0){
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==1 & length(repeated_factor_name)==0 & (length(unique(dta[,2]))==2)){ # t test
-          result = stat_t_test(data = e,data2 = dta,i = 2,cl,
-                               ttestmethod=ttestmethod,ttestFDRmethod=ttestFDRmethod, nonpara_ttestmethod=nonpara_ttestmethod,nonpara_ttestFDRmethod=nonpara_ttestFDRmethod) # 2nd column is the group
-          f$'outlier exist?' = stat_test_outlier(e,f,p,factor_name)
-          result = data.frame(f,result,check.names = F)
+          # basic statistics.
           result_stat = matrix(nrow = ncol(e),ncol = 1 + 1 + (length(unique(dta[,2])))* 2) # global mean, sd. and mean and sd for each group.
           for(i in 1:ncol(e)){
             dta$value = e_ori[,i]
@@ -212,7 +226,14 @@ if(length(independent_factor_name)==0){
           result_stat = data.frame(result_stat,check.names = F)
           colnames(result_stat) = c("Global Mean", paste("Mean of", names( by(dta$value, dta[,2],mean,na.rm = T))),
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
-          result = cbind(result,result_stat)
+          f$'outlier exist?' = stat_test_outlier(e,f,p,factor_name)
+
+
+
+            result = stat_t_test(data = e,data2 = dta,i = 2,cl,
+                                 ttestmethod,ttestcorrection, nonparattestmethod,nonparattestcorrection)
+
+            result = data.frame(f,result,check.names = F)
 
           if(need_power){
             power = stat_t_test_power(e = e,dta=dta, i = 2,sig.level = 0.05, desired_power = desired_power,
@@ -235,7 +256,7 @@ if(length(independent_factor_name)==0){
             interaction_variable1_variable2 = ezANOVA(data = dta, dv = value, wid = id, between = .(variable1,variable2), type = 3)$ANOVA[3,5]
             interaction_variable1_variable2_nonPara = NA
               # pbad2way(value ~variable1*variable2,
-                                                               # data = dta,est = "median")$AB.p.value
+                # data = dta,est = "median")$AB.p.value
 
             return(data.frame(interaction_variable1_variable2,interaction_variable1_variable2=interaction_variable1_variable2_nonPara))
           },e,dta,ezANOVA,pbad2way)
@@ -641,7 +662,7 @@ result$power = "NOT AVAILABLE FOR TWO_WAY REPEATED DESIGN"
 
           parallel = parLapply(cl, 1:ncol(e),function(i,e,dta,ezANOVA){
             dta$value = e[,i]
-            interaction_variable1_repeated1 = ezANOVA(data = dta, dv = value, wid = id, within = .(repeated1),between = .(variable1), type = 3)$ANOVA[3,5]
+            interaction_variable1_repeated1 = ezANOVA(data = dta, dv = value, wid = id, within = .(repeated1),between = .(variable1), type = 3)$`Sphericity Corrections`[2,3]
             interaction_variable1_repeated1_nonPara = NA
 
             return(data.frame(interaction_variable1_repeated1,interaction_variable1_repeated1=interaction_variable1_repeated1_nonPara))

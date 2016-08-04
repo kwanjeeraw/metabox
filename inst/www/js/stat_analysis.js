@@ -89,12 +89,9 @@ $("#danger-message-alert").hide();
 //turn to inline mode
 $.fn.editable.defaults.mode = 'inline';
 $('#stat_load_data_para_SheetIndex').editable({
-   emptytext: "<p class='text-muted'>The <span class='text-danger'>first sheet</span> will be read as default. Click me to change.</p>"
+   emptytext: "<p class='text-muted'><strong>The <span class='text-danger'>first sheet</span> will be read as default. Click me to change.</strong></p>"
     });
- $('#sample_to_be_removed').editable({
-        emptytext: 'No Sample to be Removed. Click me to add.',
-        title: 'Remove Sample'
-    });
+
 
 
 
@@ -127,26 +124,6 @@ $('#desired_power').editable({
 });
 
 
-var samplenormalizationselected = 'None';
-$('#samplenormalizationselected').editable({
-        showbuttons: false,
-        unsavedclass: null,
-        type: 'select',
-        value:'None',
-        inputclass: 'input-medium privacy-select',
-        source: [
-            {value: 'None', text: 'None'},
-            {value: 'Sample_specific', text: 'Sample_specific'},
-            {value: 'mTIC', text: 'mTIC'},
-            {value: 'Loess', text: 'Loess'},
-            {value: 'Batch Median', text: 'Batch Median'}
-        ],
-
-        success: function(response, newValue) {
-        samplenormalizationselected = newValue//update backbone model
-
-    }
-    });
 
 
 
@@ -168,39 +145,8 @@ $('#samplenormalizationselected').editable({
 
 
 
-$('#datatransformationselected').editable({
-        showbuttons: false,
-        unsavedclass: null,
-        type: 'select',
-        value:'None',
-        inputclass: 'input-medium privacy-select',
-        source: [
-            {value: 'None', text: 'None'},
-            {value: 'log', text: 'log'},
-            {value: 'power', text: 'power'}
-        ],
-        success: function(response, newValue) {
-        datatransformation_method = newValue//update backbone model
-    }
-    });
 
 
-$('#featuretransformationselected').editable({
-        showbuttons: false,
-        unsavedclass: null,
-        type: 'select',
-        value:'None',
-        inputclass: 'input-medium privacy-select',
-        source: [
-            {value: 'None', text: 'None'},
-            {value: 'Auto', text: 'Auto'},
-            {value: 'Pareto', text: 'Pareto'},
-            {value: 'Range', text: 'Range'}
-        ],
-        success: function(response, newValue) {
-        datascaling_method = newValue//update backbone model
-    }
-    });
 
 
 
@@ -210,7 +156,7 @@ $('#featuretransformationselected').editable({
 
 $("#Submit_To_Statistics").click(function(){
 // check normalization method available or not.
-    allow = true;
+
 
    if($("#independent_factor").val()===null){
     ind = []
@@ -236,25 +182,8 @@ $("#Submit_To_Statistics").click(function(){
     bootbox.alert("Between Subject Factor can NOT equal th Within Subject Factor.");
   }else{
 
-if(samplenormalizationselected==="Sample_specific"){
 
-select_samplenormalizationSample_specific(pData_column)
-
-}else if(samplenormalizationselected === "mTIC"){
-
-  select_samplenormalizationmTIC(fData_column)
-}else if(samplenormalizationselected === "Loess"){
-
-  select_samplenormalizationloess(pData_column)
-}else if(samplenormalizationselected === 'Batch Median'){
-
-  select_samplenormalizationmBatchMedian(pData_column)
-}else{
-  applystatistics();
-}//.
-
-
-
+applystatistics()
 
 
 
@@ -300,9 +229,10 @@ $(".Thefactor").on("change",function(){
 
 
 if(text.includes("one way ANOVA")){
-  onewayANOVAdescription();
+  ANOVA_disc();
 }else if(text.includes("independent t test")){
-  ttestdescription();
+  //ttestdescription();
+  t_test_disc();
 }else if(text.includes("two way ANOVA")){
   twowayANOVAdescription();
 }else if(text.includes("one way repeated ANOVA")){
@@ -366,7 +296,7 @@ $("#enrBtn").click(function(){
   if(type==="nothing"){
 bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'enrichmentrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'subnetwork.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -376,9 +306,8 @@ $("#overrepBtn").click(function(){
 bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
       //window.location = 'overrepanalysis.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
-      //var rsess1 = rsession.replace("localhost","128.120.143.234");
-      //window.open('http://128.120.143.215:3104/ocpu/library/metaboxdev/www/overreprsess.html?rsess='+rsess1 + '&idtype='+type, '_blank');
-      window.location = 'overreprsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      var rsess1 = rsession.replace("localhost","128.120.143.234");
+      window.open('http://128.120.143.215:3104/ocpu/library/metaboxdev/www/overreprsess.html?rsess='+rsess1 + '&idtype='+type, '_blank');
   }
 });
 
@@ -386,7 +315,7 @@ $("#cloudBtn").click(function(){
     if(type==="nothing"){
 bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'wordcloudrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'wordcloud.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -395,7 +324,7 @@ $("#SltBtn").click(function(){
     if(type!=="compound"){
 bootbox.alert("No compound id found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'similarityrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'similarity.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
       //window.open('http://128.120.143.208:1200/ocpu/library/MetaMapp2016/www/similarity.html?rsess='+rsession + '&idtype='+type, '_blank');
   }
 });
@@ -643,20 +572,48 @@ var req=ocpu.call("stat_norm",{
 
 
 $(".normalization").change(function(event){// able the applynormalization button.
+/* $( "#samplenormalizationSample_specific_column2" ).text("using " + sample_specific_weight );
+ $( "#Loess_column2" ).text("QC: " + QCIndicator +"; Batch: "+BatchIndicator + "; Time: " +TimeIndicator +".");
+$( "#Batch_column2" ).text("Batch Indicator: " + BatchIndicator);
+$( "#mTIC_column2" ).text("Known/Unknown Indicator: " + KnownorUnknown.value );*/
+
+/*var radios1 = document.getElementsByName('samplenormalization');
+for (var i = 0, length = radios1.length; i < length; i++) {
+    if (radios1[i].checked) {
+      samplenormalization_method = ["None","Sample_specific","mTIC","Loess","Median Fold Change", "Batch Median"][i];
+    }
+}
+var radios2 = document.getElementsByName('datatransformation');
+for (var i = 0, length = radios2.length; i < length; i++) {
+    if (radios2[i].checked) {
+      datatransformation_method = ["None","log","power"][i]
+    }
+}
+var radios3 = document.getElementsByName('datascaling');
+for (var i = 0, length = radios3.length; i < length; i++) {
+    if (radios3[i].checked) {
+      datascaling_method = ["None","Auto","Pareto","Range"][i]
+    }
+}
+
+$("#samplenormalizationmethod").text(samplenormalization_method);
+$("#datatransformationmethod").text(datatransformation_method);
+$("#featurenormalizationmethod").text(datascaling_method);*/
+
 
 $("#applynormalization").removeClass("disabled");
-if(!$("#samplenormalizationSample_specific").is(':checked')){
-  $( "#samplenormalizationSample_specific_column" ).text("");
+/*if(!$("#samplenormalizationSample_specific").is(':checked')){
+  $( "#samplenormalizationSample_specific_column" ).text("");  $( "#samplenormalizationSample_specific_column2" ).text("");
 }
 if(!$("#samplenormalizationmTIC").is(':checked')){
-  $( "#mTIC_column" ).text("");
+  $( "#mTIC_column" ).text("");$( "#mTIC_column2" ).text("");
 }
 if(!$("#samplenormalizationloess").is(':checked')){
-  $( "#Loess_column" ).text("");
+  $( "#Loess_column" ).text("");$( "#Loess_column2" ).text("");
 }
 if(!$("#samplenormalizationBatchMedian").is(':checked')){
-  $( "#Batch_column" ).text("");
-}
+  $( "#Batch_column" ).text("");$( "#Batch_column2" ).text("");
+}*/
 
 
 
@@ -671,7 +628,32 @@ $(".applynormalization").on("click",function(event){
         smallerrormsg(text = '<strong>Please select a new normalization that is different from the current one.</strong>',time = 5000);
     }else{
         apply_normalization();
-        $("#applynormalization").addClass("disabled");
+        $("#samplenormalizationmethod").text(samplenormalization_method);
+        $("#datatransformationmethod").text(datatransformation_method);
+        $("#featurenormalizationmethod").text(datascaling_method);
+
+$( "#samplenormalizationSample_specific_column2" ).text("using " + sample_specific_weight );
+$( "#mTIC_column2" ).text("Known/Unknown Indicator: " + KnownorUnknown.value );
+$( "#Batch_column2" ).text("Batch Indicator: " + BatchIndicator);
+$( "#Loess_column2" ).text("QC: " + QCIndicator +"; Batch: "+BatchIndicator + "; Time: " +TimeIndicator +".");
+
+if(!$("#samplenormalizationSample_specific").is(':checked')){
+  $( "#samplenormalizationSample_specific_column" ).text("");  $( "#samplenormalizationSample_specific_column2" ).text("");
+}
+if(!$("#samplenormalizationmTIC").is(':checked')){
+  $( "#mTIC_column" ).text("");$( "#mTIC_column2" ).text("");
+}
+if(!$("#samplenormalizationloess").is(':checked')){
+  $( "#Loess_column" ).text("");$( "#Loess_column2" ).text("");
+}
+if(!$("#samplenormalizationBatchMedian").is(':checked')){
+  $( "#Batch_column" ).text("");$( "#Batch_column2" ).text("");
+}
+
+
+$("#Samples_To_Be_Deleted").text("");
+$("#Samples_To_Be_Deleted").text($("#sample_to_be_removed").val());
+$("#applynormalization").addClass("disabled");
     }
 
 

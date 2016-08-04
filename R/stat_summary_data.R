@@ -21,8 +21,8 @@ stat_summary_data = function(DATA){
 
   type_of_each_colum_pData = sapply(pData, function(x){class(x)})
 
-  pData_columns_num = sapply(pData, function(x){length(unique(x))})
-  fData_columns_num = sapply(fData, function(x){length(unique(x))})
+  pData_columns_num = lapply(pData, function(x){length(unique(x))})
+  fData_columns_num = lapply(fData, function(x){length(unique(x))})
 
   pComponents = sapply(pData, unique)
   fComponents = sapply(fData, unique)

@@ -1,4 +1,3 @@
-var allow = false; //to determine if the pop up window should do statistics
 
 
 
