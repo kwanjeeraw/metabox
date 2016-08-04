@@ -16,7 +16,8 @@ uploaddata = function(){
           eData = obj.expression;
           fData = obj.feature;
           pData = obj.phenotype;
-
+          e_ori = obj.expression;
+          p_ori = obj.phenotype;
           pDataTable = drawTable('#View_pData',obj.phenotype, "Phenotype Data","phenotype_index");
           fDataTable = drawTable('#View_fData',obj.feature, "Feature Data","feature_index");
           fDataTable = drawTable('#View_eData',obj.expression, "Expression Data","feature_index");
@@ -147,45 +148,10 @@ var Stat_Result = {}
 
 applystatistics = function(){
   var loadSpinner = showSpinner();
-  // change the DATA. Remove the outlier.
-  var req=ocpu.call("stat_rm_sample",{
-    e:D.expression,p:D.phenotype,f:D.feature,sample_index : ""
-  },function(session){
 
-    session.getObject(function(obj){
-      DATA = obj;
-      eData = obj.expression;
-      fData = obj.feature;
-      pData = obj.phenotype;
-
-
-  var req = ocpu.call("stat_norm",{
-    e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
-  sample_index:$("#Samples_To_Be_Deleted").text().split(','),
-  mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
-  mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
-
-  sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
-  sample_specific_weight : sample_specific_weight,sample_specific_multiplyordevide : sample_specific_multiplyordevide,
-  KnownorUnknown:KnownorUnknown.value,mTICunchanged:mTICunchanged,Batchunchanged:Batchunchanged,
-  Loessunchanged:Loessunchanged,QCIndicator:QCIndicator,BatchIndicator:BatchIndicator,TimeIndicator:TimeIndicator,
-  log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log : $('#logparaautoindependent_factor').val(),
-  power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power : $('#powerparaautoindependent_factor').val()
-
-  },function(session_norm){
-
-    session_norm.getObject(function(obj2){
-
-    eData = obj2.expression;
-    fData = obj2.feature;
-    pData = obj2.phenotype;
-    e_ori = obj2.expression_only_rm_outlier;
-    p_ori = obj2.phenotype_only_rm_outlier;
 
     var req=ocpu.call("stat_hypo_test",{
-    e:eData,
-    f:fData,
-    p:pData,
+    e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
     e_ori:e_ori,
     p_ori:p_ori,
     e_before:D.expression,
@@ -194,8 +160,8 @@ applystatistics = function(){
     repeated_factor_name:$("#repeated_factor").val(),
     need_power:document.getElementById('power_analysis_needed').checked,
     desired_power: pwr,
-ttestmethod : ttestmethod, ttestcorrection : ttestcorrection, nonparattestmethod : nonparattestmethod, nonparattestcorrection : nonparattestcorrection
-
+ttestmethod : ttestmethod, ttestcorrection : ttestcorrection, nonparattestmethod : nonparattestmethod, nonparattestcorrection : nonparattestcorrection,
+ANOVAmethod:ANOVAmethod, ANOVAposthoc:ANOVAposthoc, nonparaANOVAmethod:nonparaANOVAmethod, nonparaANOVAposthoc:nonparaANOVAposthoc
 
 
  /*                    onewayANOVAmethod:onewayANOVAmethod.value,nonpara_onewayANOVAmethod:nonpara_onewayANOVAmethod.value,onewayANOVAposthocmethod:onewayANOVAposthocmethod.value,nonpara_onewayANOVAposthocmethod:nonpara_onewayANOVAposthocmethod.value,
@@ -297,10 +263,8 @@ session4.getFile("messages_hypo_test.txt", function(text){
 
 
 
-  });
-  }).fail(function(jqXHR){ hideSpinner(loadSpinner);bootbox.alert(jqXHR.responseText);});
-  });
-    }).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
+
+
 }
 
 
@@ -565,7 +529,7 @@ bootbox.dialog({   closeButton: false,
                         callback: function () {
                           mTICunchanged = KnownorUnknown.value===$('#mTICindicator').val();//if later equals the KnownorKnown, this means that nothing changed so the mTIC did should stays the same.
                             KnownorUnknown.value = $('#mTICindicator').val();
-                          $( "#mTIC_column" ).text("Known/Unknown Indicator: " + KnownorUnknown.value );
+                          $( "#mTIC_column" ).text("Using: " + KnownorUnknown.value );
 
 
                           samplenormalization_method = 'mTIC'

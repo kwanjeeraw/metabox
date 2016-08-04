@@ -182,7 +182,6 @@ $("#Submit_To_Statistics").click(function(){
     bootbox.alert("Between Subject Factor can NOT equal th Within Subject Factor.");
   }else{
 
-
 applystatistics()
 
 
@@ -211,6 +210,9 @@ $("#PCA_plot_para_submit").click(function(){
 })
 
 $(".Thefactor").on("change",function(){
+
+  console.log("!")
+
     if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
     $("#Sample_Size_Table").text("Waiting user to select factor.")
     $("#stat_method").text("Nothing is selected");
@@ -226,13 +228,15 @@ $(".Thefactor").on("change",function(){
                                         hideSpinner(loadSpinner);
                         });
                       session4.getFile("stat_method.txt", function(text){
-
+console.log(text)
 
 if(text.includes("one way ANOVA")){
   ANOVA_disc();
+  console.log(ttestmethod);
 }else if(text.includes("independent t test")){
   //ttestdescription();
   t_test_disc();
+  console.log(ttestmethod);
 }else if(text.includes("two way ANOVA")){
   twowayANOVAdescription();
 }else if(text.includes("one way repeated ANOVA")){
@@ -530,6 +534,7 @@ for (var i = 0, length = radios3.length; i < length; i++) {
 
 
 
+
 var req=ocpu.call("stat_norm",{
   e : D.expression,f : D.feature,p : D.phenotype,
   sample_index:$("#sample_to_be_removed").val().split(','),
@@ -549,6 +554,8 @@ var req=ocpu.call("stat_norm",{
     eData = obj.expression;
     fData = obj.feature;
     pData = obj.phenotype;
+    e_ori = obj.expression_only_rm_outlier;
+    p_ori = obj.phenotype_only_rm_outlier;
     var req2=ocpu.call("stat_get_modified_data",{
       DATA:obj
     },function(session2){
@@ -575,7 +582,7 @@ $(".normalization").change(function(event){// able the applynormalization button
 /* $( "#samplenormalizationSample_specific_column2" ).text("using " + sample_specific_weight );
  $( "#Loess_column2" ).text("QC: " + QCIndicator +"; Batch: "+BatchIndicator + "; Time: " +TimeIndicator +".");
 $( "#Batch_column2" ).text("Batch Indicator: " + BatchIndicator);
-$( "#mTIC_column2" ).text("Known/Unknown Indicator: " + KnownorUnknown.value );*/
+$( "#mTIC_column2" ).text("Using: " + KnownorUnknown.value );*/
 
 /*var radios1 = document.getElementsByName('samplenormalization');
 for (var i = 0, length = radios1.length; i < length; i++) {
@@ -633,7 +640,7 @@ $(".applynormalization").on("click",function(event){
         $("#featurenormalizationmethod").text(datascaling_method);
 
 $( "#samplenormalizationSample_specific_column2" ).text("using " + sample_specific_weight );
-$( "#mTIC_column2" ).text("Known/Unknown Indicator: " + KnownorUnknown.value );
+$( "#mTIC_column2" ).text("Using: " + KnownorUnknown.value );
 $( "#Batch_column2" ).text("Batch Indicator: " + BatchIndicator);
 $( "#Loess_column2" ).text("QC: " + QCIndicator +"; Batch: "+BatchIndicator + "; Time: " +TimeIndicator +".");
 

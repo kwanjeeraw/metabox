@@ -1,9 +1,16 @@
+var ttestmethod = 'Welch';
+var ttestcorrection = 'fdr';
+var nonparattestmethod = 'utest';
+var nonparattestcorrection = 'fdr';
+
+
+
 // T test.<a href="#" id="onewayANOVAmethod" data-type="select"  data-title="Select ANOVA method"></a>
 t_test_disc = function(){
-window.ttestmethod = 'Welch';
-window.ttestcorrection = 'fdr';
-window.nonparattestmethod = 'utest';
-window.nonparattestcorrection = 'fdr';
+ttestmethod = 'Welch';
+ttestcorrection = 'fdr';
+nonparattestmethod = 'utest';
+nonparattestcorrection = 'fdr';
 
 
 
@@ -19,7 +26,7 @@ window.nonparattestcorrection = 'fdr';
       {value: 'none', text:  'no test'}
     ],
     success: function(response, newValue) {
-        window.ttestmethod = newValue;
+        ttestmethod = newValue;
     }
   })
   $("#ttestcorrection").editable({
@@ -34,7 +41,7 @@ window.nonparattestcorrection = 'fdr';
       {value:'none',text:'none'}
     ],
     success: function(response, newValue){
-      window.ttestcorrection = newValue;
+      ttestcorrection = newValue;
     }
   })
 
@@ -48,7 +55,7 @@ window.nonparattestcorrection = 'fdr';
       {value: 'none', text:  'no test'}
     ],
     success: function(response, newValue) {
-        window.nonparattestmethod = newValue;
+        nonparattestmethod = newValue;
     }
   })
   $("#nonparattestcorrection").editable({
@@ -63,18 +70,22 @@ window.nonparattestcorrection = 'fdr';
       {value:'none',text:'none'}
     ],
     success: function(response, newValue){
-      window.nonparattestcorrection = newValue;
+      nonparattestcorrection = newValue;
     }
   })
 
 }
 
+var ANOVAmethod = 'Welch';
+var ANOVAposthoc = 'games.howell';
+var nonparaANOVAmethod = 'htest';//Kruskal-Wallis H test
+var nonparaANOVAposthoc = 'dunn';
 
 ANOVA_disc = function(){
-  window.ANOVAmethod = 'Welch';
-  window.ANOVAposthoc = 'games.howell';
-  window.nonparaANOVAmethod = 'htest';//Kruskal-Wallis H test
-  window.nonparaANOVAposthoc = 'dunn';
+  ANOVAmethod = 'Welch';
+  ANOVAposthoc = 'games.howell';
+  nonparaANOVAmethod = 'htest';//Kruskal-Wallis H test
+  nonparaANOVAposthoc = 'dunn';
 
  var levels = pComponents[$("#independent_factor").val()[0]].slice(0,2).join("</em>, <em>")
  var lastlevel = pComponents[$("#independent_factor").val()[0]][pComponents[$("#independent_factor").val()[0]].length-1];
@@ -88,7 +99,10 @@ ANOVA_disc = function(){
       {value:'ANOVA',text:'ANOVA'},
       {value:'Welch',text:'Welch\'s ANOVA'},
       {value: 'none', text:  'no test'}
-    ]
+    ],
+    success: function(response, newValue) {
+        ANOVAmethod = newValue;
+    }
   })
   $("#ANOVAposthoc").editable({
     value:'games.howell',
@@ -96,7 +110,10 @@ ANOVA_disc = function(){
       {value:'tukey',text:'Tukey'},
       {value:'games.howell',text:'Games-Howell'},
       {value: 'none', text:  'no'}
-    ]
+    ],
+    success: function(response, newValue) {
+        ANOVAposthoc = newValue;
+    }
   })
 
    $("#method_description_non_para").html(
@@ -107,7 +124,10 @@ ANOVA_disc = function(){
     source:[
       {value:'htest',text:'Kruskal-Wallis H Test'},
       {value: 'none', text:  'no test'}
-    ]
+    ],
+    success: function(response, newValue) {
+        nonparaANOVAmethod = newValue;
+    }
   })
   $("#nonparaANOVAposthoc").editable({
     value:'dunn',
@@ -115,6 +135,9 @@ ANOVA_disc = function(){
       {value:'dunn',text:'Dunn\'s (1964) procedure with a Bonferroni adjustment'},
       {value:'utest',text:'Mann-Whitney U tests with a Bonferroni adjustment'},
       {value: 'none', text:  'no'}
-    ]
+    ],
+    success: function(response, newValue) {
+        nonparaANOVAposthoc = newValue;
+    }
   })
 }
