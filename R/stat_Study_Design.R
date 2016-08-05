@@ -52,7 +52,21 @@ stat_Study_Design = function(DATA, between_factor = NULL, within_factor = NULL){
     }else if(length(factor_name[!factor_name%in%within_factor])==1 & length(within_factor)==0 & (length(unique(dta[,2]))==2)){# t test
       stat_method = "independent t test"
     }else if(length(factor_name[!factor_name%in%within_factor])==2 & length(within_factor)==0){# two way ANOVA
-      stat_method = "two way ANOVA"
+
+      if(length(unique(dta[,2]))>2 & length(unique(dta[,3]))>2){
+        stat_method = "two way ANOVA33"
+      }
+      if(length(unique(dta[,2]))==2 & length(unique(dta[,3]))>2){
+        stat_method = "two way ANOVA23"
+      }
+      if(length(unique(dta[,2]))>2 & length(unique(dta[,3]))==2){
+        stat_method = "two way ANOVA32"
+      }
+      if(length(unique(dta[,2]))==2 & length(unique(dta[,3]))==2){
+        stat_method = "two way ANOVA22"
+      }
+
+
     }else if(length(factor_name[!factor_name%in%within_factor])==0 & length(within_factor)==1 & (length(unique(dta[,2]))>2)){# one way repeated ANOVA
       stat_method = "one way repeated ANOVA"
     }else if(length(factor_name[!factor_name%in%within_factor])==0 & length(within_factor)==1 & (length(unique(dta[,2]))==2)){# paired t test

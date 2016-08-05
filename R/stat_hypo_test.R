@@ -20,7 +20,20 @@ stat_hypo_test = function(e,p,f,
                      need_power = T,desired_power =  NULL,
 
                      ttestmethod = NULL, ttestcorrection = NULL, nonparattestmethod = NULL, nonparattestcorrection = NULL,
-                     ANOVAmethod = NULL, ANOVAposthoc = NULL, nonparaANOVAmethod = NULL, nonparaANOVAposthoc = NULL
+                     ANOVAmethod = NULL, ANOVAposthoc = NULL, nonparaANOVAmethod = NULL, nonparaANOVAposthoc = NULL,
+
+                     twowayANOVAmethod=NULL,
+                     maineffect1ANOVAmethod=NULL,maineffect1posthoc=NULL,simplemaineffect1ANOVAmethod=NULL,simplemaineffect1posthoc=NULL,
+                     maineffect2ANOVAmethod=NULL,maineffect2posthoc=NULL,simplemaineffect2ANOVAmethod=NULL,simplemaineffect2posthoc=NULL,
+                     nonparatwowayANOVAmethod=NULL,
+                     nonparamaineffect1ANOVAmethod=NULL,nonparamaineffect1posthoc=NULL,nonparasimplemaineffect1ANOVAmethod=NULL,nonparasimplemaineffect1posthoc=NULL,
+                     nonparamaineffect2ANOVAmethod=NULL,nonparamaineffect2posthoc=NULL,nonparasimplemaineffect2ANOVAmethod=NULL,nonparasimplemaineffect2posthoc=NULL,
+
+                     maineffect1ttestmethod=NULL,maineffect1correction=NULL,simplemaineffect1ttestmethod=NULL,simplemaineffect1correction=NULL,
+                     maineffect2ttestmethod=NULL,maineffect2correction=NULL,simplemaineffect2ttestmethod=NULL,simplemaineffect2correction=NULL,
+                     nonparamaineffect1ttestmethod=NULL,nonparamaineffect1correction=NULL,nonparasimplemaineffect1ttestmethod=NULL,nonparasimplemaineffect1correction=NULL,
+                     nonparamaineffect2ttestmethod=NULL,nonparamaineffect2correction=NULL,nonparasimplemaineffect2ttestmethod=NULL,nonparasimplemaineffect2correction=NULL
+
 
 
 
@@ -245,121 +258,11 @@ if(length(independent_factor_name)==0){
 
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==2 & length(repeated_factor_name)==0){#two way ANOVA
 
+
           num_factor_variable1 = length(unique(dta$variable1))
           num_factor_variable2 = length(unique(dta$variable2))
           sudo_matrix1 = matrix(nrow = num_factor_variable1,ncol = num_factor_variable1)
           sudo_matrix2 = matrix(nrow = num_factor_variable2,ncol = num_factor_variable2)
-
-
-          parallel = parLapply(cl, 1:ncol(e),function(i,e,dta,ezANOVA,pbad2way){
-            dta$value = e[,i]
-            interaction_variable1_variable2 = ezANOVA(data = dta, dv = value, wid = id, between = .(variable1,variable2), type = 3)$ANOVA[3,5]
-            interaction_variable1_variable2_nonPara = NA
-              # pbad2way(value ~variable1*variable2,
-                # data = dta,est = "median")$AB.p.value
-
-            return(data.frame(interaction_variable1_variable2,interaction_variable1_variable2=interaction_variable1_variable2_nonPara))
-          },e,dta,ezANOVA,pbad2way)
-
-          interaction = do.call("rbind",parallel)
-          colnames(interaction) = c(paste("p_value:_Interaction_between", paste(factor_name,collapse = "_and_")),
-                                    paste("non_parametric_p_value:_Interaction_between", paste(factor_name,collapse = "_and_")))
-
-          if(!length(unique(dta$variable2))==2){ # if TRUE, then use ANOVA on main effect post hoc analysis.
-            variable2_posthoc = stat_one_way_ANOVA(data = e,dta, i=3, sudo_matrix2, factor_name,cl,
-                                                   maineffectANOVAmethod2,maineffectANOVAposthocmethod2,nonpara_maineffectANOVAmethod2,nonpara_maineffectANOVAposthocmethod2)
-            variable1_simple_main_effect = by(dta,dta$variable1,FUN = function(x){ #variable1 simple main effect
-              # x = dta[dta$variable1==levels(dta$variable1)[1],]
-              result = stat_one_way_ANOVA(data = e[dta$variable1==unique(x$variable1),],data2 = x,i=3,sudo_matrix=sudo_matrix2,factor_name,cl,
-                                          simplemaineffectANOVAmethod2,simplemaineffectANOVAposthocmethod2,nonpara_simplemaineffectANOVAmethod2,nonpara_simplemaineffectANOVAposthocmethod2) # the 3rd column is group.
-              return(result)
-            })
-            for(i in 1:length(variable1_simple_main_effect)){
-              colnames(variable1_simple_main_effect[[i]]) = paste0(levels(dta$variable1)[i],":_",colnames(variable1_simple_main_effect[[i]]))
-            }
-            result_temp = variable1_simple_main_effect[[1]]
-            for(i in 2:length(variable1_simple_main_effect)){
-              result_temp = cbind(result_temp,variable1_simple_main_effect[[i]])
-            }
-            variable1_simple_main_effect = result_temp
-          }else{
-            # if it is two levels, then no need to do post hoc analysis.
-
-            variable2_t_test = stat_t_test(data = e,dta, i=3,cl,
-                                           maineffectttestmethod2,maineffectttestposthocmethod2, nonpara_maineffectttestmethod2,nonpara_maineffectttestposthocmethod2)
-
-            variable1_simple_main_effect = by(dta,dta$variable1,FUN = function(x){ #variable1 simple main effect
-              # x = dta[dta$variable1=="drug 2",]
-              result = stat_t_test(e[dta$variable1==unique(x$variable1),],data2 = x,3,cl,
-                                   simplemaineffectttestmethod2,simplemaineffectttestposthocmethod2, nonpara_simplemaineffectttestmethod2,nonpara_simplemaineffectttestposthocmethod2) # the 3rd column is group.
-              return(result)
-            })# returns two length of list. Ordered by levels of INDICES in by().
-            for(i in 1:length(variable1_simple_main_effect)){
-              colnames(variable1_simple_main_effect[[i]]) = paste0(levels(dta$variable1)[i],":_",colnames(variable1_simple_main_effect[[i]]))
-            }
-            result_temp = variable1_simple_main_effect[[1]]
-            for(i in 2:length(variable1_simple_main_effect)){
-              result_temp = cbind(result_temp,variable1_simple_main_effect[[i]])
-            }
-            variable1_simple_main_effect = result_temp
-          }
-
-
-          if(!length(unique(dta$variable1))==2){# if TRUE, then use ANOVA on main effect post hoc analysis.
-            variable1_posthoc = stat_one_way_ANOVA(data = e,dta, i=2, sudo_matrix1, factor_name,cl,
-                                                   maineffectANOVAmethod1,maineffectANOVAposthocmethod1,nonpara_maineffectANOVAmethod1,nonpara_maineffectANOVAposthocmethod1)
-            variable2_simple_main_effect = by(dta,dta$variable2,FUN = function(x){ #variable1 simple main effect
-              # x = dta[dta$variable2==levels(dta$variable2)[1],]
-              result = stat_one_way_ANOVA(data = e[dta$variable2==unique(x$variable2),],data2 = x,i=2,sudo_matrix=sudo_matrix1,factor_name,cl,
-                                          simplemaineffectANOVAmethod1,simplemaineffectANOVAposthocmethod1,nonpara_simplemaineffectANOVAmethod1,nonpara_simplemaineffectANOVAposthocmethod1) # the 3rd column is group.
-              return(result)
-            })
-            for(i in 1:length(variable2_simple_main_effect)){
-              colnames(variable2_simple_main_effect[[i]]) = paste0(levels(dta$variable2)[i],":_",colnames(variable2_simple_main_effect[[i]]))
-            }
-            result_temp = variable2_simple_main_effect[[1]]
-            for(i in 2:length(variable2_simple_main_effect)){
-              result_temp = cbind(result_temp,variable2_simple_main_effect[[i]])
-            }
-            variable2_simple_main_effect = result_temp
-          }else{
-            # if it is two levels, then no need to do post hoc analysis.
-            variable1_t_test = stat_t_test(data = e,dta, i=2,cl,
-                                           maineffectttestmethod1,maineffectttestposthocmethod1, nonpara_maineffectttestmethod1,nonpara_maineffectttestposthocmethod1)
-
-            variable2_simple_main_effect = by(dta,dta$variable2,FUN = function(x){ #variable1 simple main effect
-              # x = dta[dta$variable2=="time 1",]
-              result = stat_t_test(e[dta$variable2==unique(x$variable2),],x, i=2,cl,
-                                   simplemaineffectttestmethod1,simplemaineffectttestposthocmethod1, nonpara_simplemaineffectttestmethod1,nonpara_simplemaineffectttestposthocmethod1) # 2nd column is group.
-              return(result)
-            })
-            for(i in 1:length(variable2_simple_main_effect)){
-              colnames(variable2_simple_main_effect[[i]]) = paste0(levels(dta$variable2)[i],":_",colnames(variable2_simple_main_effect[[i]]))
-            }
-            result_temp = variable2_simple_main_effect[[1]]
-            for(i in 2:length(variable2_simple_main_effect)){
-              result_temp = cbind(result_temp,variable2_simple_main_effect[[i]])
-            }
-            variable2_simple_main_effect = result_temp
-          }
-
-
-          if(num_factor_variable1 == 2 & (!num_factor_variable2 == 2)){
-            result = data.frame(interaction,variable1_t_test,variable2_posthoc,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
-          }else if(num_factor_variable2 == 2 & (!num_factor_variable1 == 2)){
-            result = data.frame(interaction,variable1_posthoc,variable2_t_test,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
-          }else if((num_factor_variable1 == 2) & (num_factor_variable2 == 2)){
-            result = data.frame(interaction,variable1_t_test,variable2_t_test,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
-          }else{
-            result = data.frame(interaction,variable1_posthoc,variable2_posthoc,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
-          }
-
-
-          # result[,-1] = result[,!abs(diff(result[1,]))<0.000000001]
-          f$'outlier exist?' = stat_test_outlier(e,f,p,factor_name)
-
-          result = data.frame(f,result,check.names = F)
-
 
           result_stat = matrix(nrow = ncol(e),ncol = (1 + length(unique(dta$variable1)) + length(unique(dta$variable2)) +
                                                         length(unique(dta$variable1)) * length(unique(dta$variable2)))*2) # global mean, sd. and mean and sd for each group.
@@ -395,6 +298,129 @@ if(length(independent_factor_name)==0){
                                     paste("Standard Deviation of", names( by(dta$value, paste(dta$variable1,dta$variable2, sep = "*"),sd,na.rm = T)))
           )
 
+
+
+
+
+          if(!twowayANOVAmethod=='none'){
+            interaction = parSapply(cl, 1:ncol(e),function(i,e,dta,ezANOVA){
+              dta$value = e[,i]
+              interaction_variable1_variable2 = ezANOVA(data = dta, dv = value, wid = id, between = .(variable1,variable2), type = 3)$ANOVA[3,5]
+              interaction_variable1_variable2
+            },e,dta,ezANOVA)
+          }else{
+            interaction = NA
+          }
+
+
+          if(!length(unique(dta$variable1))==2){# if TRUE, then use ANOVA on main effect post hoc analysis.
+            variable1_posthoc = stat_one_way_ANOVA(data = e,data2 = dta, i=2, sudo_matrix1, factor_name[1],cl,
+                                                   maineffect1ANOVAmethod,maineffect1posthoc,nonparamaineffect1ANOVAmethod,nonparamaineffect1posthoc)
+            variable2_simple_main_effect = by(dta,dta$variable2,FUN = function(x){ #variable1 simple main effect
+              # x = dta[dta$variable2==levels(dta$variable2)[1],]
+              result = stat_one_way_ANOVA(data = e[dta$variable2==unique(x$variable2),],data2 = x,i=2,sudo_matrix=sudo_matrix1,factor_name[1],cl,
+                                          simplemaineffect1ANOVAmethod,simplemaineffect1posthoc,nonparasimplemaineffect1ANOVAmethod,nonparasimplemaineffect1posthoc) # the 3rd column is group.
+              return(result)
+            })
+            for(i in 1:length(variable2_simple_main_effect)){
+              colnames(variable2_simple_main_effect[[i]]) = paste0(levels(dta$variable2)[i],":_",colnames(variable2_simple_main_effect[[i]]))
+            }
+            result_temp = variable2_simple_main_effect[[1]]
+            for(i in 2:length(variable2_simple_main_effect)){
+              result_temp = cbind(result_temp,variable2_simple_main_effect[[i]])
+            }
+            variable2_simple_main_effect = result_temp
+          }else{
+            # if it is two levels, then no need to do post hoc analysis.
+            variable1_t_test = stat_t_test(data = e,data2 = dta, i=2,cl,
+                                           maineffect1ttestmethod,maineffect1correction, nonparamaineffect1ttestmethod,nonparamaineffect1correction)
+
+            variable2_simple_main_effect = by(dta,dta$variable2,FUN = function(x){ #variable1 simple main effect
+              # x = dta[dta$variable2=="time 1",]
+              result = stat_t_test(e[dta$variable2==unique(x$variable2),],x, i=2,cl,
+                                   simplemaineffect1ttestmethod,simplemaineffect1correction, nonparasimplemaineffect1ttestmethod,nonparasimplemaineffect1correction) # 2nd column is group.
+              return(result)
+            })
+            for(i in 1:length(variable2_simple_main_effect)){
+              colnames(variable2_simple_main_effect[[i]]) = paste0(levels(dta$variable2)[i],":",colnames(variable2_simple_main_effect[[i]]))
+            }
+            result_temp = variable2_simple_main_effect[[1]]
+            for(i in 2:length(variable2_simple_main_effect)){
+              result_temp = cbind(result_temp,variable2_simple_main_effect[[i]])
+            }
+            variable2_simple_main_effect = result_temp
+          }
+
+
+
+
+
+
+
+
+
+          # colnames(interaction) = c(paste0("p_value:_Interaction_between_", paste(factor_name,collapse = "_and_")),
+          #                           paste("non_parametric_p_value:_Interaction_between", paste(factor_name,collapse = "_and_")))
+
+          if(!length(unique(dta$variable2))==2){ # if TRUE, then use ANOVA on main effect post hoc analysis.
+            variable2_posthoc = stat_one_way_ANOVA(data = e,data2 = dta, i=3, sudo_matrix2, factor_name[2],cl,
+                                                   maineffect2ANOVAmethod,maineffect2posthoc,nonparamaineffect2ANOVAmethod,nonparamaineffect2posthoc)
+            variable1_simple_main_effect = by(dta,dta$variable1,FUN = function(x){ #variable2 simple main effect
+              # x = dta[dta$variable1==levels(dta$variable1)[1],]
+              result = stat_one_way_ANOVA(data = e[dta$variable1==unique(x$variable1),],data2 = x,i=3,sudo_matrix=sudo_matrix2,factor_name[2],cl,
+                                          simplemaineffect2ANOVAmethod,simplemaineffect2posthoc,nonparasimplemaineffect2ANOVAmethod,nonparasimplemaineffect2posthoc) # the 3rd column is group.
+              return(result)
+            })
+            for(i in 1:length(variable1_simple_main_effect)){
+              colnames(variable1_simple_main_effect[[i]]) = paste0(levels(dta$variable1)[i],":_",colnames(variable1_simple_main_effect[[i]]))
+            }
+            result_temp = variable1_simple_main_effect[[1]]
+            for(i in 2:length(variable1_simple_main_effect)){
+              result_temp = cbind(result_temp,variable1_simple_main_effect[[i]])
+            }
+            variable1_simple_main_effect = result_temp
+          }else{
+            # if it is two levels, then no need to do post hoc analysis.
+            variable2_t_test = stat_t_test(data = e,data2 = dta, i=3,cl,
+                                           maineffect2ttestmethod,maineffect2correction, nonparamaineffect2ttestmethod,nonparamaineffect2correction)
+
+            variable1_simple_main_effect = by(dta,dta$variable1,FUN = function(x){ #variable1 simple main effect
+              # x = dta[dta$variable1=="time 2",]
+              result = stat_t_test(e[dta$variable1==unique(x$variable1),],x, i=3,cl,
+                                   simplemaineffect2ttestmethod,simplemaineffect2correction, nonparasimplemaineffect2ttestmethod,nonparasimplemaineffect2correction) # 2nd column is group.
+              return(result)
+            })
+            for(i in 1:length(variable1_simple_main_effect)){
+              colnames(variable1_simple_main_effect[[i]]) = paste0(levels(dta$variable1)[i],":",colnames(variable1_simple_main_effect[[i]]))
+            }
+            result_temp = variable1_simple_main_effect[[1]]
+            for(i in 2:length(variable1_simple_main_effect)){
+              result_temp = cbind(result_temp,variable1_simple_main_effect[[i]])
+            }
+            variable1_simple_main_effect = result_temp
+          }
+
+
+
+
+
+          if(num_factor_variable1 == 2 & (!num_factor_variable2 == 2)){
+            result = data.frame(interaction,variable1_t_test,variable2_posthoc,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
+          }else if(num_factor_variable2 == 2 & (!num_factor_variable1 == 2)){
+            result = data.frame(interaction,variable1_posthoc,variable2_t_test,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
+          }else if((num_factor_variable1 == 2) & (num_factor_variable2 == 2)){
+            result = data.frame(interaction,variable1_t_test,variable2_t_test,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
+          }else{
+            result = data.frame(interaction,variable1_posthoc,variable2_posthoc,variable1_simple_main_effect,variable2_simple_main_effect,check.names = FALSE)
+          }
+          colnames(result)[1] = paste0("p_value:_Interaction_between_", paste(factor_name,collapse = "_and_"))
+
+
+          # result[,-1] = result[,!abs(diff(result[1,]))<0.000000001]
+          f$'outlier exist?' = stat_test_outlier(e,f,p,factor_name)
+
+          result = data.frame(f,result,check.names = F)
+
           result = cbind(result,result_stat)
 
           result_stat_variable1 = result_stat[,c(1,
@@ -415,7 +441,7 @@ if(length(independent_factor_name)==0){
                                                ((((num_factor_variable1+1)+num_factor_variable2+num_factor_variable1*num_factor_variable2+1+num_factor_variable1)+1)+num_factor_variable2-1+
                                                   num_factor_variable2*num_factor_variable1))]
           if(need_power){
-          stat_power = stat_two_way_ANOVA_power(e=e,dta=dta,sig.level = 0.05, desired_power = 0.8,independent_factor_name = factor_name, cl)
+          stat_power = stat_two_way_ANOVA_power(e=e,dta=dta,sig.level = 0.05, desired_power = desired_power,independent_factor_name = factor_name, cl)
             result = cbind(result,stat_power)
           }
 

@@ -229,7 +229,6 @@ $(".Thefactor").on("change",function(){
                         });
                       session4.getFile("stat_method.txt", function(text){
 console.log(text)
-
 if(text.includes("one way ANOVA")){
   ANOVA_disc();
   console.log(ttestmethod);
@@ -237,8 +236,14 @@ if(text.includes("one way ANOVA")){
   //ttestdescription();
   t_test_disc();
   console.log(ttestmethod);
-}else if(text.includes("two way ANOVA")){
-  twowayANOVAdescription();
+}else if(text.includes("two way ANOVA33")){
+  twowayANOVA33_disc();
+}else if(text.includes("two way ANOVA23")){
+  twowayANOVA23_disc()
+}else if(text.includes("two way ANOVA22")){
+  twowayANOVA22_disc()
+}else if(text.includes("two way ANOVA32")){
+  twowayANOVA32_disc()
 }else if(text.includes("one way repeated ANOVA")){
   onewayrepeatedANOVAdescription();
 }else if(text.includes("paired t test")){

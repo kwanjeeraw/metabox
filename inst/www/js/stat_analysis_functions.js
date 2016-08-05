@@ -71,8 +71,14 @@ if(text.includes("one way ANOVA")){
 }else if(text.includes("independent t test")){
   //ttestdescription();
   t_test_disc();
-}else if(text.includes("two way ANOVA")){
-  twowayANOVAdescription();
+}else if(text.includes("two way ANOVA33")){
+  twowayANOVA33_disc();
+}else if(text.includes("two way ANOVA23")){
+  twowayANOVA23_disc()
+}else if(text.includes("two way ANOVA22")){
+  twowayANOVA22_disc()
+}else if(text.includes("two way ANOVA32")){
+  twowayANOVA32_disc()
 }else if(text.includes("one way repeated ANOVA")){
   onewayrepeatedANOVAdescription();
 }else if(text.includes("paired t test")){
@@ -161,7 +167,22 @@ applystatistics = function(){
     need_power:document.getElementById('power_analysis_needed').checked,
     desired_power: pwr,
 ttestmethod : ttestmethod, ttestcorrection : ttestcorrection, nonparattestmethod : nonparattestmethod, nonparattestcorrection : nonparattestcorrection,
-ANOVAmethod:ANOVAmethod, ANOVAposthoc:ANOVAposthoc, nonparaANOVAmethod:nonparaANOVAmethod, nonparaANOVAposthoc:nonparaANOVAposthoc
+ANOVAmethod:ANOVAmethod, ANOVAposthoc:ANOVAposthoc, nonparaANOVAmethod:nonparaANOVAmethod, nonparaANOVAposthoc:nonparaANOVAposthoc,
+
+twowayANOVAmethod:twowayANOVAmethod,
+maineffect1ANOVAmethod:maineffect1ANOVAmethod,maineffect1posthoc:maineffect1posthoc,simplemaineffect1ANOVAmethod:simplemaineffect1ANOVAmethod,simplemaineffect1posthoc:simplemaineffect1posthoc,
+maineffect2ANOVAmethod:maineffect2ANOVAmethod,maineffect2posthoc:maineffect2posthoc,simplemaineffect2ANOVAmethod:simplemaineffect2ANOVAmethod,simplemaineffect2posthoc:simplemaineffect2posthoc,
+nonparatwowayANOVAmethod:nonparatwowayANOVAmethod,
+nonparamaineffect1ANOVAmethod:nonparamaineffect1ANOVAmethod,nonparamaineffect1posthoc:nonparamaineffect1posthoc,nonparasimplemaineffect1ANOVAmethod:nonparasimplemaineffect1ANOVAmethod,nonparasimplemaineffect1posthoc:nonparasimplemaineffect1posthoc,
+nonparamaineffect2ANOVAmethod:nonparamaineffect2ANOVAmethod,nonparamaineffect2posthoc:nonparamaineffect2posthoc,nonparasimplemaineffect2ANOVAmethod:nonparasimplemaineffect2ANOVAmethod,nonparasimplemaineffect2posthoc:nonparasimplemaineffect2posthoc,
+
+
+
+maineffect1ttestmethod:maineffect1ttestmethod,maineffect1correction:maineffect1correction,simplemaineffect1ttestmethod:simplemaineffect1ttestmethod,simplemaineffect1correction:simplemaineffect1correction,
+maineffect2ttestmethod:maineffect2ttestmethod,maineffect2correction:maineffect2correction,simplemaineffect2ttestmethod:simplemaineffect2ttestmethod,simplemaineffect2correction:simplemaineffect2correction,
+nonparamaineffect1ttestmethod:nonparamaineffect1ttestmethod,nonparamaineffect1correction:nonparamaineffect1correction,nonparasimplemaineffect1ttestmethod:nonparasimplemaineffect1ttestmethod,nonparasimplemaineffect1correction:nonparasimplemaineffect1correction,
+nonparamaineffect2ttestmethod:nonparamaineffect2ttestmethod,nonparamaineffect2correction:nonparamaineffect2correction,nonparasimplemaineffect2ttestmethod:nonparasimplemaineffect2ttestmethod,nonparasimplemaineffect2correction:nonparasimplemaineffect2correction
+
 
 
  /*                    onewayANOVAmethod:onewayANOVAmethod.value,nonpara_onewayANOVAmethod:nonpara_onewayANOVAmethod.value,onewayANOVAposthocmethod:onewayANOVAposthocmethod.value,nonpara_onewayANOVAposthocmethod:nonpara_onewayANOVAposthocmethod.value,
