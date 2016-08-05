@@ -18,9 +18,9 @@ uploaddata = function(){
           pData = obj.phenotype;
           e_ori = obj.expression;
           p_ori = obj.phenotype;
-          pDataTable = drawTable('#View_pData',obj.phenotype, "Phenotype Data","phenotype_index");
-          fDataTable = drawTable('#View_fData',obj.feature, "Feature Data","feature_index");
-          fDataTable = drawTable('#View_eData',obj.expression, "Expression Data","feature_index");
+          drawTable('#View_pData',obj.phenotype, "Phenotype Data","phenotype_index");
+          drawTable('#View_fData',obj.feature, "Feature Data","feature_index");
+          drawTable('#View_eData',obj.expression, "Expression Data","feature_index");
           duplicatedID = obj.duplicatedID;
           if(duplicatedID[0]){
               document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend"  value = "TRUE"></label></div>';
@@ -618,12 +618,13 @@ function formatTableFields(jsonData){
     }
     return colnames;
 }
-var table = $('#Statistics_Result').DataTable();
+
+
+//var table = $('#Statistics_Result').DataTable();
 //@function draw table
 //@param id id element
 //@param data array of json objects
 function drawTable(id, data, filename,idSrc,tableheight="450px") {
-
 	editor = new $.fn.dataTable.Editor( {
         data: data,
         table: id,
@@ -631,7 +632,13 @@ function drawTable(id, data, filename,idSrc,tableheight="450px") {
         fields: formatTableFields(data[0])
     } );
 
-	table.destroy();
+
+  if(id === '#Statistics_Result'){
+      table.destroy();
+  }
+
+
+
 $(id).empty();
 
 	 table = $(id).DataTable( {
