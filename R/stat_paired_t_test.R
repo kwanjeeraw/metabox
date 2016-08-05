@@ -65,7 +65,7 @@ stat_paired_t_test = function(data,data2,i,cl,
   result[,4] = p.adjust(result[,3],nonpara_pairedttestFDRmethod)
   result = data.frame(result,stringsAsFactors = F,check.names = F)
   temp = paste0("p_value_",paste(levels(data2[,i])[levels(data2[,i])%in%unique(data2[,i])],collapse  = "_vs_"))
-  colnames(result) = c(temp,paste0(pairedttestFDRmethod,"_Ajusted_",temp),paste0("_non_parametric_",temp),paste0(nonpara_pairedttestFDRmethod,"_Adjusted_non_parametric_",temp))
+  colnames(result) = c(temp,paste0(pairedttestFDRmethod,"_Adjusted_",temp),paste0("_non_parametric_",temp),paste0(nonpara_pairedttestFDRmethod,"_Adjusted_non_parametric_",temp))
   rownames(result) = colnames(data)
   return(result)
 }

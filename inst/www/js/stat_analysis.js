@@ -305,7 +305,7 @@ $("#enrBtn").click(function(){
   if(type==="nothing"){
 bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'subnetwork.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'enrichmentrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -314,9 +314,9 @@ $("#overrepBtn").click(function(){
     if(type==="nothing"){
 bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      //window.location = 'overrepanalysis.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
-      var rsess1 = rsession.replace("localhost","128.120.143.234");
-      window.open('http://128.120.143.215:3104/ocpu/library/metaboxdev/www/overreprsess.html?rsess='+rsess1 + '&idtype='+type, '_blank');
+      window.location = 'overreprsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      //var rsess1 = rsession.replace("localhost","128.120.143.234");
+      //window.open('http://128.120.143.215:3104/ocpu/library/metaboxdev/www/overreprsess.html?rsess='+rsess1 + '&idtype='+type, '_blank');
   }
 });
 
@@ -324,7 +324,7 @@ $("#cloudBtn").click(function(){
     if(type==="nothing"){
 bootbox.alert("No ids found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'wordcloud.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'wordcloudrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
   }
 
 });
@@ -333,7 +333,7 @@ $("#SltBtn").click(function(){
     if(type!=="compound"){
 bootbox.alert("No compound id found in the table. Cannot proceed to the next step for MetaBox workflow.");
   }else{
-      window.location = 'similarity.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
+      window.location = 'similarityrsess.html?rsess='+rsession + '&idtype='+type;//send r object for subnetwork
       //window.open('http://128.120.143.208:1200/ocpu/library/MetaMapp2016/www/similarity.html?rsess='+rsession + '&idtype='+type, '_blank');
   }
 });

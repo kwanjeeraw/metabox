@@ -39,7 +39,7 @@ stat_t_test = function(data,data2,i,cl,
 
   result = data.frame(p_value,p_value_adj,nonparap_value,nonparap_value_adj,stringsAsFactors = F,check.names = F)
   temp = paste0("p_value_",paste(levels(data2[,i])[levels(data2[,i])%in%unique(data2[,i])],collapse  = "_vs_"))
-  colnames(result) = c(temp,paste0(ttestcorrection,"_ajusted_",temp),paste0("_non_parametric_",temp),paste0(nonparattestcorrection,"_adjusted_non_parametric_",temp))
+  colnames(result) = c(temp,paste0(ttestcorrection,"_adjusted_",temp),paste0("_non_parametric_",temp),paste0(nonparattestcorrection,"_adjusted_non_parametric_",temp))
   rownames(result) = colnames(data)
 
   result = result[,sapply(result,function(x){
