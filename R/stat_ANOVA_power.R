@@ -43,7 +43,6 @@ stat_ANOVA_power = function(e,dta,i,sig.level = 0.05, desired_power = 0.8,indepe
     colnames(power_sampleSize) = paste0(ifelse(colnames(dta)[i]=="variable1",independent_factor_name[1],independent_factor_name[2]),"_",c("post_hoc_Power", paste0("Sample_Size_at_Power_",desired_power*100,"_percent")))
   }else{
     colnames(power_sampleSize) = paste0("Interaction","_",c("post_hoc_Power", paste0("Total_Sample_Size_at_Power_",desired_power*100,"_percent")))
-
   }
 
   return(power_sampleSize)

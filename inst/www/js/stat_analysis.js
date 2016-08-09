@@ -49,10 +49,6 @@ var pComponents;
 $(document).ready(function(){//wait untile the document is fully loaded.
 
 
-
-
-
-
 PCA_score_plot = Plotly.d3.select('#stat_PCA_plot')
     .style({
         width: 100 + '%',
@@ -182,6 +178,7 @@ $("#Submit_To_Statistics").click(function(){
     bootbox.alert("Between Subject Factor can NOT equal th Within Subject Factor.");
   }else{
 
+
 applystatistics()
 
 
@@ -235,7 +232,6 @@ if(text.includes("one way ANOVA")){
 }else if(text.includes("independent t test")){
   //ttestdescription();
   t_test_disc();
-  console.log(ttestmethod);
 }else if(text.includes("two way ANOVA33")){
   twowayANOVA33_disc();
 }else if(text.includes("two way ANOVA23")){
@@ -245,14 +241,28 @@ if(text.includes("one way ANOVA")){
 }else if(text.includes("two way ANOVA32")){
   twowayANOVA32_disc()
 }else if(text.includes("one way repeated ANOVA")){
-  onewayrepeatedANOVAdescription();
+  pairedANOVA_disc();
 }else if(text.includes("paired t test")){
-  pairedttestdescription();
-}else if(text.includes("two way repeated anova")){
-  twowayrepeatedANOVAdescription();
-}else if(text.includes("mixed two way anova")){
-  mixedANOVAdescription();
+  paired_t_test_disc();
+}else if(text.includes("two way repeated anova33")){
+  twowaypairedANOVA33_disc();
+}else if(text.includes("two way repeated anova22")){
+  twowaypairedANOVA22_disc();
+}else if(text.includes("two way repeated anova32")){
+  twowaypairedANOVA32_disc();
+}else if(text.includes("two way repeated anova23")){
+  twowaypairedANOVA23_disc();
+}else if(text.includes("mixed two way anova33")){
+  mixedANOVA33_disc();
+}else if(text.includes("mixed two way anova22")){
+  mixedANOVA22_disc();
+}else if(text.includes("mixed two way anova32")){
+  mixedANOVA32_disc();
+}else if(text.includes("mixed two way anova23")){
+  mixedANOVA23_disc();
 }
+
+
 loadxeditable_elements();
 
 hideSpinner(loadSpinner);

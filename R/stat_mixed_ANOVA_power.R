@@ -46,7 +46,7 @@ stat_mixed_ANOVA_power = function(e,p,dta,sig.level = 0.05, desired_power = 0.8,
                                  Gmean = mean(dta$value,na.rm = T)
                                  Gsd = sd(dta$value,na.rm = T)
 
-                                 reshape = dcast(dta,id~repeated1)[,-1]
+                                 reshape = reshape2::dcast(dta,id~repeated1)[,-1]
                                  # rho = mean(cor(reshape)[upper.tri(cor(reshape))])
                                  rho = cor(dta$value,as.numeric(dta$repeated1))
                                  mu = m/(1-rho)

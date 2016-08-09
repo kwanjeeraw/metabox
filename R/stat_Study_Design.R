@@ -72,9 +72,36 @@ stat_Study_Design = function(DATA, between_factor = NULL, within_factor = NULL){
     }else if(length(factor_name[!factor_name%in%within_factor])==0 & length(within_factor)==1 & (length(unique(dta[,2]))==2)){# paired t test
       stat_method = "paired t test"
     }else if(length(factor_name[!factor_name%in%within_factor])==0 & length(within_factor)==2){# two way repeated anova.
-      stat_method = "two way repeated anova"
+
+
+      if(length(unique(dta[,2]))>2 & length(unique(dta[,3]))>2){
+        stat_method = "two way repeated anova33"
+      }
+      if(length(unique(dta[,2]))==2 & length(unique(dta[,3]))>2){
+        stat_method = "two way repeated anova23"
+      }
+      if(length(unique(dta[,2]))>2 & length(unique(dta[,3]))==2){
+        stat_method = "two way repeated anova32"
+      }
+      if(length(unique(dta[,2]))==2 & length(unique(dta[,3]))==2){
+        stat_method = "two way repeated anova22"
+      }
+
+
+
     }else if(length(factor_name[!factor_name%in%within_factor])==1 & length(within_factor)==1){# mixed two way anova
-      stat_method = "mixed two way anova"
+      if(length(unique(dta[,2]))>2 & length(unique(dta[,3]))>2){
+        stat_method = "mixed two way anova33"
+      }
+      if(length(unique(dta[,2]))==2 & length(unique(dta[,3]))>2){
+        stat_method = "mixed two way anova23"
+      }
+      if(length(unique(dta[,2]))>2 & length(unique(dta[,3]))==2){
+        stat_method = "mixed two way anova32"
+      }
+      if(length(unique(dta[,2]))==2 & length(unique(dta[,3]))==2){
+        stat_method = "mixed two way anova22"
+      }
     }else{
       stat_method = "Your Design is so complicated that we couldn't analysis. If you have any question, please contact Sili: slfan@ucdavis.edu"
     }

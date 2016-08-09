@@ -18,9 +18,9 @@ uploaddata = function(){
           pData = obj.phenotype;
           e_ori = obj.expression;
           p_ori = obj.phenotype;
-          drawTable('#View_pData',obj.phenotype, "Phenotype Data","phenotype_index");
-          drawTable('#View_fData',obj.feature, "Feature Data","feature_index");
-          drawTable('#View_eData',obj.expression, "Expression Data","feature_index");
+         drawTable('#View_pData',obj.phenotype, "Phenotype Data","phenotype_index");
+         drawTable('#View_fData',obj.feature, "Feature Data","feature_index");
+         drawTable('#View_eData',obj.expression, "Expression Data","feature_index");
           duplicatedID = obj.duplicatedID;
           if(duplicatedID[0]){
               document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend"  value = "TRUE"></label></div>';
@@ -80,15 +80,26 @@ if(text.includes("one way ANOVA")){
 }else if(text.includes("two way ANOVA32")){
   twowayANOVA32_disc()
 }else if(text.includes("one way repeated ANOVA")){
-  onewayrepeatedANOVAdescription();
+  pairedANOVA_disc();
 }else if(text.includes("paired t test")){
-  pairedttestdescription();
-}else if(text.includes("two way repeated anova")){
-  twowayrepeatedANOVAdescription();
-}else if(text.includes("mixed two way anova")){
-  mixedANOVAdescription();
+  paired_t_test_disc();
+}else if(text.includes("two way repeated anova33")){
+  twowaypairedANOVA33_disc();
+}else if(text.includes("two way repeated anova22")){
+  twowaypairedANOVA22_disc();
+}else if(text.includes("two way repeated anova32")){
+  twowaypairedANOVA32_disc();
+}else if(text.includes("two way repeated anova23")){
+  twowaypairedANOVA23_disc();
+}else if(text.includes("mixed two way anova33")){
+  mixedANOVA33_disc();
+}else if(text.includes("mixed two way anova22")){
+  mixedANOVA22_disc();
+}else if(text.includes("mixed two way anova32")){
+  mixedANOVA32_disc();
+}else if(text.includes("mixed two way anova23")){
+  mixedANOVA23_disc();
 }
-
 
 
 loadxeditable_elements();
@@ -156,8 +167,11 @@ applystatistics = function(){
   var loadSpinner = showSpinner();
 
 
+
+
+
     var req=ocpu.call("stat_hypo_test",{
-    e : DATA.expression,f : DATA.feature,p : DATA.phenotype,
+    e:DATA.expression,f : DATA.feature,p : DATA.phenotype,
     e_ori:e_ori,
     p_ori:p_ori,
     e_before:D.expression,
@@ -166,51 +180,45 @@ applystatistics = function(){
     repeated_factor_name:$("#repeated_factor").val(),
     need_power:document.getElementById('power_analysis_needed').checked,
     desired_power: pwr,
-ttestmethod : ttestmethod, ttestcorrection : ttestcorrection, nonparattestmethod : nonparattestmethod, nonparattestcorrection : nonparattestcorrection,
-ANOVAmethod:ANOVAmethod, ANOVAposthoc:ANOVAposthoc, nonparaANOVAmethod:nonparaANOVAmethod, nonparaANOVAposthoc:nonparaANOVAposthoc,
 
-twowayANOVAmethod:twowayANOVAmethod,
-maineffect1ANOVAmethod:maineffect1ANOVAmethod,maineffect1posthoc:maineffect1posthoc,simplemaineffect1ANOVAmethod:simplemaineffect1ANOVAmethod,simplemaineffect1posthoc:simplemaineffect1posthoc,
-maineffect2ANOVAmethod:maineffect2ANOVAmethod,maineffect2posthoc:maineffect2posthoc,simplemaineffect2ANOVAmethod:simplemaineffect2ANOVAmethod,simplemaineffect2posthoc:simplemaineffect2posthoc,
-nonparatwowayANOVAmethod:nonparatwowayANOVAmethod,
-nonparamaineffect1ANOVAmethod:nonparamaineffect1ANOVAmethod,nonparamaineffect1posthoc:nonparamaineffect1posthoc,nonparasimplemaineffect1ANOVAmethod:nonparasimplemaineffect1ANOVAmethod,nonparasimplemaineffect1posthoc:nonparasimplemaineffect1posthoc,
-nonparamaineffect2ANOVAmethod:nonparamaineffect2ANOVAmethod,nonparamaineffect2posthoc:nonparamaineffect2posthoc,nonparasimplemaineffect2ANOVAmethod:nonparasimplemaineffect2ANOVAmethod,nonparasimplemaineffect2posthoc:nonparasimplemaineffect2posthoc,
+ttestmethod : ttestmethod,ttestcorrection : ttestcorrection,nonparattestmethod : nonparattestmethod,nonparattestcorrection : nonparattestcorrection,
+
+ANOVAmethod : ANOVAmethod,ANOVAposthoc : ANOVAposthoc,nonparaANOVAmethod : nonparaANOVAmethod,nonparaANOVAposthoc : nonparaANOVAposthoc,
+
+twowayANOVAmethod : twowayANOVAmethod,
+maineffect1ANOVAmethod : maineffect1ANOVAmethod,maineffect1ANOVAposthoc : maineffect1ANOVAposthoc,simplemaineffect1ANOVAmethod : simplemaineffect1ANOVAmethod,simplemaineffect1ANOVAposthoc : simplemaineffect1ANOVAposthoc,
+maineffect1ttestmethod : maineffect1ttestmethod,maineffect1ttestcorrection : maineffect1ttestcorrection,simplemaineffect1ttestmethod : simplemaineffect1ttestmethod,simplemaineffect1ttestcorrection : simplemaineffect1ttestcorrection,
+maineffect2ANOVAmethod : maineffect2ANOVAmethod,maineffect2ANOVAposthoc : maineffect2ANOVAposthoc,simplemaineffect2ANOVAmethod : simplemaineffect2ANOVAmethod,simplemaineffect2ANOVAposthoc : simplemaineffect2ANOVAposthoc,
+maineffect2ttestmethod : maineffect2ttestmethod,maineffect2ttestcorrection : maineffect2ttestcorrection,simplemaineffect2ttestmethod : simplemaineffect2ttestmethod,simplemaineffect2ttestcorrection : simplemaineffect2ttestcorrection,
+nonparatwowayANOVAmethod : nonparatwowayANOVAmethod,
+nonparamaineffect1ANOVAmethod : nonparamaineffect1ANOVAmethod,nonparamaineffect1ANOVAposthoc : nonparamaineffect1ANOVAposthoc,nonparasimplemaineffect1ANOVAmethod : nonparasimplemaineffect1ANOVAmethod,nonparasimplemaineffect1ANOVAposthoc : nonparasimplemaineffect1ANOVAposthoc,
+nonparamaineffect1ttestmethod : nonparamaineffect1ttestmethod,nonparamaineffect1ttestcorrection : nonparamaineffect1ttestcorrection,nonparasimplemaineffect1ttestmethod : nonparasimplemaineffect1ttestmethod,nonparasimplemaineffect1ttestcorrection : nonparasimplemaineffect1ttestcorrection,
+nonparamaineffect2ANOVAmethod : nonparamaineffect2ANOVAmethod,nonparamaineffect2ANOVAposthoc : nonparamaineffect2ANOVAposthoc,nonparasimplemaineffect2ANOVAmethod : nonparasimplemaineffect2ANOVAmethod,nonparasimplemaineffect2ANOVAposthoc : nonparasimplemaineffect2ANOVAposthoc,
+nonparamaineffect2ttestmethod : nonparamaineffect2ttestmethod,nonparamaineffect2ttestcorrection : nonparamaineffect2ttestcorrection,nonparasimplemaineffect2ttestmethod : nonparasimplemaineffect2ttestmethod,nonparasimplemaineffect2ttestcorrection : nonparasimplemaineffect2ttestcorrection,
+
+pairedttestmethod : pairedttestmethod,pairedttestcorrection : pairedttestcorrection,nonparapairedttestmethod : nonparapairedttestmethod,nonparapairedttestcorrection : nonparapairedttestcorrection,
+
+pairedANOVAmethod : pairedANOVAmethod,pairedANOVAadjust : pairedANOVAadjust,pairedANOVAposthoc : pairedANOVAposthoc,nonparapairedANOVAmethod : nonparapairedANOVAmethod,nonparapairedANOVAposthoc : nonparapairedANOVAposthoc,
+
+twowaypairedANOVAmethod : twowaypairedANOVAmethod,twowaypairedANOVAadjust : twowaypairedANOVAadjust,
+maineffect1pairedANOVAmethod : maineffect1pairedANOVAmethod,maineffect1pairedANOVAadjust : maineffect1pairedANOVAadjust,maineffect1pairedANOVAposthoc : maineffect1pairedANOVAposthoc,simplemaineffect1pairedANOVAmethod : simplemaineffect1pairedANOVAmethod,simplemaineffect1pairedANOVAadjust : simplemaineffect1pairedANOVAadjust,simplemaineffect1pairedANOVAposthoc : simplemaineffect1pairedANOVAposthoc,
+maineffect1pairedttestmethod : maineffect1pairedttestmethod,maineffect1pairedttestcorrection : maineffect1pairedttestcorrection,simplemaineffect1pairedttestmethod : simplemaineffect1pairedttestmethod,simplemaineffect1pairedttestcorrection : simplemaineffect1pairedttestcorrection,
+maineffect2pairedANOVAmethod : maineffect2pairedANOVAmethod,maineffect2pairedANOVAadjust : maineffect2pairedANOVAadjust,maineffect2pairedANOVAposthoc : maineffect2pairedANOVAposthoc,simplemaineffect2pairedANOVAmethod : simplemaineffect2pairedANOVAmethod,simplemaineffect2pairedANOVAadjust : simplemaineffect2pairedANOVAadjust,simplemaineffect2pairedANOVAposthoc : simplemaineffect2pairedANOVAposthoc,
+maineffect2pairedttestmethod : maineffect2pairedttestmethod,maineffect2pairedttestcorrection : maineffect2pairedttestcorrection,simplemaineffect2pairedttestmethod : simplemaineffect2pairedttestmethod,simplemaineffect2pairedttestcorrection : simplemaineffect2pairedttestcorrection,
+
+nonparatwowaypairedANOVAmethod : nonparatwowaypairedANOVAmethod,
+nonparamaineffect1pairedANOVAmethod : nonparamaineffect1pairedANOVAmethod,nonparamaineffect1pairedANOVAposthoc : nonparamaineffect1pairedANOVAposthoc,nonparasimplemaineffect1pairedANOVAmethod : nonparasimplemaineffect1pairedANOVAmethod,nonparasimplemaineffect1pairedANOVAposthoc : nonparasimplemaineffect1pairedANOVAposthoc,
+nonparamaineffect1pairedttestmethod : nonparamaineffect1pairedttestmethod,nonparamaineffect1pairedttestcorrection : nonparamaineffect1pairedttestcorrection,nonparasimplemaineffect1pairedttestmethod : nonparasimplemaineffect1pairedttestmethod,nonparasimplemaineffect1pairedttestcorrection : nonparasimplemaineffect1pairedttestcorrection,
+nonparamaineffect2pairedANOVAmethod : nonparamaineffect2pairedANOVAmethod,nonparamaineffect2pairedANOVAposthoc : nonparamaineffect2pairedANOVAposthoc,nonparasimplemaineffect2pairedANOVAmethod : nonparasimplemaineffect2pairedANOVAmethod,nonparasimplemaineffect2pairedANOVAposthoc : nonparasimplemaineffect2pairedANOVAposthoc,
+nonparamaineffect2pairedttestmethod : nonparamaineffect2pairedttestmethod,nonparamaineffect2pairedttestcorrection : nonparamaineffect2pairedttestcorrection,nonparasimplemaineffect2pairedttestmethod : nonparasimplemaineffect2pairedttestmethod,nonparasimplemaineffect2pairedttestcorrection : nonparasimplemaineffect2pairedttestcorrection,
+
+mixedANOVA : mixedANOVA,mixedANOVAadjust : mixedANOVAadjust,
+nonparamixedANOVA : nonparamixedANOVA
 
 
 
-maineffect1ttestmethod:maineffect1ttestmethod,maineffect1correction:maineffect1correction,simplemaineffect1ttestmethod:simplemaineffect1ttestmethod,simplemaineffect1correction:simplemaineffect1correction,
-maineffect2ttestmethod:maineffect2ttestmethod,maineffect2correction:maineffect2correction,simplemaineffect2ttestmethod:simplemaineffect2ttestmethod,simplemaineffect2correction:simplemaineffect2correction,
-nonparamaineffect1ttestmethod:nonparamaineffect1ttestmethod,nonparamaineffect1correction:nonparamaineffect1correction,nonparasimplemaineffect1ttestmethod:nonparasimplemaineffect1ttestmethod,nonparasimplemaineffect1correction:nonparasimplemaineffect1correction,
-nonparamaineffect2ttestmethod:nonparamaineffect2ttestmethod,nonparamaineffect2correction:nonparamaineffect2correction,nonparasimplemaineffect2ttestmethod:nonparasimplemaineffect2ttestmethod,nonparasimplemaineffect2correction:nonparasimplemaineffect2correction
 
 
-
- /*                    onewayANOVAmethod:onewayANOVAmethod.value,nonpara_onewayANOVAmethod:nonpara_onewayANOVAmethod.value,onewayANOVAposthocmethod:onewayANOVAposthocmethod.value,nonpara_onewayANOVAposthocmethod:nonpara_onewayANOVAposthocmethod.value,
-
-                     ttestmethod:ttestmethod.value,ttestFDRmethod:ttestFDRmethod.value,nonpara_ttestmethod:nonpara_ttestmethod.value,nonpara_ttestFDRmethod:nonpara_ttestFDRmethod.value,
-
-                     twowayANOVAmethod:twowayANOVAmethod.value,maineffectANOVAmethod1:maineffectANOVAmethod1.value,maineffectANOVAposthocmethod1:maineffectANOVAposthocmethod1.value,maineffectANOVAmethod2:maineffectANOVAmethod2.value,maineffectANOVAposthocmethod2:maineffectANOVAposthocmethod2.value,
-                     simplemaineffectANOVAmethod1:simplemaineffectANOVAmethod1.value,simplemaineffectANOVAposthocmethod1:simplemaineffectANOVAposthocmethod1.value,simplemaineffectANOVAmethod2:simplemaineffectANOVAmethod2.value,simplemaineffectANOVAposthocmethod2:simplemaineffectANOVAposthocmethod2.value,
-                     nonpara_maineffectANOVAmethod1:nonpara_maineffectANOVAmethod1.value,nonpara_maineffectANOVAposthocmethod1:nonpara_maineffectANOVAposthocmethod1.value,nonpara_maineffectANOVAmethod2:nonpara_maineffectANOVAmethod2.value,nonpara_maineffectANOVAposthocmethod2:nonpara_maineffectANOVAposthocmethod2.value,
-                     nonpara_simplemaineffectANOVAmethod1:nonpara_simplemaineffectANOVAmethod1.value,nonpara_simplemaineffectANOVAposthocmethod1:nonpara_simplemaineffectANOVAposthocmethod1.value,nonpara_simplemaineffectANOVAmethod2:nonpara_simplemaineffectANOVAmethod2.value,nonpara_simplemaineffectANOVAposthocmethod2:nonpara_simplemaineffectANOVAposthocmethod2.value,
-                     maineffectttestmethod1:maineffectttestmethod1.value,maineffectttestposthocmethod1:maineffectttestposthocmethod1.value,maineffectttestmethod2:maineffectttestmethod2.value,maineffectttestposthocmethod2:maineffectttestposthocmethod2.value,
-                     simplemaineffectttestmethod1:simplemaineffectttestmethod1.value,simplemaineffectttestposthocmethod1:simplemaineffectttestposthocmethod1.value,simplemaineffectttestmethod2:simplemaineffectttestmethod2.value,simplemaineffectttestposthocmethod2:simplemaineffectttestposthocmethod2.value,
-                     nonpara_maineffectttestmethod1:nonpara_maineffectttestmethod1.value,nonpara_maineffectttestposthocmethod1:nonpara_maineffectttestposthocmethod1.value,nonpara_maineffectttestmethod2:nonpara_maineffectttestmethod2.value,nonpara_maineffectttestposthocmethod2:nonpara_maineffectttestposthocmethod2.value,
-                     nonpara_simplemaineffectttestmethod1:nonpara_simplemaineffectttestmethod1.value,nonpara_simplemaineffectttestposthocmethod1:nonpara_simplemaineffectttestposthocmethod1.value,nonpara_simplemaineffectttestmethod2:nonpara_simplemaineffectttestmethod2.value,nonpara_simplemaineffectttestposthocmethod2:nonpara_simplemaineffectttestposthocmethod2.value,
-
-                     onewayrepeatedANOVAmethod : "rANOVA",onewayrepeatedANOVAposthocmethod : "paired+bonf",onewaySpher_Corr : onewaySpher_Corr.value,
-                     nonpara_onewayrepeatedANOVAmethod : "rANOVA",nonpara_onewayrepeatedANOVAposthocmethod : "nonpara_paired+bonf",
-
-                     pairedttestmethod : "paired t test", pairedttestFDRmethod : pairedttestFDRmethod.value, nonpara_pairedttestmethod : "Wil test", nonpara_pairedttestFDRmethod : nonpara_pairedttestFDRmethod.value,
-
-                     mainSpher_Corr1 : mainSpher_Corr1.value,mainSpher_Corr2 : mainSpher_Corr2.value,simplemainSpher_Corr1 : simplemainSpher_Corr1.value,simplemainSpher_Corr2 : simplemainSpher_Corr2.value,
-                     simplemaineffectpairedttestposthocmethod1 : simplemaineffectpairedttestposthocmethod1.value, simplemaineffectpairedttestposthocmethod2 : simplemaineffectpairedttestposthocmethod2.value, nonpara_simplemaineffectpairedttestposthocmethod1 : nonpara_simplemaineffectpairedttestposthocmethod1.value,
-                     nonpara_simplemaineffectpairedttestposthocmethod2 : nonpara_simplemaineffectpairedttestposthocmethod2.value,
-                     maineffectpairedttestposthocmethod1 : maineffectpairedttestposthocmethod1.value,nonpara_maineffectpairedttestposthocmethod1 : nonpara_maineffectpairedttestposthocmethod1.value,
-
-                     maineffectpairedttestposthocmethod2 : maineffectpairedttestposthocmethod2.value,nonpara_maineffectpairedttestposthocmethod2 : nonpara_maineffectpairedttestposthocmethod2.value
-
-*/
 
   },function(session4){
     //$("#StudyDesign").collapse('hide');
@@ -625,12 +633,12 @@ function formatTableFields(jsonData){
 //@param id id element
 //@param data array of json objects
 function drawTable(id, data, filename,idSrc,tableheight="450px") {
-	editor = new $.fn.dataTable.Editor( {
+	/*editor = new $.fn.dataTable.Editor( {
         data: data,
         table: id,
         idSrc:  idSrc,
         fields: formatTableFields(data[0])
-    } );
+    } );*/
 
 
   if(id === '#Statistics_Result'){
