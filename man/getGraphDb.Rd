@@ -11,7 +11,7 @@ url of the database location.
 }
 \description{
 get database location of the current working envornment.
-By default the database lacation is http://localhost:7474/db/data/cypher
+By default the local Neo4j database location is http://localhost:7474/db/data/
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

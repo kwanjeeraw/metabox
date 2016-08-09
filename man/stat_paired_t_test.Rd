@@ -4,8 +4,8 @@
 \alias{stat_paired_t_test}
 \title{stat_paired_t_test}
 \usage{
-stat_paired_t_test(data, data2, i, cl, pairedttestFDRmethod,
-  nonpara_pairedttestFDRmethod)
+stat_paired_t_test(data, data2, i, cl, pairedttestmethod, pairedttestcorrection,
+  nonparapairedttestmethod, nonparapairedttestcorrection)
 }
 \description{
 stat_paired_t_test
