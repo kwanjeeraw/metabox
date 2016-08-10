@@ -21,6 +21,7 @@ Imports:
     data.tree,
     tm,
     wordcloud,
+	dunn.test,
     userfriendlyscience,
     ez,
     FSA,
