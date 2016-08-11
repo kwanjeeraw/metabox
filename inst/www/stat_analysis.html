@@ -131,261 +131,197 @@
     <!-- Navigation-->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div id="includedNav" ></div>
-      <div class="navbar-header">
-    <img src="image/logo.png" width="223"/>
-</div>
-
-<div class="alert alert-success  alert-dismissable" id="success-message-alert" style="position:fixed; top:5px; right:5px;  z-index:100;">
-    <button type="button" class="close" data-dismiss="alert">x</button>
-    <p id="success-message-alert-text"></p>
-</div>
-
-
-<div class="alert alert-warning  alert-dismissable" id="warning-message-alert" style="position:fixed; top:5px; right:5px;  z-index:100;">
-    <button type="button" class="close" data-dismiss="alert">x</button>
-    <p id="warning-message-alert-text"></p>
-</div>
-
-
-<div class="alert alert-danger  alert-dismissable" id="danger-message-alert" style="position:fixed; top:5px; right:5px;  z-index:100;">
-    <button type="button" class="close" data-dismiss="alert">x</button>
-    <p id="danger-message-alert-text"></p>
-</div>
-
-
-
-<div class="collapse navbar-collapse">
-<ul class="nav navbar-nav side-nav">
-        <li><h6 class="badge bg-orange">STATISTICAL ANALYSIS</h6></li>
-        <li><a href="stat_analysis.html"><i class="glyphicon glyphicon-stats"></i> Statistical Analysis</a></li>
-    <!--     <li><a href="#"><i class="fa fa-file-text-o"></i> Statistical Analysis Report<i class="fa fa-angle-left" style="float:right"></i></a></li>-->
-        <li><h6 class="badge bg-blue">NETWORK CONSTRUCTION</h6></li>
-        <li>
-            <a ha href="javascript:;" data-toggle="collapse" data-target="#bionw"><i class="fa fa-tree"></i> BioNetwork <i class="fa fa-fw fa-caret-down"></i></a>
-            <ul id="bionw" class="collapse">
-                <li><a href="simplenetwork.html"><i class="fa fa-angle-double-right"></i> SimpleNetwork</a></li>
-                <li><a href="hetnetwork.html"><i class="fa fa-angle-double-right"></i> HeterogeneousNetwork</a></li>
-            </ul>
-        </li>
-        <li>
-            <a href="javascript:;" data-toggle="collapse" data-target="#correl"><i class="fa fa-line-chart"></i> Correlations <i class="fa fa-fw fa-caret-down"></i></a>
-            <ul id="correl" class="collapse">
-                <li><a href="corr.html"><i class="fa fa-angle-double-right"></i> Correlation</a></li>
-                <li><a href="parcorr.html"><i class="fa fa-angle-double-right"></i> PartialCorrelation</a></li>
-            </ul>
-        </li>
-        <li><a href="similarity.html"><i class="fa fa-flask"></i> Similarity</a></li>
-        <li><h6 class="badge bg-green">FUNCTIONAL ANALYSIS</h6></li>
-        <li><a href="enrichanalysis.html"><i class="fa fa-pie-chart"></i> Enrichment</a></li>
-        <li><a href="overrepanalysis.html"><i class="fa fa-users"></i> Overrepresentation</a></li>
-        <li><a href="wordcloud.html"><i class="fa fa-cloud"></i> WordCloud</a></li>
-        <li><h6 class="badge">MISCELLANEOUS</h6></li>
-        <li><a href="convertid.html"><i class="fa fa-arrows-h"></i> ConvertID</a></li>
-        <li><a href="blank-page.html"><i class="fa fa-graduation-cap"></i> Tutorial</a></li>
-        <li><a href="index.html"><i class="fa fa-info"></i> About</a></li>
-        <!--li>//can't keep db url!!
-            <a href="javascript:;" data-toggle="collapse" data-target="#pres"><i class="fa fa-cogs"></i> Pre-setting <i class="fa fa-fw fa-caret-down"></i></a>
-            <ul id="pres" class="collapse">
-                <li><a href="setgraphdb.html"><i class="fa fa-angle-double-right"></i> SetDatabase</a></li>
-            </ul>
-        </li-->
-    </ul>
-</div>
+    <div class="navbar-header">
+        <img src="image/logo.png" width="223"/>
+    </div>
+    <div class="alert alert-success  alert-dismissable" id="success-message-alert" style="position:fixed; top:5px; right:5px;  z-index:100;">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        <p id="success-message-alert-text"></p>
+    </div>
+    <div class="alert alert-warning  alert-dismissable" id="warning-message-alert" style="position:fixed; top:5px; right:5px;  z-index:100;">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        <p id="warning-message-alert-text"></p>
+    </div>
+    <div class="alert alert-danger  alert-dismissable" id="danger-message-alert" style="position:fixed; top:5px; right:5px;  z-index:100;">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        <p id="danger-message-alert-text"></p>
+    </div>
+    <div class="collapse navbar-collapse">
+        <ul class="nav navbar-nav side-nav">
+            <li><h6 class="badge bg-orange">STATISTICAL ANALYSIS</h6></li>
+            <li><a href="stat_analysis.html"><i class="glyphicon glyphicon-stats"></i> Statistical Analysis</a></li>
+        <!--     <li><a href="#"><i class="fa fa-file-text-o"></i> Statistical Analysis Report<i class="fa fa-angle-left" style="float:right"></i></a></li>-->
+            <li><h6 class="badge bg-blue">NETWORK CONSTRUCTION</h6></li>
+            <li>
+                <a ha href="javascript:;" data-toggle="collapse" data-target="#bionw"><i class="fa fa-tree"></i> BioNetwork <i class="fa fa-fw fa-caret-down"></i></a>
+                <ul id="bionw" class="collapse">
+                    <li><a href="simplenetwork.html"><i class="fa fa-angle-double-right"></i> SimpleNetwork</a></li>
+                    <li><a href="hetnetwork.html"><i class="fa fa-angle-double-right"></i> HeterogeneousNetwork</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="javascript:;" data-toggle="collapse" data-target="#correl"><i class="fa fa-line-chart"></i> Correlations <i class="fa fa-fw fa-caret-down"></i></a>
+                <ul id="correl" class="collapse">
+                    <li><a href="corr.html"><i class="fa fa-angle-double-right"></i> Correlation</a></li>
+                    <li><a href="parcorr.html"><i class="fa fa-angle-double-right"></i> PartialCorrelation</a></li>
+                </ul>
+            </li>
+            <li><a href="similarity.html"><i class="fa fa-flask"></i> Similarity</a></li>
+            <li><h6 class="badge bg-green">FUNCTIONAL ANALYSIS</h6></li>
+            <li><a href="enrichanalysis.html"><i class="fa fa-pie-chart"></i> Enrichment</a></li>
+            <li><a href="overrepanalysis.html"><i class="fa fa-users"></i> Overrepresentation</a></li>
+            <li><a href="wordcloud.html"><i class="fa fa-cloud"></i> WordCloud</a></li>
+            <li><h6 class="badge">MISCELLANEOUS</h6></li>
+            <li><a href="convertid.html"><i class="fa fa-arrows-h"></i> ConvertID</a></li>
+            <li><a href="blank-page.html"><i class="fa fa-graduation-cap"></i> Tutorial</a></li>
+            <li><a href="index.html"><i class="fa fa-info"></i> About</a></li>
+            <!--li>//can't keep db url!!
+                <a href="javascript:;" data-toggle="collapse" data-target="#pres"><i class="fa fa-cogs"></i> Pre-setting <i class="fa fa-fw fa-caret-down"></i></a>
+                <ul id="pres" class="collapse">
+                    <li><a href="setgraphdb.html"><i class="fa fa-angle-double-right"></i> SetDatabase</a></li>
+                </ul>
+            </li-->
+        </ul>
+    </div>
     </nav>
     <div id="content-wrapper">
-<div class="container-fluid">
-<div class="row">
-<div class="col-lg-12">
-  <h1 class = "page-header">Statistics</h1>
-</div>
-</div>
-
-
-
-
-<!--Upload Data-->
-<div class="row">
-<div class="col-lg-12">
-<div id="message"></div>
-
-
-
-
-
-
-
-
+    <div class="container-fluid">
+        <div class="row">
+        <div class="col-lg-12">
+          <h1 class = "page-header">Statistics</h1>
+        </div>
+        </div>
+        <!--Upload Data-->
+        <div class="row">
+        <div class="col-lg-12">
+            <div id="message"></div>
   <div class="panel panel-default">
-
-
-<a data-toggle="collapse" href="#UploadData">
-  <div class="panel-heading">
-    <div class="row">
-      <div class="col-xs-3">
-        <i class="fa fa-upload fa-3x"></i>
-          </div>
-          <div class="col-xs-9 text-right">
-            <div  style="font-size: 30px;">Upload Data</div>
-              </div>
-              </div>
-              </div>
-              </a>
-
-
-
-
-
-
+    <a data-toggle="collapse" href="#UploadData">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-xs-3">
+                    <i class="fa fa-upload fa-3x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                    <div  style="font-size: 30px;">Upload Data</div>
+                </div>
+            </div>
+        </div>
+    </a>
     <div id="UploadData" class="panel-collapse" >
       <div class="panel-body">
-
-
-
-
-<!--Data Uploading Small Panel-->
-<div class="row">
-  <div class="col-lg-2">
-
-                            <ul class="nav nav-tabs">
-                                <li class="active"><a href="#UploadDataTab" data-toggle="tab">Data From User</a></li>
-                                <li><a href="#UploadDataTabUseExample" data-toggle="tab">Example Data</a></li>
-                            </ul>
-                            <div class="tab-content">
-                                <div class="tab-pane fade in active" id="UploadDataTab">
-                                    <div style="float: left;"><div class="form-group">
-
-
-
-                                                                                  <label>Sheet Name:</label>
-<span><a href="#" id="stat_load_data_para_SheetIndex" data-type="text" data-pk="1" data-title="" class="editable editable-click " data-original-title="" title=""></a></span><br>
-
-            <div class="input-group">
-                <label class="input-group-btn">
-                    <span class="btn btn-primary">
-                        Upload A File&hellip; <input id="inputUploadData" type="file" style="display: none;" class = "disableafterupload">
-                    </span>
-                </label>
-                <input id = "file_name" type="text" class="form-control" readonly>
+        <!--Data Uploading Small Panel-->
+        <div class="row">
+          <div class="col-lg-4">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#UploadDataTab" data-toggle="tab">Data From User</a></li>
+                <li><a href="#UploadDataTabUseExample" data-toggle="tab">Example Data</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade in active" id="UploadDataTab">
+                    <div style="float: left;"><div class="form-group">
+                        <label>Sheet Name:</label>
+                        <span><a href="#" id="stat_load_data_para_SheetIndex" data-type="text" data-pk="1" data-title="" class="editable editable-click " data-original-title="" title=""></a></span><br>
+                        <div class="input-group">
+                            <label class="input-group-btn">
+                            <span class="btn btn-primary">
+                            Upload A File&hellip; <input id="inputUploadData" type="file" style="display: none;" class = "disableafterupload">
+                            </span>
+                            </label>
+                            <input id = "file_name" type="text" class="form-control" readonly>
+                        </div>
+                    </div></div><div class="clearfix"></div>
+                    <p class="text-danger alertToRefresh"></p>
+                </div>
+                <div class="tab-pane fade" id="UploadDataTabUseExample">
+                    <div class="form-group">
+                        <label>Use Example Data</label><br>
+                        <label class="radio-inline">
+                            <input  class = "disableafterupload" type="radio" name="optionsRadiosInline" id="example_ttest" value="Two Independent Group Data">Two Independent Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_ANOVA" value="Multi-Independent Group Data" class = "disableafterupload">Multi-Independent Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_3_4_ANOVA" value="3*4-Independent Group Data" class = "disableafterupload">3*4-Independent Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_2_2_ANOVA" value="2*2-Independent Group Data" class = "disableafterupload">2*2-Independent Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_paired_ttest" value="Two Paired Group Data" class = "disableafterupload">Two Paired Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_paired_ANOVA" value="Multi-Paired Group Data" class = "disableafterupload">Multi-Paired Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_3_4_repeated_ANOVA" value="3*4-Paired Group Data" class = "disableafterupload">3*4-Paired Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_2_2_repeated_ANOVA" value="2*2-Paired Group Data" class = "disableafterupload">2*2-Paired Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_3_4_mixed_ANOVA" value="3*4-Mixed Group Data" class = "disableafterupload">3*4-Mixed Group Data
+                        </label><br>
+                        <label class="radio-inline">
+                            <input type="radio" name="optionsRadiosInline" id="example_2_2_mixed_ANOVA" value="2*2-Mixed Group Data" class = "disableafterupload">2*2-Mixed Group Data
+                        </label><br>
+                    </div>
+                    <button type="button" class="btn btn-outline btn-primary btn-sm disableafterupload" style="float: left; visibility: hidden;" id="submit_example_data">Submit</button><br><br>
+                    <p class="text-danger alertToRefresh"></p>
+                </div>
             </div>
-
-
-                                        </div></div>
-
-<p class="text-danger alertToRefresh"></p>
-                                </div>
-
-
-                                <div class="tab-pane fade" id="UploadDataTabUseExample">
-                                        <div class="form-group">
-                                            <label>Use Example Data</label><br>
-                                            <label class="radio-inline">
-                                                <input  class = "disableafterupload" type="radio" name="optionsRadiosInline" id="example_ttest" value="Two Independent Group Data">Two Independent Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_ANOVA" value="Multi-Independent Group Data" class = "disableafterupload">Multi-Independent Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_ANOVA" value="3*4-Independent Group Data" class = "disableafterupload">3*4-Independent Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_ANOVA" value="2*2-Independent Group Data" class = "disableafterupload">2*2-Independent Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ttest" value="Two Paired Group Data" class = "disableafterupload">Two Paired Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_paired_ANOVA" value="Multi-Paired Group Data" class = "disableafterupload">Multi-Paired Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_repeated_ANOVA" value="3*4-Paired Group Data" class = "disableafterupload">3*4-Paired Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_repeated_ANOVA" value="2*2-Paired Group Data" class = "disableafterupload">2*2-Paired Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_3_4_mixed_ANOVA" value="3*4-Mixed Group Data" class = "disableafterupload">3*4-Mixed Group Data
-                                            </label>
-                                            <label class="radio-inline">
-                                                <input type="radio" name="optionsRadiosInline" id="example_2_2_mixed_ANOVA" value="2*2-Mixed Group Data" class = "disableafterupload">2*2-Mixed Group Data
-                                            </label>
-                                        </div>
-<button type="button" class="btn btn-outline btn-primary btn-sm disableafterupload" style="float: left; visibility: hidden;" id="submit_example_data">Submit</button>
-<p class="text-danger alertToRefresh"></p>
-                            </div>
-
-                            </div>
-  </div>
-  <div class="col-lg-10">
-
-
-      <ul class="nav nav-tabs">
-          <li class="active"><a href="#Summary_Phenotype_Data" data-toggle="tab">Phenotype</a></li>
-          <li><a href="#Summary_Feature_Data" data-toggle="tab">Feature</a></li>
-          <li><a href="#Summary_Expression_Data" data-toggle="tab">Expression</a></li>
-      </ul>
-      <div class="tab-content">
-        <div class="tab-pane fade in active" id="Summary_Phenotype_Data">
-          <table id="View_pData" width="100%" class="table table-striped table-bordered" cellspacing="0"></table>
+          </div>
+          <div class="col-lg-8">
+              <ul class="nav nav-tabs">
+                  <li class="active"><a href="#Summary_Phenotype_Data" data-toggle="tab">Phenotype</a></li>
+                  <li><a href="#Summary_Feature_Data" data-toggle="tab">Feature</a></li>
+                  <li><a href="#Summary_Expression_Data" data-toggle="tab">Expression</a></li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade in active" id="Summary_Phenotype_Data">
+                  <table id="View_pData" width="100%" class="table table-striped table-bordered" cellspacing="0"></table>
+                </div>
+                <div class="tab-pane fade in" id="Summary_Feature_Data">
+                  <table id="View_fData" width="100%" class="table table-striped table-bordered" cellspacing="0"></table>
+                </div>
+                <div class="tab-pane fade" id="Summary_Expression_Data">
+                  <table id="View_eData" width="100%" class="table table-striped table-bordered" cellspacing="0"></table>
+                </div>
+              </div>
+          </div>
         </div>
-        <div class="tab-pane fade in" id="Summary_Feature_Data">
-          <table id="View_fData" width="100%" class="table table-striped table-bordered" cellspacing="0"></table>
-        </div>
-        <div class="tab-pane fade" id="Summary_Expression_Data">
-          <table id="View_eData" width="100%" class="table table-striped table-bordered" cellspacing="0"></table>
-        </div>
-      </div>
-
-
-
-  </div>
-</div>
-
-
-
+    </div>
     </div>
   </div>
-</div>
-
-</div>
-
-</div><!--Upload Data-->
-
-
-
+</div></div><!--Upload Data-->
 <!--showafterupload-->
 <div id="showafterupload" hidden>
 <!--visualization-->
-
 <div class="panel panel-warning">
-                      <a data-toggle="collapse" href="#visualization_body">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="fa fa-search fa-3x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                    <div  style="font-size: 30px;">Data Normalization</div>
-                                    <div>Visualize Normalization Procedures Using PCA</div>
-                                </div>
-                            </div>
-                        </div>
-                        </a>
+    <a data-toggle="collapse" href="#visualization_body">
+      <div class="panel-heading">
+          <div class="row">
+              <div class="col-xs-3">
+                  <i class="fa fa-search fa-3x"></i>
+              </div>
+              <div class="col-xs-9 text-right">
+                  <div  style="font-size: 30px;">Data Normalization</div>
+                  <div>Visualize Normalization Procedures Using PCA</div>
+              </div>
+          </div>
+      </div>
+      </a>
     <div id = "visualization_body" class="panel-collapse collapse">
-
       <div class="panel-body" >
         <div class="row">
-
-          <div class="col-lg-2">
+          <div class="col-lg-3">
 <div class="panel panel-success">
-
       <div class="panel-heading">
-                            <div class="row">
-                                      <i class="fa fa-gears"></i>
-
-
-                            </div>
+        <div class="row">
+            <i class="fa fa-gears"></i>
+        </div>
      </div>
-
 <div class="panel-body"  style="height:600px;position: relative;">
   <div style="height:400px;margin: auto;height:100%;">
     <!--Sample Normalization-->
@@ -417,9 +353,8 @@
       Loess Normalization + Batch Median Correction
     </label><span id="Loess_column" class="text-muted pull-right" style = "font-style: italic"></span>
   </div>
-
-    <div class="radio">
-  </div>
+<div class="radio">
+</div>
   <div class="radio">
     <label>
       <input type="radio" name="samplenormalization" id="samplenormalizationBatchMedian" value="BatchMedian"  class="normalization">
@@ -427,7 +362,7 @@
     </label><span id="Batch_column" class="text-muted pull-right" style = "font-style: italic"></span>
   </div>
   </form>
- </fieldset><!--Sample Normalization-->
+</fieldset><!--Sample Normalization-->
 <!--Data Transformation-->
 <fieldset>
     <form id = "datatransformation">
@@ -444,10 +379,7 @@
       log
     </label>
     <!-- <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "stat_norm_log_para" data-target="#stat_norm_log_para_modal"><i class="fa fa-gear pull-right"></i></button></div>-->
-
-
   </div>
-
   <div class="radio">
     <label>
       <input type="radio" name="datatransformation" id="datatransformationpower" value="power"  class="normalization">
@@ -487,32 +419,18 @@
     </label>
     </div>
     </form>
- </fieldset><!--Data Scaling-->
-
-
+</fieldset><!--Data Scaling-->
 <button style="position:absolute;bottom:5px;right:5px;" type="button" class="btn btn-outline btn-primary applynormalization disabled"  id="applynormalization" > Apply</button>
-
-
-
   </div>
-
-
 </div>
     <div class="panel-footer">
-
-         <div class="pull-right">
-       <div id="download_norm_data"><a id="download_visualization_norm" download = "file.csv" class="btn btn-success btn-sm btn-outline" role="button" disabled  data-toggle="tooltip" data-placement="left" data-html="true" title="No Normalization Applied Yet"><i class="glyphicon glyphicon-download-alt"></i> Download Normalized Data</a></div>
-
-         </div>
-
-<div class="clearfix"></div>
-         </div>
-
-
+    <div class="pull-right">
+        <div id="download_norm_data"><a id="download_visualization_norm" download = "file.csv" class="btn btn-success btn-sm btn-outline" role="button" disabled  data-toggle="tooltip" data-placement="left" data-html="true" title="No Normalization Applied Yet"><i class="glyphicon glyphicon-download-alt"></i> Download Normalized Data</a></div>
+    </div>
+    <div class="clearfix"></div>
+    </div>
         </div>
-
         </div>
-
         <div class="col-lg-6">
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -527,83 +445,59 @@
          <select class="input-sm selectpicker factor" data-width="fit" id="PCA_color">
           </select>
          </div>
-
          <div style="float: right;"><button type="button" class="btn btn-outline btn-default btn-xs" data-toggle="modal" id = "PCA_plot_para" data-target="#PCA_plot_para_modal"><i class="glyphicon glyphicon-edit"> Settings</i></button></div>
-
 <div class="clearfix"></div>
          </div>
                     </div>
-
         </div>
-      <div class="col-lg-4">
-     <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Information of Selected Samples
-                        </div>
-                        <div class="panel-body"  style="height:600px;position: relative;">
-                          <div style="height:400px;margin: auto;height:60%;" id="morris-donut-chart"><span><i class="fa fa-info-circle"></i><span class="text-muted" style="font-size:10px"> This session can display the sample information you selected from PCA plot</span></span></div>
-                           <div style="height:40%;">
-<div style = 'bottom: 120px; position: absolute;width:95%;margin: auto;'>
-                                     Sample Selected
-                                    <span class="pull-right text-muted median" id = "sample_selected"><em></em>
-                                    </span>
-</div>
-
-
-
-                                    <div class="form-group" style = 'bottom: 5px; position: absolute;width:95%;margin: auto;'>
-                                         <label><p class="pull-left">Remove Following Samples: </p>
-
-                                         </label><span><div style="float:right; display:inline"><button type="button" class="btn btn-outline btn-danger btn-xs applynormalization" id = "remove_sample">Apply</button></div></span>
-                                        <textarea class="form-control" rows="3" id="sample_to_be_removed"></textarea>
-                                    </div>
-
-
-                            </div>
-                        </div>
-                        <div class="panel-footer">
-         <div class="pull-left">
-         <select class="input-sm selectpicker factor" data-width="fit" id="Donut_color">
-          </select>
-         </div>
-
-<div class="clearfix"></div>
-         </div>
-         </div>
-          </div>
-
-
-
+    <div class="col-lg-3">
+        <div class="panel panel-default">
+        <div class="panel-heading">
+            Information of Selected Samples
+        </div>
+        <div class="panel-body"  style="height:600px;position: relative;">
+          <div style="height:400px;margin: auto;height:60%;" id="morris-donut-chart"><span><i class="fa fa-info-circle"></i><span class="text-muted" style="font-size:10px"> This session can display the sample information you selected from PCA plot</span></span></div>
+           <div style="height:40%;">
+            <div style = 'bottom: 120px; position: absolute;width:95%;margin: auto;'>
+               <span class="pull-right text-muted median" id = "sample_selected"><em></em></span>
+            </div>
+            <div class="form-group" style = 'bottom: 5px; position: absolute;width:95%;margin: auto;'>
+                 <label><p class="pull-left">Remove Following Samples: </p>
+                 </label><span><div style="float:right; display:inline"><button type="button" class="btn btn-outline btn-danger btn-xs applynormalization" id = "remove_sample">Apply</button></div></span>
+                <textarea class="form-control" rows="3" id="sample_to_be_removed"></textarea>
+            </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+           <div class="pull-left">
+              <select class="input-sm selectpicker factor" data-width="fit" id="Donut_color"></select>
+           </div>
+           <div class="clearfix"></div>
+        </div>
+        </div>
+    </div>
     </div>
   </div>
-
-
-
 </div>
 </div><!--visualization-->
-
-
   <!--Summarize Data-->
-
-                    <div class="panel panel-primary">
-                      <a data-toggle="collapse" href=".panel-collapse.collapse.StudyDesign">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-3">
-                                    <i class="glyphicon glyphicon-stats fa-3x"></i>
-                                </div>
-                                <div class="col-xs-9 text-right">
-                                  <p  style="font-size: 30px;">Univariate Statistics</p>
-
-                                </div>
-                            </div>
-                        </div>
-                         </a>
-
+<div class="panel panel-primary">
+  <a data-toggle="collapse" href=".panel-collapse.collapse.StudyDesign">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-xs-3">
+                <i class="glyphicon glyphicon-stats fa-3x"></i>
+            </div>
+            <div class="col-xs-9 text-right">
+              <p  style="font-size: 30px;">Univariate Statistics</p>
+            </div>
+        </div>
+    </div>
+     </a>
   <div id="StudyDesign" class="panel-collapse collapse StudyDesign" >
       <div class="panel-body">
         <div class="row">
-  <div class="col-lg-2">
+  <div class="col-lg-4">
        <ul class="nav nav-tabs">
           <li class="active"><a href="#Summary_Data" data-toggle="tab">Study Design</a></li>
           <!--<li><a href="#UniVplot" data-toggle="tab">Plots</a></li>-->
@@ -637,119 +531,27 @@
 <!--<a href="#" id="datatransformationselected" data-type="select" ></a>-->
 <p>Feature Normalization: <strong><span id = "featurenormalizationmethod">None</span></strong></p>
 <!--<a href="#" id="featuretransformationselected" data-type="select" ></a>-->
-
 </div>
-
-
-
-
                                         </div>
             </li>
-
 <li class="list-group-item">
   <div class="form-group">
     <label><p class="text-info">Power Analysis</p></label>
                                             <label class="checkbox-inline pull-right" >
                                                 <input type="checkbox" id = "power_analysis_needed" checked value = "TRUE"></label>
     <div class="text-muted">
-
       <p>Desired Power: <a href="#" id="desired_power" data-type="text" data-pk="1">80</a><span>%</span></p>
-
     </div>
-
-
-
   </div>
 </li>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <li class="list-group-item">
-
-
-
 <button type="button" class="btn btn-outline btn-success btn-lg btn-block" id="Submit_To_Statistics">Submit!</button>
   </li>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         </ul>
         </div>
-
-
-
-
-
-
-
-
-
       </div>
-
-
-
-
-
     </div>
-
-  <div class="col-lg-10">
+  <div class="col-lg-8">
       <ul class="nav nav-tabs">
           <li class="active"><a href="#UnivStat_Result" data-toggle="tab">Stat Table</a></li>
          <!-- <li><a href="#UnivStat_Result_Report" data-toggle="tab">Report</a></li>-->
@@ -771,18 +573,11 @@
         <div class="tab-pane fade" id="UnivStat_Result_Report"><p>Report!</p>
         </div>
       </div>
-
-
-
-
-
-
   </div>
   </div>
   </div>
 
 </div>
-
                     </div>
          <!--Summarize Data-->
 
@@ -824,28 +619,6 @@
                     </div>
 </div>tatistical result-->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div id="draw_boxplot_modal" class="modal fade" role="dialog">
           <div class="modal-dialog">
             <!-- Modal content-->
@@ -860,21 +633,9 @@
                                       <label>Which Column is title?</label>
 
 <select id="boxplottitle">
-
 </select>
-
-
-
-
-
                      </div>
-
-
-
                     <div class="form-group">
-
-
-
                                         <div class="form-group">
                                             <label>Factor Order</label>
                                             <input class="form-control" id="boxplot_factor_order">
@@ -895,18 +656,7 @@
           </div>
         </div>
 
-
-
-
-
-
-
 </div>
-
-
-
-
-
 <!--  modal -->
         <div id="notifyBox" class="modal fade" tabindex="-1" role="dialog" data-keyboard="false" data-backdrop="static">
           <div class="modal-dialog"><div class="modal-content">
@@ -919,10 +669,6 @@
             </div></div>
           </div></div>
         </div>
-
-
-
-
         <div id="stat_load_data_para_modal" class="modal fade" role="dialog">
           <div class="modal-dialog">
 
@@ -945,13 +691,8 @@
 
           </div>
         </div>
-
-
-
-
         <div id="PCA_plot_para_modal" class="modal fade" role="dialog">
           <div class="modal-dialog">
-
             <!-- Modal content-->
             <div class="modal-content">
               <div class="modal-header">
@@ -997,13 +738,8 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal" id = "PCA_plot_para_submit">Submit</button>
               </div>
             </div>
-
           </div>
         </div>
-
-
-
-
         <div id="stat_norm_log_para_modal" class="modal fade" role="dialog">
           <div class="modal-dialog">
 
@@ -1042,7 +778,6 @@
                <select class="input-sm selectpicker Thefactor" multiple  data-max-options="2" id="logparaautoindependent_factor">
           </select>
 </div>
-
                      </div>
               </div>
               <div class="modal-footer">
