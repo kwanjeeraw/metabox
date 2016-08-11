@@ -166,10 +166,6 @@ var Stat_Result = {}
 applystatistics = function(){
   var loadSpinner = showSpinner();
 
-
-
-
-
     var req=ocpu.call("stat_hypo_test",{
     e:DATA.expression,f : DATA.feature,p : DATA.phenotype,
     e_ori:e_ori,
@@ -280,13 +276,7 @@ $.getJSON(res_url).success(function(obj){
                });
 
 
-session4.getFile("messages_hypo_test.txt", function(text){
-          if(text.length>10){
-           warningmsg(text);
-          }
 
-
-        });
 
     }).fail(function(jqXHR){hideSpinner(loadSpinner);bootbox.alert(jqXHR.responseText); });
 
