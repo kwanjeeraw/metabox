@@ -54,7 +54,7 @@ stat_LoessNorm = function(data = e, f, p,
 
 
   tf = t(f);colnames(tf) = f$feature_index;tf = data.frame(tf) # in order to have the colnames(data.sort.time) and f$compound matched.
-  cl <- makeCluster(detectCores(logical = TRUE))
+  cl <- makeCluster(10)
   o=parSapply(cl = cl, which(colnames(data.sort.time)%in%colnames(tf)),
               FUN = function(i,data.sort.time,stat_median_correction, span,loess.as,robust){
                 # i = 49

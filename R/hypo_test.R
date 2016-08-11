@@ -105,7 +105,7 @@ if(length(repeated_factor_name)==0){
     sudo_matrix1 = matrix(nrow = num_factor_variable1,ncol = num_factor_variable1)
     sudo_matrix2 = matrix(nrow = num_factor_variable2,ncol = num_factor_variable2)
 
-    cl = makeCluster(detectCores())
+    cl = makeCluster(10)
     parallel = parLapply(cl, 1:ncol(e),function(i,e,dta,ezANOVA,pbad2way){
       dta$value = e[,i]
       interaction_variable1_variable2 = ezANOVA(data = dta, dv = value, wid = id, between = .(variable1,variable2), type = 3)$ANOVA[3,5]
@@ -335,7 +335,7 @@ if(length(repeated_factor_name)==0){
     })
     result = matrix(nrow = ncol(e),ncol = length(unlist(c(interaction_variable1_repeated1,variable1_posthoc,repeated1_posthoc,variable1_simple_main_effect,repeated1_simple_main_effect))))
     result[1,] = unlist(c(interaction_variable1_repeated1,variable1_posthoc,repeated1_posthoc,variable1_simple_main_effect,repeated1_simple_main_effect))
-    cl = makeCluster(detectCores())
+    cl = makeCluster(10)
     # clusterExport(cl, c("ezANOVA","dta","e","posthocTGH","result"))
     parallel = parLapply(cl, 2:ncol(e),
               function(i,dta,e,result,ezANOVA,posthocTGH){
