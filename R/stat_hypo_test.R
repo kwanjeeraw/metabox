@@ -181,7 +181,7 @@ if(length(independent_factor_name)==0){
       if(sum(table(dta[,c(-1,-ncol(dta))])==0)>0){
         return("Please check sample size for your study design. Cannot have empty class.")
       }else{
-        cl = makeCluster(detectCores())
+        # cl = makeCluster(detectCores())
         if(length(factor_name[!factor_name%in%repeated_factor_name])==1 & length(repeated_factor_name)==0 & (length(unique(dta[,2]))>2)){#oneway ANOVA.
           num_factor_variable = length(unique(dta$variable1))
           sudo_matrix = matrix(nrow = num_factor_variable,ncol = num_factor_variable)#helping for cure the format issue with dunnTest().
