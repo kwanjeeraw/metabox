@@ -51,7 +51,7 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
       txtinput = unique(stringr::str_trim(unlist(gsub("[^[:digit:]]","",txtinput)))) #remove whiteline, duplicate, words
       txtinput = txtinput[txtinput!=""]
       cat("Computing Tanimoto similarity ...\n")
-#       tanmt = CID_tanimoto(txtinput)
+        tanmt = metabomapr::CID_tanimoto(txtinput)
 #       #format output
 #       nRow = nrow(tanmt)
 #       nNames = dimnames(tanmt)[[1]]

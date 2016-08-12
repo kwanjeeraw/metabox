@@ -21,7 +21,7 @@ Imports:
     data.tree,
     tm,
     wordcloud,
-	  dunn.test,
+    dunn.test,
     userfriendlyscience,
     ez,
     FSA,
@@ -29,4 +29,4 @@ Imports:
     outliers,
     openxlsx,
     NLP
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 5.0.1
