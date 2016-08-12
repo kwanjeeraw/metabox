@@ -7,7 +7,7 @@ if (!require("devtools"))
 install.packages('devtools', repos="http://cran.rstudio.com/")
 library(devtools)
 source('https://bioconductor.org/biocLite.R')
-biocLite(c('impute','preprocessCore','GO.db','AnnotationDbi','WGCNA','piano','qpgraph','BioNet'))
+biocLite(c('impute','preprocessCore','GO.db','AnnotationDbi','WGCNA','piano','qpgraph','BioNet','ChemmineR'))
 install_github('kwanjeeraw/metabox')
 
 library(metabox)
