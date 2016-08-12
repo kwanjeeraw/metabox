@@ -36,7 +36,6 @@
 #'@seealso \pkg{\link{metabomapr}}, \code{\link{CID_tanimoto}}, \code{\link{fpSim}}, \code{\link{sdfid}}
 #'@examples
 #'#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
-#'@import dplyr
 #'@export
 computeSimilarity <- function(txtinput, coef=0.7, returnas="dataframe") UseMethod("computeSimilarity")
 #'@export
@@ -52,7 +51,7 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
       txtinput = unique(stringr::str_trim(unlist(gsub("[^[:digit:]]","",txtinput)))) #remove whiteline, duplicate, words
       txtinput = txtinput[txtinput!=""]
       cat("Computing Tanimoto similarity ...\n")
-        tanmt = metabomapr::CID_tanimoto(txtinput)
+#        tanmt = metabomapr::CID_tanimoto(txtinput)
 #       #format output
 #       nRow = nrow(tanmt)
 #       nNames = dimnames(tanmt)[[1]]
@@ -62,6 +61,7 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
 #       dstCols = as.dist(colMat)
 #       network = data.frame(source = as.character(nNames[dstRows]), target = as.character(nNames[dstCols]), coef = tanmt[lower.tri(tanmt)], stringsAsFactors = FALSE)
 #       network = network[network$coef > coef, ]
+        tanmt = CID_tanimoto(txtinput)
         network = getChemSimNet(txtinput, cutoff = coef)
 #network = data.frame(source = c('1','2','3','4','5'), target = c('11','12','13','14','15'), coef = c(0.1,0.2,0.4,0.5,0.9), stringsAsFactors = FALSE)
       cat("Format and returning network of size ",nrow(network)," ...\n")

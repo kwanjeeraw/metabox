@@ -29,5 +29,6 @@ Imports:
     outliers,
     openxlsx,
     NLP,
+    digest,
     dplyr
 RoxygenNote: 5.0.1
