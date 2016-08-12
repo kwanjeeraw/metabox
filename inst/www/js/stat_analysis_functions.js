@@ -23,7 +23,7 @@ uploaddata = function(){
          drawTable('#View_eData',obj.expression, "Expression Data","feature_index");
           duplicatedID = obj.duplicatedID;
           if(duplicatedID[0]){
-              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each sampleID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend"  value = "TRUE"></label></div>';
+              document.getElementById("PCA_connect_id").innerHTML = '<div class="form-group"><label>Display Trend of Each subjectID:</label><label class="checkbox-inline pull-right" ><input type="checkbox" id = "PCA_IDtrend"  value = "TRUE"></label></div>';
           }
           var req2 = ocpu.call("stat_summary_data",{
             DATA:D
@@ -37,10 +37,14 @@ uploaddata = function(){
                 fData_column = obj2.column_names_of_fData;
                 why_not_able = obj2.why_not_able;
 
+                if(obj2.no_repeated[0]){
+                  $( "#repeated_measure_factor" ).hide();
+                }
+
+
 
                 guess_independent_factor=obj2.guess_independent_factor;
                 guess_repeated_factor=obj2.guess_repeated_factor;
-
 
                 //decidenormalizationability(obj2.column_names_of_pData);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#logparaautoindependent_factor",null,"dfdasfdasfewrf");
@@ -54,7 +58,7 @@ uploaddata = function(){
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color",null,guess_independent_factor);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
 
-                     var req = ocpu.call("stat_Study_Design",{
+                    var req = ocpu.call("stat_Study_Design",{
                     DATA:D,
                     between_factor:$("#independent_factor").val(),
                     within_factor:$("#repeated_factor").val()
@@ -267,16 +271,18 @@ $.getJSON(res_url).success(function(obj){
             		}else{
             		  type = "nothing"
             		}
-
-
 });
-
                 }
                 hideSpinner(loadSpinner);
                });
 
 
-
+          session4.getFile("messages_hypo_test.txt", function(text){
+            console.log(text)
+            if(text.length>10){
+             warningmsg(text);
+            }
+          });
 
     }).fail(function(jqXHR){hideSpinner(loadSpinner);bootbox.alert(jqXHR.responseText); });
 
@@ -288,7 +294,83 @@ $.getJSON(res_url).success(function(obj){
 
 
 
+apply_normalization = function(){
 
+
+    var loadSpinner = showSpinner();
+var radios1 = document.getElementsByName('samplenormalization');
+for (var i = 0, length = radios1.length; i < length; i++) {
+    if (radios1[i].checked) {
+      samplenormalization_method = ["None","Sample_specific","mTIC","Loess","Median Fold Change", "Batch Median"][i];
+    }
+}
+var radios2 = document.getElementsByName('datatransformation');
+for (var i = 0, length = radios2.length; i < length; i++) {
+    if (radios2[i].checked) {
+      datatransformation_method = ["None","log","power"][i]
+    }
+}
+var radios3 = document.getElementsByName('datascaling');
+for (var i = 0, length = radios3.length; i < length; i++) {
+    if (radios3[i].checked) {
+      datascaling_method = ["None","Auto","Pareto","Range"][i]
+    }
+}
+
+
+
+var req=ocpu.call("stat_norm",{
+  e : D.expression,f : D.feature,p : D.phenotype,
+  sample_index:$("#sample_to_be_removed").val().split(','),
+  mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
+  mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
+  sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
+  sample_specific_weight : sample_specific_weight,sample_specific_multiplyordevide : sample_specific_multiplyordevide,
+  KnownorUnknown:KnownorUnknown.value,mTICunchanged:mTICunchanged,
+  Loessunchanged:Loessunchanged,QCIndicator:QCIndicator,BatchIndicator:BatchIndicator,TimeIndicator:TimeIndicator,
+  Batchunchanged:Batchunchanged,
+  log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log:$('#logparaautoindependent_factor').val(),
+  power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power:$('#powerparaautoindependent_factor').val()
+},function(session){
+  session.getObject(function(obj){
+    DATA = obj;
+    mTICdid = obj.mTICdid; Loessdid = obj.Loessdid; medFCdid = obj.medFCdid; BatchMediandid = obj.BatchMediandid;
+    mTIC = obj.mTIC; Loess = obj.Loess; medFC = obj.medFC; BatchMedian = obj.BatchMedian;
+    eData = obj.expression;
+    fData = obj.feature;
+    pData = obj.phenotype;
+    e_ori = obj.expression_only_rm_outlier;
+    p_ori = obj.phenotype_only_rm_outlier;
+    var req2=ocpu.call("stat_get_modified_data",{
+      DATA:obj
+    },function(session2){
+        download_norm_data_adress = session2.getLoc() + "R/.val/csv";
+      $("#download_norm_data").empty();
+              var r= $('<a id = "download_visualization_norm" download = "file.csv" href='+download_norm_data_adress+' class="btn btn-success btn-sm btn-outline" role="button"><i class="glyphicon glyphicon-download-alt"></i> Download Normalized Data</a>');
+
+              $("#download_norm_data").append(r);
+    });
+    var req = ocpu.call("stat_Study_Design",{
+                    DATA:obj,
+                    between_factor:$("#independent_factor").val(),
+                    within_factor:$("#repeated_factor").val()
+                    },function(session4){
+                  session4.getStdout(function(outtxt){
+                            $("#Sample_Size_Table").text(outtxt);
+                                        hideSpinner(loadSpinner);
+                        })
+                    });
+
+
+  plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
+ //  hideSpinner(loadSpinner);
+  });
+}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
+
+
+
+
+};
 
 
 function select_samplenormalizationSample_specific(pData_column){
@@ -853,7 +935,7 @@ summaryPhenotype = function(id,columns,columns_num){
 var text = '<ul class="list-group">';
 
 for(var i = 0;i<columns.length;i++){
-  if(columns[i] === "phenotype_index" || columns[i] === "sampleID" ||columns[i] === "batch" ||columns[i] === "Sample_specific_weight" ||columns[i] === "QC"||
+  if(columns[i] === "phenotype_index" || columns[i] === "subjectID" ||columns[i] === "batch" ||columns[i] === "Sample_specific_weight" ||columns[i] === "QC"||
   columns[i]==="time_of_injection"||columns[i]=="rank"){
        text += '<li class="list-group-item"><span class="label label-info" style="float:right">'+columns_num[i] +'</span> '+columns[i]+'<div style="float:left"><input class="toggleone" name="checkPhenotype" checked type="checkbox" disabled readonly></div></li>';
   }else{

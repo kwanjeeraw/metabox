@@ -32,7 +32,7 @@ stat_basic_statistics = function(e,f,p,independent_factor_name = NULL, repeated_
     colnames(dta) = c("value",paste0("variable",1:sum(!factor_name%in%repeated_factor_name)),paste0("repeated",1:length(repeated_factor_name)))
   }
   dta$id = 1:nrow(dta)#!!!
-  # dta$id = p$sampleID
+  # dta$id = p$subjectID
 
   for(i in 2:ncol(dta)){
     dta[,i] = factor(dta[,i])

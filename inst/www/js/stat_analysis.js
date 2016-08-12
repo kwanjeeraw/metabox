@@ -125,31 +125,6 @@ $('#desired_power').editable({
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 $("#Submit_To_Statistics").click(function(){
 // check normalization method available or not.
 
@@ -195,20 +170,12 @@ applystatistics()
 
 
 
-
-
-
-
-
-
-
 $("#PCA_plot_para_submit").click(function(){
     plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
 })
 
 $(".Thefactor").on("change",function(){
 
-  console.log("!")
 
     if($("#independent_factor").val()===null && $("#repeated_factor").val()===null){
     $("#Sample_Size_Table").text("Waiting user to select factor.")
@@ -216,7 +183,7 @@ $(".Thefactor").on("change",function(){
   }else{
     var loadSpinner = showSpinner();
                      var req = ocpu.call("stat_Study_Design",{
-                    DATA:D,
+                    DATA:DATA,
                     between_factor:$("#independent_factor").val(),
                     within_factor:$("#repeated_factor").val()
                     },function(session4){
@@ -272,28 +239,6 @@ hideSpinner(loadSpinner);
 
 
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -524,124 +469,11 @@ window.onresize = function() {
 
 
 
-apply_normalization = function(){
 
-
-    var loadSpinner = showSpinner();
-var radios1 = document.getElementsByName('samplenormalization');
-for (var i = 0, length = radios1.length; i < length; i++) {
-    if (radios1[i].checked) {
-      samplenormalization_method = ["None","Sample_specific","mTIC","Loess","Median Fold Change", "Batch Median"][i];
-    }
-}
-var radios2 = document.getElementsByName('datatransformation');
-for (var i = 0, length = radios2.length; i < length; i++) {
-    if (radios2[i].checked) {
-      datatransformation_method = ["None","log","power"][i]
-    }
-}
-var radios3 = document.getElementsByName('datascaling');
-for (var i = 0, length = radios3.length; i < length; i++) {
-    if (radios3[i].checked) {
-      datascaling_method = ["None","Auto","Pareto","Range"][i]
-    }
-}
-
-
-
-
-var req=ocpu.call("stat_norm",{
-  e : D.expression,f : D.feature,p : D.phenotype,
-  sample_index:$("#sample_to_be_removed").val().split(','),
-  mTICdid : mTICdid,Loessdid:Loessdid,medFCdid:medFCdid,BatchMediandid:BatchMediandid,
-  mTIC:mTIC,Loess:Loess,medFC:medFC,BatchMedian:BatchMedian,
-  sample_normalization : samplenormalization_method,data_transformation:datatransformation_method,data_scaling:datascaling_method,
-  sample_specific_weight : sample_specific_weight,sample_specific_multiplyordevide : sample_specific_multiplyordevide,
-  KnownorUnknown:KnownorUnknown.value,mTICunchanged:mTICunchanged,
-  Loessunchanged:Loessunchanged,QCIndicator:QCIndicator,BatchIndicator:BatchIndicator,TimeIndicator:TimeIndicator,
-  Batchunchanged:Batchunchanged,
-  log_para:$('input[name="logpara"]:checked').val(),independent_factor_name_log:$('#logparaautoindependent_factor').val(),
-  power_para:$('input[name="powerpara"]:checked').val(),independent_factor_name_power:$('#powerparaautoindependent_factor').val()
-},function(session){
-  session.getObject(function(obj){
-    mTICdid = obj.mTICdid; Loessdid = obj.Loessdid; medFCdid = obj.medFCdid; BatchMediandid = obj.BatchMediandid;
-    mTIC = obj.mTIC; Loess = obj.Loess; medFC = obj.medFC; BatchMedian = obj.BatchMedian;
-    eData = obj.expression;
-    fData = obj.feature;
-    pData = obj.phenotype;
-    e_ori = obj.expression_only_rm_outlier;
-    p_ori = obj.phenotype_only_rm_outlier;
-    var req2=ocpu.call("stat_get_modified_data",{
-      DATA:obj
-    },function(session2){
-        download_norm_data_adress = session2.getLoc() + "R/.val/csv";
-      $("#download_norm_data").empty();
-              var r= $('<a id = "download_visualization_norm" download = "file.csv" href='+download_norm_data_adress+' class="btn btn-success btn-sm btn-outline" role="button"><i class="glyphicon glyphicon-download-alt"></i> Download Normalized Data</a>');
-
-              $("#download_norm_data").append(r);
-    })
-
-
-  plotPCAScore(e1 = eData, f1 = fData, p1 = pData);
- //  hideSpinner(loadSpinner);
-  });
-}).fail(function(jqXHR){errormsg(1 + jqXHR.responseText); hideSpinner(loadSpinner);});
-
-
-
-
-};
 
 
 $(".normalization").change(function(event){// able the applynormalization button.
-/* $( "#samplenormalizationSample_specific_column2" ).text("using " + sample_specific_weight );
- $( "#Loess_column2" ).text("QC: " + QCIndicator +"; Batch: "+BatchIndicator + "; Time: " +TimeIndicator +".");
-$( "#Batch_column2" ).text("Batch Indicator: " + BatchIndicator);
-$( "#mTIC_column2" ).text("Using: " + KnownorUnknown.value );*/
-
-/*var radios1 = document.getElementsByName('samplenormalization');
-for (var i = 0, length = radios1.length; i < length; i++) {
-    if (radios1[i].checked) {
-      samplenormalization_method = ["None","Sample_specific","mTIC","Loess","Median Fold Change", "Batch Median"][i];
-    }
-}
-var radios2 = document.getElementsByName('datatransformation');
-for (var i = 0, length = radios2.length; i < length; i++) {
-    if (radios2[i].checked) {
-      datatransformation_method = ["None","log","power"][i]
-    }
-}
-var radios3 = document.getElementsByName('datascaling');
-for (var i = 0, length = radios3.length; i < length; i++) {
-    if (radios3[i].checked) {
-      datascaling_method = ["None","Auto","Pareto","Range"][i]
-    }
-}
-
-$("#samplenormalizationmethod").text(samplenormalization_method);
-$("#datatransformationmethod").text(datatransformation_method);
-$("#featurenormalizationmethod").text(datascaling_method);*/
-
-
 $("#applynormalization").removeClass("disabled");
-/*if(!$("#samplenormalizationSample_specific").is(':checked')){
-  $( "#samplenormalizationSample_specific_column" ).text("");  $( "#samplenormalizationSample_specific_column2" ).text("");
-}
-if(!$("#samplenormalizationmTIC").is(':checked')){
-  $( "#mTIC_column" ).text("");$( "#mTIC_column2" ).text("");
-}
-if(!$("#samplenormalizationloess").is(':checked')){
-  $( "#Loess_column" ).text("");$( "#Loess_column2" ).text("");
-}
-if(!$("#samplenormalizationBatchMedian").is(':checked')){
-  $( "#Batch_column" ).text("");$( "#Batch_column2" ).text("");
-}*/
-
-
-
-
-
-
 });
 
 
@@ -677,8 +509,6 @@ $("#Samples_To_Be_Deleted").text("");
 $("#Samples_To_Be_Deleted").text($("#sample_to_be_removed").val());
 $("#applynormalization").addClass("disabled");
     }
-
-
 });
 
 

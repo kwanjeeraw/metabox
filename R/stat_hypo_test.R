@@ -23,16 +23,16 @@ stat_hypo_test = function(e,p,f,
 
                      ANOVAmethod = NULL,ANOVAposthoc = NULL,nonparaANOVAmethod = NULL,nonparaANOVAposthoc = NULL,
 
-                     twowayANOVAmethod = NULL,
-                     maineffect1ANOVAmethod = NULL,maineffect1ANOVAposthoc = NULL,simplemaineffect1ANOVAmethod = NULL,simplemaineffect1ANOVAposthoc = NULL,
-                     maineffect1ttestmethod = NULL,maineffect1ttestcorrection = NULL,simplemaineffect1ttestmethod = NULL,simplemaineffect1ttestcorrection = NULL,
+                     twowayANOVAmethod = 'two way ANOVA',
+                     maineffect1ANOVAmethod = 'Welch',maineffect1ANOVAposthoc = 'games.howell',simplemaineffect1ANOVAmethod = 'Welch',simplemaineffect1ANOVAposthoc = 'games.howell',
+                     maineffect1ttestmethod = 'Welch',maineffect1ttestcorrection = 'fdr',simplemaineffect1ttestmethod = 'Welch',simplemaineffect1ttestcorrection = 'fdr',
                      maineffect2ANOVAmethod = NULL,maineffect2ANOVAposthoc = NULL,simplemaineffect2ANOVAmethod = NULL,simplemaineffect2ANOVAposthoc = NULL,
-                     maineffect2ttestmethod = NULL,maineffect2ttestcorrection = NULL,simplemaineffect2ttestmethod = NULL,simplemaineffect2ttestcorrection = NULL,
+                     maineffect2ttestmethod = 'Welch',maineffect2ttestcorrection = 'fdr',simplemaineffect2ttestmethod = 'Welch',simplemaineffect2ttestcorrection = 'none',
                      nonparatwowayANOVAmethod = NULL,
-                     nonparamaineffect1ANOVAmethod = NULL,nonparamaineffect1ANOVAposthoc = NULL,nonparasimplemaineffect1ANOVAmethod = NULL,nonparasimplemaineffect1ANOVAposthoc = NULL,
-                     nonparamaineffect1ttestmethod = NULL,nonparamaineffect1ttestcorrection = NULL,nonparasimplemaineffect1ttestmethod = NULL,nonparasimplemaineffect1ttestcorrection = NULL,
+                     nonparamaineffect1ANOVAmethod = 'htest',nonparamaineffect1ANOVAposthoc = 'utest',nonparasimplemaineffect1ANOVAmethod = 'htest',nonparasimplemaineffect1ANOVAposthoc = 'utest',
+                     nonparamaineffect1ttestmethod = 'utest',nonparamaineffect1ttestcorrection = 'fdr',nonparasimplemaineffect1ttestmethod = 'uteste',nonparasimplemaineffect1ttestcorrection = 'fdr',
                      nonparamaineffect2ANOVAmethod = NULL,nonparamaineffect2ANOVAposthoc = NULL,nonparasimplemaineffect2ANOVAmethod = NULL,nonparasimplemaineffect2ANOVAposthoc = NULL,
-                     nonparamaineffect2ttestmethod = NULL,nonparamaineffect2ttestcorrection = NULL,nonparasimplemaineffect2ttestmethod = NULL,nonparasimplemaineffect2ttestcorrection = NULL,
+                     nonparamaineffect2ttestmethod = 'utest',nonparamaineffect2ttestcorrection = 'fdr',nonparasimplemaineffect2ttestmethod = 'utest',nonparasimplemaineffect2ttestcorrection = 'none',
 
 
 
@@ -42,18 +42,18 @@ stat_hypo_test = function(e,p,f,
 
                      twowaypairedANOVAmethod = NULL,twowaypairedANOVAadjust = NULL,
                      maineffect1pairedANOVAmethod = NULL,maineffect1pairedANOVAadjust = NULL,maineffect1pairedANOVAposthoc = NULL,simplemaineffect1pairedANOVAmethod = NULL,simplemaineffect1pairedANOVAadjust = NULL,simplemaineffect1pairedANOVAposthoc = NULL,
-                     maineffect1pairedttestmethod = NULL,maineffect1pairedttestcorrection = NULL,simplemaineffect1pairedttestmethod = NULL,simplemaineffect1pairedttestcorrection = NULL,
+                     maineffect1pairedttestmethod = 'Welch',maineffect1pairedttestcorrection = 'fdr',simplemaineffect1pairedttestmethod = 'utest',simplemaineffect1pairedttestcorrection = 'fdr',
                      maineffect2pairedANOVAmethod = NULL,maineffect2pairedANOVAadjust = NULL,maineffect2pairedANOVAposthoc = NULL,simplemaineffect2pairedANOVAmethod = NULL,simplemaineffect2pairedANOVAadjust = NULL,simplemaineffect2pairedANOVAposthoc = NULL,
-                     maineffect2pairedttestmethod = NULL,maineffect2pairedttestcorrection = NULL,simplemaineffect2pairedttestmethod = NULL,simplemaineffect2pairedttestcorrection = NULL,
+                     maineffect2pairedttestmethod = 'paired t test',maineffect2pairedttestcorrection = 'fdr',simplemaineffect2pairedttestmethod = 'paired t test',simplemaineffect2pairedttestcorrection = 'fdr',
 
                      nonparatwowaypairedANOVAmethod = NULL,
                      nonparamaineffect1pairedANOVAmethod = NULL,nonparamaineffect1pairedANOVAposthoc = NULL,nonparasimplemaineffect1pairedANOVAmethod = NULL,nonparasimplemaineffect1pairedANOVAposthoc = NULL,
-                     nonparamaineffect1pairedttestmethod = NULL,nonparamaineffect1pairedttestcorrection = NULL,nonparasimplemaineffect1pairedttestmethod = NULL,nonparasimplemaineffect1pairedttestcorrection = NULL,
+                     nonparamaineffect1pairedttestmethod = 'paired t test',nonparamaineffect1pairedttestcorrection = 'fdr',nonparasimplemaineffect1pairedttestmethod = 'paired utest',nonparasimplemaineffect1pairedttestcorrection = 'fdr',
                      nonparamaineffect2pairedANOVAmethod = NULL,nonparamaineffect2pairedANOVAposthoc = NULL,nonparasimplemaineffect2pairedANOVAmethod = NULL,nonparasimplemaineffect2pairedANOVAposthoc = NULL,
-                     nonparamaineffect2pairedttestmethod = NULL,nonparamaineffect2pairedttestcorrection = NULL,nonparasimplemaineffect2pairedttestmethod = NULL,nonparasimplemaineffect2pairedttestcorrection = NULL,
+                     nonparamaineffect2pairedttestmethod = 'paired utest',nonparamaineffect2pairedttestcorrection = 'fdr',nonparasimplemaineffect2pairedttestmethod = 'paired utest',nonparasimplemaineffect2pairedttestcorrection = 'fdr',
 
-                     mixedANOVA = NULL,mixedANOVAadjust = NULL,
-                     nonparamixedANOVA = NULL
+                     mixedANOVA = 'mixed anova',mixedANOVAadjust = 'GG',
+                     nonparamixedANOVA ='nonpara mixed anova'
 
                      # e = e_ori = DATA$expression;p = p_ori = DATA$phenotype; f = DATA$feature;
 
@@ -89,8 +89,8 @@ stat_hypo_test = function(e,p,f,
 
 
   }else{
-    if(sum(duplicated(p$sampleID))==0){
-      stop("The sampleID you provided doesn't support the repeated design. Please close and check or not to select within subject factor.")
+    if(sum(duplicated(p$subjectID))==0){
+      stop("The subjectID you provided doesn't support the repeated design. Please close and check or not to select within subject factor.")
     }
   }
 
@@ -119,11 +119,11 @@ if(length(independent_factor_name)==0){
   e_ori = e_ori[noNA,]; p_ori = p_ori[noNA,]
 
 
-      excluded = p$sampleID[!p$sampleID%in%names(table(p$sampleID))[table(p$sampleID)%in%sort(table(p$sampleID),decreasing=TRUE)[1]]]
-      e = e[p$sampleID%in%names(table(p$sampleID))[table(p$sampleID)%in%sort(table(p$sampleID),decreasing=TRUE)[1]],]
-      e_ori = e_ori[p$sampleID%in%names(table(p$sampleID))[table(p$sampleID)%in%sort(table(p$sampleID),decreasing=TRUE)[1]],]
-      p = p[p$sampleID%in%names(table(p$sampleID))[table(p$sampleID)%in%sort(table(p$sampleID),decreasing=TRUE)[1]],]
-      p_ori = p_ori[p_ori$sampleID%in%names(table(p_ori$sampleID))[table(p_ori$sampleID)%in%sort(table(p_ori$sampleID),decreasing=TRUE)[1]],]
+      excluded = p$subjectID[!p$subjectID%in%names(table(p$subjectID))[table(p$subjectID)%in%sort(table(p$subjectID),decreasing=TRUE)[1]]]
+      e = e[p$subjectID%in%names(table(p$subjectID))[table(p$subjectID)%in%sort(table(p$subjectID),decreasing=TRUE)[1]],]
+      e_ori = e_ori[p$subjectID%in%names(table(p$subjectID))[table(p$subjectID)%in%sort(table(p$subjectID),decreasing=TRUE)[1]],]
+      p = p[p$subjectID%in%names(table(p$subjectID))[table(p$subjectID)%in%sort(table(p$subjectID),decreasing=TRUE)[1]],]
+      p_ori = p_ori[p_ori$subjectID%in%names(table(p_ori$subjectID))[table(p_ori$subjectID)%in%sort(table(p_ori$subjectID),decreasing=TRUE)[1]],]
 
       feature_contain_constant_group = unique(unlist(sapply(by(e,apply(data.frame(p[,factor_name]),1,function(y){
         paste(y,collapse = "")
@@ -170,7 +170,7 @@ if(length(independent_factor_name)==0){
       #  ID that are not full, would be deleted. This is critical for repeated measure.
 
 
-      dta$id = p$sampleID
+      dta$id = p$subjectID
 
 
       for(i in 2:ncol(dta)){
@@ -181,7 +181,7 @@ if(length(independent_factor_name)==0){
       if(sum(table(dta[,c(-1,-ncol(dta))])==0)>0){
         return("Please check sample size for your study design. Cannot have empty class.")
       }else{
-        cl = makeCluster(min(detectCores(),8))
+        cl = makeCluster(min(detectCores(),10))
         if(length(factor_name[!factor_name%in%repeated_factor_name])==1 & length(repeated_factor_name)==0 & (length(unique(dta[,2]))>2)){#oneway ANOVA.
           num_factor_variable = length(unique(dta$variable1))
           sudo_matrix = matrix(nrow = num_factor_variable,ncol = num_factor_variable)#helping for cure the format issue with dunnTest().

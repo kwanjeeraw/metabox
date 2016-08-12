@@ -40,6 +40,9 @@ stat_PCA_plot = function(e, f, p, color, sample_information_selection =NULL, Ell
   score = data.frame(score, p[,sample_information_selection])
   rownames(score) = rownames(e)
   variance = pca$sdev^2/sum(pca$sdev^2)
+
+
+
   temp = by(score,p[[color]],FUN=function(x){ # this is for the scatters.
     # x = score[p[[color]]==p[[color]][1],]
     text.temp = x[sample_information_selection]
@@ -49,15 +52,20 @@ stat_PCA_plot = function(e, f, p, color, sample_information_selection =NULL, Ell
 
 
     if(Ellipse){
-      ell.info <- cov.wt(cbind(x[,1], x[,2]))
-      eigen.info <- eigen(ell.info$cov)
-      lengths <- sqrt(eigen.info$values * 2 * qf(.95, 2, length(x[,1])-1))
-      d = rbind(ell.info$center + lengths[1] * eigen.info$vectors[,1],
-                ell.info$center - lengths[1] * eigen.info$vectors[,1],
-                ell.info$center + lengths[2] * eigen.info$vectors[,2],
-                ell.info$center - lengths[2] * eigen.info$vectors[,2])
-      r <- cluster::ellipsoidhull(d)
-      pred = predict(r,100)
+      pred = tryCatch({
+        ell.info <- cov.wt(cbind(x[,1], x[,2]))
+        eigen.info <- eigen(ell.info$cov)
+        lengths <- sqrt(eigen.info$values * 2 * qf(.95, 2, length(x[,1])-1))
+        d = rbind(ell.info$center + lengths[1] * eigen.info$vectors[,1],
+                  ell.info$center - lengths[1] * eigen.info$vectors[,1],
+                  ell.info$center + lengths[2] * eigen.info$vectors[,2],
+                  ell.info$center - lengths[2] * eigen.info$vectors[,2])
+        r <- cluster::ellipsoidhull(d)
+        predict(r,100)
+      },error = function(e){
+        NULL
+      })
+
     }else{
       pred = NULL
     }
@@ -75,6 +83,10 @@ stat_PCA_plot = function(e, f, p, color, sample_information_selection =NULL, Ell
          ,marker=NULL,showlegend=FALSE
     ))
   },simplify =F)
+
+
+
+
   temp0 = range(score[,1]);range_x = temp0 + c(-0.1 * diff(temp0), 0.1 * diff(temp0))
   temp0 = range(score[,2]);range_y = temp0 + c(-0.1 * diff(temp0), 0.1 * diff(temp0))
 
@@ -111,9 +123,9 @@ stat_PCA_plot = function(e, f, p, color, sample_information_selection =NULL, Ell
 
 
   if(IDtrend){
-    full_id = unique(p$sampleID)
+    full_id = unique(p$subjectID)
     for(i in 1:length(full_id)){
-      result[[length(temp)+length(temp)+i]] = list(x = score[,1][p$sampleID%in%full_id[i]], y = score[,2][p$sampleID%in%full_id[i]]
+      result[[length(temp)+length(temp)+i]] = list(x = score[,1][p$subjectID%in%full_id[i]], y = score[,2][p$subjectID%in%full_id[i]]
                                                    ,mode = 'lines'
                                                    ,hoverinfo='none'
                                                    ,name = NULL, line = list(dash='dot',color = "black",

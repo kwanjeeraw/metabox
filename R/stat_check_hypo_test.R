@@ -25,18 +25,18 @@ stat_check_hypo_test = function(e,p,f,e_ori,p_ori, # This is for mean and sd.
   }
 
   factor_name = c(independent_factor_name,repeated_factor_name)
-  # check if sampleID OK.
-  if(is.null(repeated_factor_name)){# t test, ANOVA, two way ANOVA, sampleID should be identical to each other.
-    if(sum(duplicated(p$sampleID))>0){
-      return("sampleID should be identical to each other if your study doesn't evolve any repeated measure.")
+  # check if subjectID OK.
+  if(is.null(repeated_factor_name)){# t test, ANOVA, two way ANOVA, subjectID should be identical to each other.
+    if(sum(duplicated(p$subjectID))>0){
+      return("subjectID should be identical to each other if your study doesn't evolve any repeated measure.")
     }
   }
 
   if(!is.null(independent_factor_name) & !is.null(repeated_factor_name)){# Mixed factor ANOVA.
-    if(sum(as.numeric(by(p$sampleID,p[,repeated_factor_name],function(x){
+    if(sum(as.numeric(by(p$subjectID,p[,repeated_factor_name],function(x){
       sum(duplicated(x))
     })))>0){
-      return("sampleID conflicts with your study design.")
+      return("subjectID conflicts with your study design.")
     }
   }
 

@@ -1073,8 +1073,8 @@ maineffect2ANOVAmethod = null;maineffect2ANOVAposthoc = null;simplemaineffect2AN
 nonparatwowayANOVAmethod = null;
 nonparamaineffect1ANOVAmethod = 'htest';nonparamaineffect1ANOVAposthoc = 'dunn';nonparasimplemaineffect1ANOVAmethod = 'htest';nonparasimplemaineffect1ANOVAposthoc = 'dunn';
 nonparamaineffect1ttestmethod = null;nonparamaineffect1ttestcorrection = null;nonparasimplemaineffect1ttestmethod = null;nonparasimplemaineffect1ttestcorrection = null;
-nonparamaineffect2ANOVAmethod = 'htest';nonparamaineffect2ANOVAposthoc = 'dunn';nonparasimplemaineffect2ANOVAmethod = 'htest';nonparasimplemaineffect2ANOVAposthoc = 'dunn';
-nonparamaineffect2ttestmethod = null;nonparamaineffect2ttestcorrection = null;nonparasimplemaineffect2ttestmethod = null;nonparasimplemaineffect2ttestcorrection = null;
+nonparamaineffect2ANOVAmethod = null;nonparamaineffect2ANOVAposthoc = null;nonparasimplemaineffect2ANOVAmethod = null;nonparasimplemaineffect2ANOVAposthoc = null;
+nonparamaineffect2ttestmethod = 'utest';nonparamaineffect2ttestcorrection = 'fdr';nonparasimplemaineffect2ttestmethod = 'utest';nonparasimplemaineffect2ttestcorrection = 'fdr';
 
 pairedttestmethod = null;pairedttestcorrection = null;nonparapairedttestmethod = null;nonparapairedttestcorrection = null;
 

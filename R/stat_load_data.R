@@ -14,7 +14,7 @@
 #'@export
 
 stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns a expression data frame(eData),
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # t test
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two independent group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"
@@ -22,7 +22,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\one way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # two way ANOVA 2*2
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\\\data\\two way ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\\\data\\two way ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
   # two way ANOVA 3*4
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two way ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
@@ -34,10 +34,10 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
   # two way repeated ANOVA 2*2
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
   # two way repeated ANOVA 3*4
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two way repeated ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
   # mixed ANOVA 2*2
-  # file = "C:\\Users\\fansi\\Desktop\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 255530 Jan Schilling_Project 1_ mouse serum_04-2016_submit_4.29.2016.xlsx"
   # mixed ANOVA 3*4
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\mixed ANOVA\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
 
@@ -108,10 +108,10 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
       }
     }
 
-    if(sum(!c("phenotype_index","sampleID","feature_index")%in%c(colnames(pData),colnames(fData)))>0){
+    if(sum(!c("phenotype_index","subjectID","feature_index")%in%c(colnames(pData),colnames(fData)))>0){
       message = paste0("The data uploaded doesn't have ",
-                       paste(c("phenotype_index","sampleID","feature_index")[!
-                                                                                                c("phenotype_index","sampleID","feature_index")%in%c(colnames(pData),colnames(fData))],collapse = ", ")," and they are added automatically. You can examine them by ")
+                       paste(c("phenotype_index","subjectID","feature_index")[!
+                                                                                                c("phenotype_index","subjectID","feature_index")%in%c(colnames(pData),colnames(fData))],collapse = ", ")," and they are added automatically. You can examine them by ")
 
     }else{
       message = NULL
@@ -120,8 +120,8 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
     if(!"phenotype_index"%in%colnames(pData)){
       pData$phenotype_index = 1:nrow(pData)
     }
-    if(!"sampleID"%in%colnames(pData)){
-      pData$sampleID = 1:nrow(pData)
+    if(!"subjectID"%in%colnames(pData)){
+      pData$subjectID = 1:nrow(pData)
     }
     if(!"feature_index"%in%colnames(fData)){
       fData$feature_index = 1:nrow(fData)
@@ -160,7 +160,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
     }else{
       writeLines(message,"messages.txt")
     }
-    if(sum(duplicated(pData$sampleID[pData$sampleID>0]))){
+    if(sum(duplicated(pData$subjectID[pData$subjectID>0]))){
       duplicatedID = T
     }else{
       duplicatedID = F

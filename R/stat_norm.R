@@ -120,7 +120,7 @@ stat_norm = function(e, f, p,
 }
   }else if(sample_normalization == "Loess"){
 
-    if(sum(p$sampleID[p$phenotype_index%in%sample_index]<1)>0){
+    if(sum(p$subjectID[p$phenotype_index%in%sample_index]<1)>0){
       stop("For Loess + Batch normalization, you cannot remove QC before normalization because QC are enssential of fitting the right loess curve.
            However, if you insist on remove it, please remove them before data uploading. ")
     }

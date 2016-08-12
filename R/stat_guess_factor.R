@@ -17,13 +17,13 @@ stat_guess_factor = function(DATA){
   library(stringr)
   pData = DATA$phenotype
 
-  table_p = table(pData$sampleID)
+  table_p = table(pData$subjectID)
 
   if(max(table_p)==1){ # there is no repeated measure here.
 
     independent_factor_name = colnames(pData)[!(sapply(sapply(pData,table),length)==1 | sapply(sapply(pData,table),length)==nrow(pData))]
 
-    independent_factor_name = independent_factor_name[!independent_factor_name%in%c('phenotype_index','sampleID','batch','Sample_specific_weight','QC','tim_of_injection','rank')]
+    independent_factor_name = independent_factor_name[!independent_factor_name%in%c('phenotype_index','subjectID','batch','Sample_specific_weight','QC','tim_of_injection','rank')]
 
 
 
@@ -31,8 +31,8 @@ stat_guess_factor = function(DATA){
 
     }else{ # It means that there are repeated factors.
     temp = sapply(pData,function(x){
-      sapply(unique(pData$sampleID),function(id){
-        sum(by(pData$sampleID,x,function(y){id%in%y}))
+      sapply(unique(pData$subjectID),function(id){
+        sum(by(pData$subjectID,x,function(y){id%in%y}))
       })
     })
 
@@ -49,7 +49,7 @@ stat_guess_factor = function(DATA){
     }) == max(table_p)]
     )
 
-    repeated_factor_name = repeated_factor_name[!repeated_factor_name%in%c('phenotype_index','sampleID','batch','Sample_specific_weight','QC','tim_of_injection','rank')]
+    repeated_factor_name = repeated_factor_name[!repeated_factor_name%in%c('phenotype_index','subjectID','batch','Sample_specific_weight','QC','tim_of_injection','rank')]
 
     if(length(repeated_factor_name)==0){
       repeated_factor_name = ""
@@ -67,7 +67,7 @@ stat_guess_factor = function(DATA){
             length(unique(y))
           })
         })[1,]==1)]
-      independent_factor_name = independent_factor_name[!independent_factor_name%in%c('phenotype_index','sampleID','batch','Sample_specific_weight','QC','tim_of_injection','rank')]
+      independent_factor_name = independent_factor_name[!independent_factor_name%in%c('phenotype_index','subjectID','batch','Sample_specific_weight','QC','tim_of_injection','rank')]
 
     }
 
