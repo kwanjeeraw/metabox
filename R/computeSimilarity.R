@@ -61,8 +61,8 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
 #       dstCols = as.dist(colMat)
 #       network = data.frame(source = as.character(nNames[dstRows]), target = as.character(nNames[dstCols]), coef = tanmt[lower.tri(tanmt)], stringsAsFactors = FALSE)
 #       network = network[network$coef > coef, ]
-#         #network = getChemSimNet(txtinput, cutoff = coef)
-network = data.frame(source = c('1','2','3','4','5'), target = c('11','12','13','14','15'), coef = c(0.1,0.2,0.4,0.5,0.9), stringsAsFactors = FALSE)
+        network = getChemSimNet(txtinput, cutoff = coef)
+#network = data.frame(source = c('1','2','3','4','5'), target = c('11','12','13','14','15'), coef = c(0.1,0.2,0.4,0.5,0.9), stringsAsFactors = FALSE)
       cat("Format and returning network of size ",nrow(network)," ...\n")
       if(nrow(network)>0){#pass cutoff
         network = data.frame(source = as.character(network[,1]), target = as.character(network[,2]), coef = as.numeric(network[,3]), stringsAsFactors = FALSE)
