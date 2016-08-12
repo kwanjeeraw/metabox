@@ -36,6 +36,7 @@
 #'@seealso \pkg{\link{metabomapr}}, \code{\link{CID_tanimoto}}, \code{\link{fpSim}}, \code{\link{sdfid}}
 #'@examples
 #'#simnw <- computeSimilarity(c(1110,10413,196,51,311,43,764,790)) #compute similarity network for given pubchem compounds
+#'@import dplyr
 #'@export
 computeSimilarity <- function(txtinput, coef=0.7, returnas="dataframe") UseMethod("computeSimilarity")
 #'@export
