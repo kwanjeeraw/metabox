@@ -28,5 +28,6 @@ Imports:
     WRS2,
     outliers,
     openxlsx,
-    NLP
+    NLP,
+    dplyr
 RoxygenNote: 5.0.1
