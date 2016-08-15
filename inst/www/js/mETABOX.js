@@ -37,24 +37,28 @@ function JSONToTabConvertor(JSONData,ShowHeader) {
 //@param tab tab-delimited input
 //@param moltype type of entity e.g. PubChem, uniprot, ensembl
 function tabToJSON(tab,moltype) {
-	var lines = tab.split(/\r?\n/);
 	var outjson = [];
-	var headers = lines[0].split(/\t/);//keep header
-	if(headers.length > 1){//with headers
-		for(var i = 1; i < lines.length; i++){
-			var obj = {};
-			var currentline = lines[i].split(/\t/);
-			for(var j = 0; j < headers.length; j++){
-				obj[headers[j]] = currentline[j];
+	if(tab==""){
+		outjson = tab.split(/\s+/g);
+	}else{
+		var lines = tab.split(/\r?\n/);
+		var headers = lines[0].split(/\t/);//keep header
+		if(headers.length > 1){//with headers
+			for(var i = 1; i < lines.length; i++){
+				var obj = {};
+				var currentline = lines[i].split(/\t/);
+				for(var j = 0; j < headers.length; j++){
+					obj[headers[j]] = currentline[j];
+				}
+				outjson.push(obj);
 			}
-			outjson.push(obj);
-		}
-	}else{//no header
-		for(var i = 0; i < lines.length; i++){
-			var obj = {};
-			obj[moltype] = lines[i];
-			outjson.push(obj);
-		}
+		}else{//no header
+			for(var i = 0; i < lines.length; i++){
+				var obj = {};
+				obj[moltype] = lines[i];
+				outjson.push(obj);
+			}
+		}	
 	}
 	return JSON.parse(JSON.stringify(outjson)); //return JSON object
 }
@@ -72,6 +76,9 @@ function loadTxtFile(event,id) {
   reader.readAsText(input.files[0]);
 };
 
+//@function load example and pass to textarea
+//@param id id element
+//@param example type of entities
 function loadexamplelist(id,example){
 	var exdat = null;
 	switch (example)

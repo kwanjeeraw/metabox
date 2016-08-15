@@ -62,6 +62,40 @@ fetchHetNetworkByGID.default <- function(from=NULL, to=NULL, pattern, returnas="
       if (!is.character(pattern)) stop("argument 'pattern' must be a character vector")
       if (length(from) == 0) from = NULL #reset empty list to NULL
       if (length(to) == 0) to = NULL #reset empty list to NULL
+      flagfromdf = FALSE
+      if (class(from) == "data.frame" && !is.null(from)) {
+        datfrominput = from #keep input data
+        flagfromdf = TRUE
+        if(!is.null(from$grinn)){
+          from = from$grinn
+        }else if(!is.null(from$PubChem)){
+          from = from$PubChem
+          colnames(datfrominput) = gsub("PubChem","grinn",colnames(datfrominput))
+        }else if(!is.null(from$uniprot)){
+          from = from$uniprot
+          colnames(datfrominput) = gsub("uniprot","grinn",colnames(datfrominput))
+        }else if(!is.null(from$ensembl)){
+          from = from$ensembl
+          colnames(datfrominput) = gsub("ensembl","grinn",colnames(datfrominput))
+        }
+      }
+      flagtodf = FALSE
+      if (class(to) == "data.frame" && !is.null(to)) {
+          dattoinput = to #keep input data
+          flagtodf = TRUE
+          if(!is.null(to$grinn)){
+            to = to$grinn
+          }else if(!is.null(to$PubChem)){
+            to = to$PubChem
+            colnames(dattoinput) = gsub("PubChem","grinn",colnames(dattoinput))
+          }else if(!is.null(to$uniprot)){
+            to = to$uniprot
+            colnames(dattoinput) = gsub("uniprot","grinn",colnames(dattoinput))
+          }else if(!is.null(to$ensembl)){
+            to = to$ensembl
+            colnames(dattoinput) = gsub("ensembl","grinn",colnames(dattoinput))
+          }
+      }
       #construct query
       maxkw = 500 #maximum keywords
       doPar = FALSE
@@ -114,7 +148,28 @@ cat(qstring,"\n")
         path = apply(ft, 1, function (x) curlRequest.TRANSACTION(cypher=gsub("keyfrom", x[1], gsub("keyto", x[2], querystring))))
         paths = unlist(path, recursive = FALSE)
       }
-      formatNetworkOutput(paths,returnas)
+      network = formatNetworkOutput(paths)
+      networknode = network$nodes
+      if(flagfromdf && flagtodf){#keep from-to input data
+        fromtoinput = plyr::rbind.fill(datfrominput,dattoinput)
+        fromtoinput = unique(fromtoinput)
+        networknode = merge(networknode,fromtoinput,by.x='gid',by.y='grinn',all.x=TRUE)
+        networknode = networknode[,c(2,1,3:ncol(networknode))]
+        networknode[is.na(networknode)] = ""
+      }
+      if(flagfromdf && !flagtodf){#keep from input data
+        networknode = merge(networknode,datfrominput,by.x='gid',by.y='grinn',all.x=TRUE)
+        networknode = networknode[,c(2,1,3:ncol(networknode))]
+      }
+      if(!flagfromdf && flagtodf){#keep to input data
+        networknode = merge(networknode,dattoinput,by.x='gid',by.y='grinn',all.x=TRUE)
+        networknode = networknode[,c(2,1,3:ncol(networknode))]
+      }
+      out = switch(returnas,
+                   dataframe = list(nodes=networknode, edges=network$edges),
+                   list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network$edges, seq(nrow(network$edges)))),
+                   json = list(nodes=jsonlite::toJSON(networknode), edges=jsonlite::toJSON(network$edges)),
+                   stop("incorrect return type"))
     },error=function(e) {
       message(e)
       cat("\nError: RETURN no network ..\n")

@@ -56,14 +56,16 @@
     var fntype;
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();
-      var from = $("#from").val().trim().split(/\s+/g);     
+      //var from = $("#from").val().trim().split(/\s+/g);
+	  var from = tabToJSON($("#from").val().trim(),"grinn");
       if(from[0] == ''){from = null;}
-      var to = $("#to").val().trim().split(/\s+/g);
+      //var to = $("#to").val().trim().split(/\s+/g);
+	  var to = tabToJSON($("#to").val().trim(),"grinn");
       if(to[0] == ''){to = null;}
       var pattern = $('input[name="relationship"]:checked').parent().text().trim();
-      var internalid = $('#internalid').is(':checked');
-      var callfn = "fetchHetNetwork";
-      if(!internalid){callfn = "fetchHetNetworkByGID";}
+      //var internalid = $('#internalid').is(':checked');
+      var callfn = "fetchHetNetworkByGID";
+      //if(!internalid){callfn = "fetchHetNetworkByGID";}  
       var req = ocpu.call(callfn,{from:from,to:to,pattern:pattern}, function(session) {//calls R function: fetchHetNetwork
         compute_session = session;
         session.getStdout(function(outtxt){
@@ -183,7 +185,7 @@
             <h3>Query simple network</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Query the networks of a specific relationship from the database, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
+              <i class="fa fa-info-circle"></i> Query the networks of a specific relationship from the database.
             </div>
           </div>
         </div>
@@ -202,14 +204,14 @@
                       <div class="form-group">
                         <label for="from">From node:</label>
                         <textarea class="form-control" id="from" name="from" rows="5"></textarea>
-                        <p class="help-block">Separate each ID by a new line or space e.g. UniProt IDs: P18669 P15259 P51854 Q16822 O75390 P13929 P11498 P07195 P06744 P09467</p>
+                        <p class="help-block">Separate each ID by a new line (try <a href="#" onclick='loadexamplelist("#from","proteins")'>example</a>).</p>
                       </div>
                     </div>
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label>or Upload a file:</label>
                         <input type='file' id="frominput" name="frominput" accept='text/plain' onchange='loadTxtFile(event,"#from")'>
-                        <p class="help-block">One column, separate each ID by a new line</p>
+						<p class="help-block">See Note for input format.</p>
                       </div>
                     </div>
                   </div>
@@ -219,16 +221,25 @@
                       <div class="form-group">
                         <label for="to">To node:</label>
                         <textarea class="form-control" id="to" name="to" rows="5"></textarea>
-                        <p class="help-block">Separate each ID by a new line or space e.g. PubChem CIDs: 311 970 1005 1060 10267 79025 107689 439168 439183 439278 439284 440641</p>
+                        <p class="help-block">Separate each ID by a new line (try <a href="#" onclick='loadexamplelist("#to","compoundsnw")'>example</a>).</p>
                       </div>
                     </div>
                     <div class="col-lg-4">
                       <div class="form-group">
                         <label>or Upload a file:</label>
                         <input type='file' id="toinput" name="toinput" accept='text/plain' onchange='loadTxtFile(event,"#to")'>
-                        <p class="help-block">One column, separate each ID by a new line</p>
+                        <p class="help-block">See Note for input format.</p>
                       </div>
                     </div>
+					<div class="col-lg-12">
+						<div class="alert alert-default alert-dismissable">
+							<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+							<b>Note:</b>
+							<p class="help-block">- For one column table: separate each ID by a new line. <br>
+							- For multicolumn table: 1st column = ID lists with PubChem or uniprot or ensembl as a header (see below), separate each column by tab. <br>
+							- Metabox accepts PubChem CID for compounds, UniProt entry for proteins, Ensembl for genes.</p>
+						</div>	
+					</div>
                   </div>
                   <!-- /.row -->
                   <div class="row">
@@ -288,11 +299,11 @@
                       </div>
                     </div>
                     <div class="col-lg-5">
-                        <div class="form-group">
+                        <!--div class="form-group">
                           <label>Use internal ids</label>
                           <input id="internalid"  name="internalid" type="checkbox" value="true">
                           <p class="help-block">Check whether input data use internal database ids</p>
-                        </div>
+                        </div-->
                     </div>
                   </div>
                   <!-- /.row -->

@@ -32,9 +32,9 @@
 #'@examples
 #'#cypher = "MATCH ptw = (from:Compound)-[:BIOCHEMICAL_REACTION]->(:Compound) WHERE ID(from) = 0 RETURN DISTINCT ptw LIMIT 2"
 #'#nw = curlRequest.TRANSACTION(cypher)
-#'#result = formatNetworkOutput.default(nw, returnas="dataframe")
-formatNetworkOutput <- function(graph, returnas) UseMethod("formatNetworkOutput")
-formatNetworkOutput.default <- function(graph, returnas){
+#'#result = formatNetworkOutput.default(nw)
+formatNetworkOutput <- function(graph) UseMethod("formatNetworkOutput")
+formatNetworkOutput.default <- function(graph){
   pair = data.frame() #list of mapped nodes
   attb = data.frame() #list of node attributes
   if(length(graph) <= 30000){
@@ -54,9 +54,5 @@ formatNetworkOutput.default <- function(graph, returnas){
     attb = unique(attb)
     attb = as.data.frame(lapply(attb, unlist), stringsAsFactors = FALSE)#convert df of list
   }
-  out = switch(returnas,
-               dataframe = list(nodes=attb, edges=pair),
-               list = list(nodes = split(attb, seq(nrow(attb))), edges = split(pair, seq(nrow(pair)))),
-               json = list(nodes=jsonlite::toJSON(attb), edges=jsonlite::toJSON(pair)),
-               stop("incorrect return type"))
+  list(nodes=attb, edges=pair)
 }
