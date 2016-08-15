@@ -89,6 +89,8 @@ function loadexamplelist(id,example){
 	   break;
 	   case 'compoundsnw': exdat = [311,970,1005,1060,10267,79025,107689,439168,439183,439278,439284,440641];
 	   break;
+	   case 'relpattern': exdat = ['(:Gene)-[:CONVERSION]->(from:Protein)-[:CATALYSIS]->(to:Compound)'];
+	   break;
 	   default: exdat = [43,51,196,311,764,790,970,1005,1044,1060,1110,1188,10267,10413,27476,79025,107689,439168,439183,440641];
 	}
 	$(id).val("");//clear textarea
@@ -123,6 +125,7 @@ function exportNwZip(nodes, edges, img){
 //@param img, nlegend cytoscapeJS png object
 function exportEnrichmentZip(nodes, edges, enrichment, pairs, img, nlegend){
     var zip = new JSZip();
+	zip.file("README.txt", readme);
     zip.file("node.txt", JSONToTabConvertor(nodes,true));
     if (edges != null) {zip.file("edge.txt", JSONToTabConvertor(edges,true));}
     zip.file("result.txt", JSONToTabConvertor(enrichment,true));

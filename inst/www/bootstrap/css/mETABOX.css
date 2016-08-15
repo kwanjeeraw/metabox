@@ -70,6 +70,9 @@ td.highlight {
     top:15;
     left:0;
 }
+a.exlink:hover {
+	cursor:pointer;
+}
 /*Statistics*/
 .small-label{
   font-weight: 400

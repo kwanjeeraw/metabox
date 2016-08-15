@@ -90,6 +90,7 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
         if(flagdf){#keep input data
           networknode = merge(networknode,datinput,by.x='gid',by.y='PubChem',all.x=TRUE)
           networknode = networknode[,c(2,1,3:ncol(networknode))]
+          networknode[is.na(networknode)] = ""
         }
         ## output
         switch(returnas,

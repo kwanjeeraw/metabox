@@ -155,7 +155,6 @@ cat(qstring,"\n")
         fromtoinput = unique(fromtoinput)
         networknode = merge(networknode,fromtoinput,by.x='gid',by.y='grinn',all.x=TRUE)
         networknode = networknode[,c(2,1,3:ncol(networknode))]
-        networknode[is.na(networknode)] = ""
       }
       if(flagfromdf && !flagtodf){#keep from input data
         networknode = merge(networknode,datfrominput,by.x='gid',by.y='grinn',all.x=TRUE)
@@ -165,6 +164,7 @@ cat(qstring,"\n")
         networknode = merge(networknode,dattoinput,by.x='gid',by.y='grinn',all.x=TRUE)
         networknode = networknode[,c(2,1,3:ncol(networknode))]
       }
+      networknode[is.na(networknode)] = ""
       out = switch(returnas,
                    dataframe = list(nodes=networknode, edges=network$edges),
                    list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network$edges, seq(nrow(network$edges)))),
@@ -173,7 +173,7 @@ cat(qstring,"\n")
     },error=function(e) {
       message(e)
       cat("\nError: RETURN no network ..\n")
-      switch(returnas,
+      out = switch(returnas,
              dataframe = list(nodes = data.frame(), edges = data.frame()),
              list = list(nodes = list(), edges = list()),
              json = list(nodes = "", edges = ""))

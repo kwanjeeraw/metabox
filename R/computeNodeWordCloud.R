@@ -54,13 +54,21 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
       if (class(tmparg) == "try-error") {
         stop("argument 'annotation' is not valid, choose one from the list: pathway,mesh")
       }
-      if (class(txtinput) == "data.frame") {#get result from statistical analysis
-        if(!is.null(txtinput$PubChem)){
+      flagdf = FALSE
+      if (class(txtinput) == "data.frame" && !is.null(txtinput)) {#get result from statistical analysis
+        datinput = txtinput #keep input data
+        flagdf = TRUE
+        if(!is.null(txtinput$grinn)){
+          txtinput = txtinput$grinn
+        }else if(!is.null(txtinput$PubChem)){
           txtinput = txtinput$PubChem
+          colnames(datinput) = gsub("PubChem","grinn",colnames(datinput))
         }else if(!is.null(txtinput$uniprot)){
           txtinput = txtinput$uniprot
+          colnames(datinput) = gsub("uniprot","grinn",colnames(datinput))
         }else if(!is.null(txtinput$ensembl)){
           txtinput = txtinput$ensembl
+          colnames(datinput) = gsub("ensembl","grinn",colnames(datinput))
         }
       }
       txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
@@ -79,6 +87,11 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
           wc$rank = seq(1:nrow(wc))
           wc = wc[,c(ncol(wc),1:(ncol(wc)-1))] #rearrange columns
           networknode = annonws$nodes[annonws$nodes$nodelabel != "Pathway", ] #not return pathway nodes
+          if(flagdf){#keep input data
+            networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            networknode = networknode[,c(2,1,3:ncol(networknode))]
+            networknode[is.na(networknode)] = ""
+          }
           list(nodes=networknode, edges=annonws$edges, wordcloud=wc) #output
         }
         else{#no annotation found
@@ -106,6 +119,11 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
           wc = wc[order(wc$freq, decreasing = TRUE),]
           wc$rank = seq(1:nrow(wc))
           wc = wc[,c(ncol(wc),1:(ncol(wc)-5),(ncol(wc)-2),(ncol(wc)-1))] #rearrange columns
+          if(flagdf){#keep input data
+            networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            networknode = networknode[,c(2,1,3:ncol(networknode))]
+            networknode[is.na(networknode)] = ""
+          }
           list(nodes=networknode, edges=annonws$edges, wordcloud=wc) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output
