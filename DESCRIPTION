@@ -1,8 +1,8 @@
 Package: metabox
 Type: Package
 Title: metabox
-Version: 1.0
-Date: 2016-07-27
+Version: 1.1
+Date: 2016-08-14
 Authors@R: "Kwanjeera W <kwanich@ucdavid.edu> [aut, cre]"
 Description: metaboxdev.
 Depends:
