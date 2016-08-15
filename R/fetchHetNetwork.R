@@ -118,14 +118,20 @@ cat(qstring,"\n")
         path = apply(ft, 1, function (x) curlRequest.TRANSACTION(cypher=gsub("keyfrom", x[1], gsub("keyto", x[2], querystring))))
         paths = unlist(path, recursive = FALSE)
       }
-      formatNetworkOutput(paths,returnas)
+      network = formatNetworkOutput(paths)
+      networknode = network$nodes
+      out = switch(returnas,
+                   dataframe = list(nodes=networknode, edges=network$edges),
+                   list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network$edges, seq(nrow(network$edges)))),
+                   json = list(nodes=jsonlite::toJSON(networknode), edges=jsonlite::toJSON(network$edges)),
+                   stop("incorrect return type"))
     },error=function(e) {
-      message(e)
-      cat("\nError: RETURN no network ..\n")
-      switch(returnas,
-             dataframe = list(nodes = data.frame(), edges = data.frame()),
-             list = list(nodes = list(), edges = list()),
-             json = list(nodes = "", edges = ""))
+    message(e)
+    cat("\nError: RETURN no network ..\n")
+    out = switch(returnas,
+                 dataframe = list(nodes = data.frame(), edges = data.frame()),
+                 list = list(nodes = list(), edges = list()),
+                 json = list(nodes = "", edges = ""))
     })
   return(out)
 }
