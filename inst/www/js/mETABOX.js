@@ -33,6 +33,32 @@ function JSONToTabConvertor(JSONData,ShowHeader) {
     return CSV;
 }
 
+//@function convert tab-delimited format to json object
+//@param tab tab-delimited input
+//@param moltype type of entity e.g. PubChem, uniprot, ensembl
+function tabToJSON(tab,moltype) {
+	var lines = tab.split(/\r?\n/);
+	var outjson = [];
+	var headers = lines[0].split(/\t/);//keep header
+	if(headers.length > 1){//with headers
+		for(var i = 1; i < lines.length; i++){
+			var obj = {};
+			var currentline = lines[i].split(/\t/);
+			for(var j = 0; j < headers.length; j++){
+				obj[headers[j]] = currentline[j];
+			}
+			outjson.push(obj);
+		}
+	}else{//no header
+		for(var i = 0; i < lines.length; i++){
+			var obj = {};
+			obj[moltype] = lines[i];
+			outjson.push(obj);
+		}
+	}
+	return JSON.parse(JSON.stringify(outjson)); //return JSON object
+}
+
 //@function load one column text file and pass to textarea
 //@param id id element
 function loadTxtFile(event,id) {
@@ -46,11 +72,33 @@ function loadTxtFile(event,id) {
   reader.readAsText(input.files[0]);
 };
 
+function loadexamplelist(id,example){
+	var exdat = null;
+	switch (example)
+	{
+	   case 'compounds': exdat = [43,51,196,311,764,790,970,1005,1044,1060,1110,1188,10267,10413,27476,79025,107689,439168,439183,440641];
+	   break;
+	   case 'proteins': exdat = ['P18669','P15259','P51854','Q16822','O75390','P13929','P11498','P07195','P06744','P09467'];
+	   break;
+	   case 'compoundsnw': exdat = [311,970,1005,1060,10267,79025,107689,439168,439183,439278,439284,440641];
+	   break;
+	   default: exdat = [43,51,196,311,764,790,970,1005,1044,1060,1110,1188,10267,10413,27476,79025,107689,439168,439183,440641];
+	}
+	$(id).val("");//clear textarea
+	$(id).val(exdat.join("\n"));//assign value to textarea
+}
+
+var readme = "- node.txt contains node attribute.\r\n"+
+"- PubChem or uniprot or ensembl column is equal to gid column.\r\n"+
+"- id column is neo4j ids and used in source or target columns of edge.txt or in member column of functional analysis results.\r\n"+
+"- If exists, user input data are mapped to nodes and kept in node.txt.";
+
 //@function export network outputs as a zip file
 //@param nodes, edges array of json objects
 //@param img cytoscapeJS png object
 function exportNwZip(nodes, edges, img){
     var zip = new JSZip();
+	zip.file("README.txt", readme);
     zip.file("node.txt", JSONToTabConvertor(nodes,true));
     zip.file("edge.txt", JSONToTabConvertor(edges,true));
     zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});

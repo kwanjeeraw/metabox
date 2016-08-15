@@ -56,8 +56,8 @@
     var annotation;
     var fntype;
     $("#computeBtn").click(function(){
-      var loadSpinner = showSpinner();    
-      var txtinput = $("#txtinput").val().trim().split(/\s+/g);
+      var loadSpinner = showSpinner();
+	  var txtinput = tabToJSON($("#txtinput").val().trim(),"PubChem");
       var coef = Number($("#coef").val());
       var req = ocpu.call("computeSimilarity",{txtinput:txtinput, coef:coef}, function(session) {//calls R function: computeSimilarity
         compute_session = session;
@@ -178,7 +178,7 @@
             <h3>Compute chemical-structure similarity network</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Compute chemical structure similarity network, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
+              <i class="fa fa-info-circle"></i> Compute chemical structure similarity network.
             </div>
           </div>
         </div>
@@ -195,7 +195,7 @@
                   <div class="form-group">
                     <label for="txtinput">PubChem CIDs:</label>
                     <textarea class="form-control" id="txtinput" name="txtinput" rows="5"></textarea>
-                    <p class="help-block">Separate each ID by a new line or space e.g. PubChem CIDs: 43 51 196 311 764 790 970 1005 1044 1060 1110 1188 10267 10413 27476 79025 107689 439168 439183 440641</p>
+                    <p class="help-block">Separate each CID by a new line (try <a href="#" onclick='loadexamplelist("#txtinput","compounds")'>example</a>).</p>
                   </div>
                   <div class="form-group">
                     <label>or Upload a file:</label>
