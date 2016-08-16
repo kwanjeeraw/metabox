@@ -71,6 +71,7 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
       if(is.null(y)) {#have one input, assign values to a square matrix
         cat("Formating row.names of input data frame ...\n")
         tmp = x[,2:ncol(x)]
+        tmp = as.data.frame(sapply(tmp, as.numeric)) #require numeric value
         row.names(tmp) = x[,1]
         x = tmp
         cat("Computing correlation ...\n")
@@ -127,10 +128,12 @@ computeCorrelation.default <- function(x, y=NULL, xtype=NULL, ytype=NULL, intern
       }else if(!is.null(y)) {#have another data
         cat("Formating row.names of x input data frame ...\n")
         tmp = x[,2:ncol(x)]
+        tmp = as.data.frame(sapply(tmp, as.numeric)) #require numeric value
         row.names(tmp) = x[,1]
         x = tmp
         cat("Formating row.names of y input data frame ...\n")
         tmp = y[,2:ncol(y)]
+        tmp = as.data.frame(sapply(tmp, as.numeric)) #require numeric value
         row.names(tmp) = y[,1]
         y = tmp
         cat("Computing correlation ...\n")

@@ -112,12 +112,14 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
           if(internalid){
             #format pval: 1st id, 2nd pval, ... ,use only 1st and 2nd column
             pv = nodedata[,2]
+            pv = as.numeric(pv)
             names(pv) = nodedata[,1]
             pval = pv
           }else{
             #format pval: 1st gid, 2nd pval, ... ,use only 1st and 2nd column, change gid to id
             merged = merge(annonws$nodes, nodedata, by.x = colnames(annonws$nodes)[2], by.y = colnames(nodedata)[1], all.y = TRUE)
             pv = merged[,ncol(annonws$nodes)+1]
+            pv = as.numeric(pv)
             names(pv) = merged$id
             pval = pv
           }
@@ -178,6 +180,7 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
           }
           #format pval: 1st gid, 2nd pval, ... ,use only 1st and 2nd column
           pv = nodedata[,2]
+          pv = as.numeric(pv)
           names(pv) = nodedata[,1]
           pval = pv
           era = computeEnrichment(edgelist = annonws$edges[,2:1], pval = pval, fc = NULL, method = method, size=size, returnas="dataframe") #compute enrichment
