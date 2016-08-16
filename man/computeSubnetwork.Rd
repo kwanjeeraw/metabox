@@ -4,7 +4,7 @@
 \alias{computeSubnetwork}
 \title{Compute a subnetwork}
 \usage{
-computeSubnetwork(edgelist, nodelist, pval, fc, fdr, internalid, method, returnas)
+computeSubnetwork(edgelist, nodelist, pval, fc, fdr, pcol, internalid, method, returnas)
 }
 \arguments{
 \item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
@@ -18,6 +18,8 @@ If \code{pval} is a data frame, 1st column contains the network nodes and 2nd co
 \item{fc}{a numeric vector of fold changes with name attributes identical to the names of network nodes. Default is NULL.}
 
 \item{fdr}{a numeric value specifying false discovery rate. Default is 0.05.}
+
+\item{pcol}{a string specifying columnname containing p-values. This parameter is only for accepting the input from GUI.}
 
 \item{internalid}{a logical value indicating whether the network nodes are neo4j ids, if TRUE (default).
 It has no effect if there is no database installed.}

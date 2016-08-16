@@ -70,19 +70,25 @@
             inp_session = session;
             session.getObject(function(object){
               //Table output
-              if (inputTable != undefined) {
-                 inputTable.destroy();
-                 $('#inputdt').empty();
-               }
-              inputTable = drawTableNw('#inputdt',object);
+				if (inputTable != undefined) {
+					inputTable.destroy();
+					$('#inputdt').empty();
+				}
+				inputTable = drawTableNw('#inputdt',object);
+				$("#pvcol").empty(); // remove old options
+				$.each(object[0], function(key) {
+				  $("#pvcol").append($("<option></option>")
+				  .attr("value", key).text(key));
+				});//set stat column
             });//getObject
           }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
         });//fileinput
         $("#computeBtn").click(function(){
           var loadSpinner = showSpinner();    
           var fdr = Number($("#fdr").val());
-          var internalid = $('#internalid').is(':checked');
-          var req = ocpu.call("computeSubnetwork",{edgelist:data.edges, nodelist:data.nodes, pval:inp_session, fdr:fdr, internalid:internalid}, function(session) {//calls R function: computeSubnetwork
+          //var internalid = $('#internalid').is(':checked');
+		  var pvcol = $("#pvcol").val();//get stat column
+          var req = ocpu.call("computeSubnetwork",{edgelist:data.edges, nodelist:data.nodes, pval:inp_session, fdr:fdr, pcol:pvcol, internalid:false}, function(session) {//calls R function: computeSubnetwork
             compute_session = session;
             session.getStdout(function(outtxt){
               $("#consolemsg").text(outtxt);
@@ -220,20 +226,22 @@
               <div id="args" class="panel-body collapse in">
                 <form role="form">
                   <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-12">
                       <div class="form-group">
                         <label>Upload data:</label>
                         <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
-                        <p class="help-block">Tab-delimited input data contain p-values and/or fold-changes</p>
+                        <p class="help-block">Tab-delimited input data contain p-values, fold-changes and etc. 
+						1st column = ID lists with PubChem or uniprot or ensembl as a header (see below), separate each column by tab. 
+						Metabox accepts PubChem CID for compounds, UniProt entry for proteins, Ensembl for genes.</p>
                       </div>
                     </div>
-                    <div class="col-lg-6">
+                    <!--div class="col-lg-6">
                       <div class="form-group">
                         <label>Use internal ids</label>
                         <input id="internalid"  name="internalid" type="checkbox" value="true">
                         <p class="help-block">Check whether input data use internal database ids</p>
                       </div>
-                    </div>
+                    </div-->
                   </div>
                   <!-- /.row -->
                   <div class="row">
@@ -260,6 +268,13 @@
                       <div class="form-group">
                         <label for="fdr">Maximum false discovery rate (FDR):</label>
                         <input id="fdr" name="fdr" type="number" class="form-control" value="0.05" min="0" max="1" step="0.01">
+                      </div>
+                    </div>
+					<div class="col-lg-6">
+                      <div class="form-group">
+                        <label>Select entity-level statistics:</label>
+                        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Select a column that contains the entity-level statistics used for analysis"></i>
+                        <select id="pvcol" class="form-control"></select>
                       </div>
                     </div>
                   </div>

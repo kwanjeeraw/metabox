@@ -4,7 +4,7 @@
 \alias{computeNwEnrichment}
 \title{Perform enrichment analysis on the input network}
 \usage{
-computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, internalid, method, size)
+computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, pcol, internalid, method, size)
 }
 \arguments{
 \item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
@@ -20,6 +20,8 @@ If \code{pval} is a vector, the name attributes must be identical to the names o
 If \code{pval} is a data frame, 1st column contains the network nodes and 2nd column contains statistical values.}
 
 \item{fc}{a numeric vector of fold changes or sign information (positive or negative) with name attributes identical to the names of entities. Default is NULL.}
+
+\item{pcol}{a string specifying columnname containing p-values. This parameter is only for accepting the input from GUI.}
 
 \item{internalid}{a logical value indicating whether the network nodes are neo4j ids, if TRUE (default). If not, the network nodes are expected to be any ids.
 See details and see \code{\link{convertId}} for how to convert ids. It has no effect on Mesh annotation.}

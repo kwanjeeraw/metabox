@@ -4,7 +4,7 @@
 \alias{formatNetworkOutput}
 \title{Format network}
 \usage{
-formatNetworkOutput(graph, returnas)
+formatNetworkOutput(graph)
 }
 \arguments{
 \item{graph}{list of paths containing network information to be formatted}
@@ -45,7 +45,7 @@ maximum no. of paths returned = 30000 paths
 \examples{
 #cypher = "MATCH ptw = (from:Compound)-[:BIOCHEMICAL_REACTION]->(:Compound) WHERE ID(from) = 0 RETURN DISTINCT ptw LIMIT 2"
 #nw = curlRequest.TRANSACTION(cypher)
-#result = formatNetworkOutput.default(nw, returnas="dataframe")
+#result = formatNetworkOutput.default(nw)
 }
 \author{
 Kwanjeera W \email{kwanich@ucdavis.edu}

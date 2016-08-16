@@ -14,5 +14,7 @@
 readInfile <- function(file, header=TRUE, sep="\t", rowname=NULL) UseMethod("readInfile")
 #'@export
 readInfile.default <- function(file, header=TRUE, sep="\t", rowname=NULL){
-  read.csv(file, header = header, sep = sep, row.names = rowname, stringsAsFactors = FALSE)
+  inpfile = read.csv(file, header = header, sep = sep, row.names = rowname, stringsAsFactors = FALSE)
+  inpfile[is.na(inpfile)] = ""
+  inpfile
 }

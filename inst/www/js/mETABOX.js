@@ -238,16 +238,9 @@ function formatTableHeader(jsonData){
 //@param id id element
 //@param data array of json objects
 function drawTable(id, data) {
-	
-	
-	
 	editor = new $.fn.dataTable.Editor( {
         table: id,
     } );
-	
-	
-	
-	
 	 $(id).DataTable( {
 		destroy: true,
 	    data: data,
@@ -267,7 +260,6 @@ function drawTable(id, data) {
         }
     ]
     } );
-	
   /* $(id).DataTable({
       destroy: true,
       scrollX: true,
@@ -286,7 +278,6 @@ function drawTable(id, data) {
             "selectNone"
         ]
     });*/
- 
 }
 
 //@function draw table

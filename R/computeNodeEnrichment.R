@@ -77,13 +77,24 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
       if (class(nodedata) != "data.frame"){
         stop("argument 'nodedata' is not valid, data frame is required.")
       }
+      flagdf = FALSE
       if(!is.null(pcol)){#get result from statistical analysis
-        if(!is.null(nodedata$PubChem)){
+        datinput = nodedata #keep input data
+        flagdf = TRUE
+        if(!is.null(nodedata$grinn)){
+          nodedata = nodedata[,c('grinn',pcol)]
+        }else if(!is.null(nodedata$PubChem)){
           nodedata = nodedata[,c('PubChem',pcol)]
+          colnames(datinput) = gsub("PubChem","grinn",colnames(datinput))
+        }else if(!is.null(nodedata$pubchem)){
+          nodedata = nodedata[,c('pubchem',pcol)]
+          colnames(datinput) = gsub("pubchem","grinn",colnames(datinput))
         }else if(!is.null(nodedata$uniprot)){
           nodedata = nodedata[,c('uniprot',pcol)]
+          colnames(datinput) = gsub("uniprot","grinn",colnames(datinput))
         }else if(!is.null(nodedata$ensembl)){
           nodedata = nodedata[,c('ensembl',pcol)]
+          colnames(datinput) = gsub("ensembl","grinn",colnames(datinput))
         }
         #nodedata = na.omit(nodedata)
       }
@@ -134,6 +145,11 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
           era = dplyr::left_join(era,ptwstat[,-2],by=c('id'='id')) #merge with annotation info
           era = era[c(1:(ncol(era)-3),(ncol(era)-1),ncol(era),(ncol(era)-2))] #rearrange columns
           networknode = annonws$nodes[annonws$nodes$nodelabel != "Pathway", ] #not return pathway nodes
+          if(flagdf){#keep input data
+            networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            networknode = networknode[,c(2,1,3:ncol(networknode))]
+            networknode[is.na(networknode)] = ""
+          }
           list(nodes=networknode, edges=annonws$edges, enrichment=era) #output
         }
         else{#no annotation found
@@ -166,6 +182,11 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes[,1:6], era, by='id') #merge annotation attributes and enrichemt results
           era = era[,c(ncol(era),1:(ncol(era)-6),(ncol(era)-3),(ncol(era)-2),(ncol(era)-4),(ncol(era)-5),(ncol(era)-1))] #rearrange columns
+          if(flagdf){#keep input data
+            networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            networknode = networknode[,c(2,1,3:ncol(networknode))]
+            networknode[is.na(networknode)] = ""
+          }
           list(nodes=networknode, edges=annonws$edges, enrichment=era) #output
         }
         else{#no annotation found

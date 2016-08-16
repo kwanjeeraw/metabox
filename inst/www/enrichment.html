@@ -71,16 +71,22 @@
                  inputTable.destroy();
                  $('#inputdt').empty();
                }
-              inputTable = drawTableNw('#inputdt',object);
+				inputTable = drawTableNw('#inputdt',object);
+				$("#pvcol").empty(); // remove old options
+				$.each(object[0], function(key) {
+				  $("#pvcol").append($("<option></option>")
+				  .attr("value", key).text(key));
+				});//set stat column			  
             });//getObject
           }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
         });//fileinput
         $("#computeBtn").click(function(){
           var loadSpinner = showSpinner();    
-          var internalid = $('#internalid').is(':checked');
+          //var internalid = $('#internalid').is(':checked');
+		  var pvcol = $("#pvcol").val();//get stat column  
           var method = $("#method").val();
           annotation = $('input[name="annotation"]:checked').val();
-          var req = ocpu.call("computeNwEnrichment",{edgelist:data.edges, nodelist:data.nodes, annotation:annotation, internalid:internalid, pval:inp_session, method:method}, function(session) {//calls R function: computeNwEnrichment
+          var req = ocpu.call("computeNwEnrichment",{edgelist:data.edges, nodelist:data.nodes, annotation:annotation, internalid:false, pval:inp_session, pcol:pvcol, method:method}, function(session) {//calls R function: computeNwEnrichment
             compute_session = session;
             session.getStdout(function(outtxt){
               $("#consolemsg").text(outtxt);
@@ -160,7 +166,7 @@
             <h3>Enrichment analysis</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Perform enrichment analysis on the input network, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
+              <i class="fa fa-info-circle"></i> Perform enrichment analysis on the input network.
             </div>
           </div>
         </div>
@@ -175,20 +181,22 @@
               <div id="args" class="panel-body collapse in">
                 <form role="form">
                   <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-12">
                       <div class="form-group">
                         <label>Upload data:</label>
                         <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
-                        <p class="help-block">Tab-delimited input data contain p-values and/or fold-changes</p>
+                        <p class="help-block">Tab-delimited input data contain p-values, fold-changes and etc. 
+						1st column = ID lists with PubChem or uniprot or ensembl as a header (see below), separate each column by tab. 
+						Metabox accepts PubChem CID for compounds, UniProt entry for proteins, Ensembl for genes.</p>
                       </div>
                     </div>
-                    <div class="col-lg-6">
+                    <!--div class="col-lg-6">
                       <div class="form-group">
                         <label>Use internal ids</label>
                         <input id="internalid"  name="internalid" type="checkbox" value="true">
                         <p class="help-block">Check whether input data use internal database ids</p>
                       </div>
-                    </div>
+                    </div-->
                   </div>
                   <!-- /.row -->
                   <div class="row">
@@ -231,6 +239,16 @@
                         <p class="help-block">Mesh annotation is available for Compound only.</p>
                       </div>
                     </div>
+                  </div>
+                  <!-- /.row -->
+                  <div class="row">
+                    <div class="col-lg-7">
+                      <div class="form-group">
+                        <label>Select entity-level statistics:</label>
+                        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Select a column that contains the entity-level statistics used for enrichemnt analysis"></i>
+                        <select id="pvcol" class="form-control"></select>
+                      </div>
+                    </div>  
                   </div>
                   <!-- /.row -->
                   <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>

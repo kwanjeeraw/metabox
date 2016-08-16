@@ -54,6 +54,7 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
       if (class(tmparg) == "try-error") {
         stop("argument 'annotation' is not valid, choose one from the list: pathway,mesh")
       }
+      nodetype = Hmisc::capitalize(nodetype)
       flagdf = FALSE
       if (class(txtinput) == "data.frame" && !is.null(txtinput)) {#get result from statistical analysis
         datinput = txtinput #keep input data
@@ -63,6 +64,9 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
         }else if(!is.null(txtinput$PubChem)){
           txtinput = txtinput$PubChem
           colnames(datinput) = gsub("PubChem","grinn",colnames(datinput))
+        }else if(!is.null(txtinput$pubchem)){
+          txtinput = txtinput$pubchem
+          colnames(datinput) = gsub("pubchem","grinn",colnames(datinput))
         }else if(!is.null(txtinput$uniprot)){
           txtinput = txtinput$uniprot
           colnames(datinput) = gsub("uniprot","grinn",colnames(datinput))

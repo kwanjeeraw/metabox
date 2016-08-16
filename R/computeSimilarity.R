@@ -49,6 +49,10 @@ computeSimilarity.default <- function (txtinput, coef=0.7, returnas="dataframe")
           datinput = txtinput #keep input data
           flagdf = TRUE
           txtinput = txtinput$PubChem
+        }else if(!is.null(txtinput$pubchem)){
+          datinput = txtinput #keep input data
+          flagdf = TRUE
+          txtinput = txtinput$pubchem
         }
       }
       txtinput = unique(stringr::str_trim(unlist(gsub("[^[:digit:]]","",txtinput)))) #remove whiteline, duplicate, words

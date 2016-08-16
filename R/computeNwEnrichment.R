@@ -3,7 +3,7 @@
 #'The input network is generated from any function such as \code{\link{computeSimilarity}}, \code{\link{computeCorrelation}}, \code{\link{computeParCorrelation}}, \code{\link{computeSubnetwork}},
 #'\code{\link{fetchHetNetwork}}, \code{\link{fetchHetNetworkByGID}}, \code{\link{fetchNetwork} and \code{\link{fetchNetworkByGID}}.
 #'The function wraps around the main functions of \pkg{\link{piano}}.
-#'@usage computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, internalid, method, size)
+#'@usage computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, pcol, internalid, method, size)
 #'@param edgelist a data frame of edges contains at least a source column (1st column) and a target column (2nd column).
 #'@param nodelist a data frame of nodes contains at least two columns of node attributes.
 #'1st column is id or neo4j id, 2nd column is id or grinn id. The 2nd column is used for Mesh annotation.
@@ -13,6 +13,7 @@
 #'If \code{pval} is a vector, the name attributes must be identical to the names of network nodes.
 #'If \code{pval} is a data frame, 1st column contains the network nodes and 2nd column contains statistical values.
 #'@param fc a numeric vector of fold changes or sign information (positive or negative) with name attributes identical to the names of entities. Default is NULL.
+#'@param pcol a string specifying columnname containing p-values. This parameter is only for accepting the input from GUI.
 #'@param internalid a logical value indicating whether the network nodes are neo4j ids, if TRUE (default). If not, the network nodes are expected to be any ids.
 #'See details and see \code{\link{convertId}} for how to convert ids. It has no effect on Mesh annotation.
 #'@param method a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}
@@ -64,9 +65,9 @@
 #'#pval <- data.frame(nid=c(0, 2, 1, 49180, 11429, 1774, 43936,217389,268332,268655,328500,335545, 282124, 266645, 356549, 269007, 284429, 334878), stat=runif(18, 0, 0.06))
 #'#result <- computeNwEnrichment(bionw$edges, bionw$nodes, annotation="pathway", pval, size=c(1,100))
 #'@export
-computeNwEnrichment <- function(edgelist, nodelist, annotation="pathway", pval, fc=NULL, internalid = TRUE, method="reporter", size=c(3,500)) UseMethod("computeNwEnrichment")
+computeNwEnrichment <- function(edgelist, nodelist, annotation="pathway", pval, fc=NULL, pcol=NULL, internalid = TRUE, method="reporter", size=c(3,500)) UseMethod("computeNwEnrichment")
 #'@export
-computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway", pval, fc=NULL, internalid = TRUE, method="reporter", size=c(3,500)){
+computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway", pval, fc=NULL, pcol=NULL, internalid = TRUE, method="reporter", size=c(3,500)){
   out <- tryCatch(
     {
       tmparg <- try(annotation <- match.arg(tolower(annotation), c("pathway","mesh"), several.ok = FALSE), silent = TRUE)
@@ -76,6 +77,26 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
       tmparg <- try(method <- match.arg(tolower(method), c("reporter","fisher","median","mean","stouffer"), several.ok = FALSE), silent = TRUE)
       if (class(tmparg) == "try-error") {
         stop("argument 'method' is not valid, choose one from the list: reporter,fisher,median,mean,stouffer")
+      }
+      flagdf = FALSE
+      if(!is.null(pcol)){#get input data from GUI
+        datinput = pval #keep input data
+        flagdf = TRUE
+        if(!is.null(pval$grinn)){
+          pval = pval[,c('grinn',pcol)]
+        }else if(!is.null(pval$PubChem)){
+          pval = pval[,c('PubChem',pcol)]
+          colnames(datinput) = gsub("PubChem","grinn",colnames(datinput))
+        }else if(!is.null(pval$pubchem)){
+          pval = pval[,c('pubchem',pcol)]
+          colnames(datinput) = gsub("pubchem","grinn",colnames(datinput))
+        }else if(!is.null(pval$uniprot)){
+          pval = pval[,c('uniprot',pcol)]
+          colnames(datinput) = gsub("uniprot","grinn",colnames(datinput))
+        }else if(!is.null(pval$ensembl)){
+          pval = pval[,c('ensembl',pcol)]
+          colnames(datinput) = gsub("ensembl","grinn",colnames(datinput))
+        }
       }
       require('dplyr')#load dplyr for opencpu
       if (class(pval) == "data.frame") {#format pval dataframe input: 1st id, 2nd pval, 3rd fc (can be NULL)
@@ -125,6 +146,11 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
           tot = plyr::ddply(ptwstat,c('id'),plyr::summarise,annotation_size=list(paste0(nodelabel,' (',count,')')))
           era = dplyr::left_join(era,tot,by=c('id'='id'))
           era = era[c(1:(ncol(era)-3),(ncol(era)-1),ncol(era),(ncol(era)-2))] #rearrange columns
+          if(flagdf){#keep input data
+            nodelist = merge(nodelist,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            nodelist = nodelist[,c(2,1,3:ncol(nodelist))]
+            nodelist[is.na(nodelist)] = ""
+          }
           list(nodes=nodelist, edges=edgelist, enrichment=era, pairs=annonws$edges) #output
         }
         else{#no annotation found
@@ -143,6 +169,11 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
           era$rank = seq(1:nrow(era))
           era = merge(annonws$nodes[,1:6], era, by='id') #merge annotation attributes and enrichemt results
           era = era[,c(ncol(era),1:(ncol(era)-6),(ncol(era)-3),(ncol(era)-2),(ncol(era)-4),(ncol(era)-5),(ncol(era)-1))] #rearrange columns
+          if(flagdf){#keep input data
+            nodelist = merge(nodelist,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            nodelist = nodelist[,c(2,1,3:ncol(nodelist))]
+            nodelist[is.na(nodelist)] = ""
+          }
           list(nodes=nodelist, edges=edgelist, enrichment=era, pairs=annopair) #output
         }
         else{#no annotation found

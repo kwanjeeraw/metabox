@@ -1,6 +1,6 @@
 #'Compute a subnetwork
 #'@description compute a subnetwork from p-values of the nodes of a network.
-#'@usage computeSubnetwork(edgelist, nodelist, pval, fc, fdr, internalid, method, returnas)
+#'@usage computeSubnetwork(edgelist, nodelist, pval, fc, fdr, pcol, internalid, method, returnas)
 #'@param edgelist a data frame of edges contains at least a source column (1st column) and a target column (2nd column).
 #'@param nodelist a data frame of nodes contains node attributes e.g. node id, node name, node xref. Default is NULL.
 #'@param pval a numeric vector or a two-column data frame of statistical values e.g. p-values.
@@ -8,6 +8,7 @@
 #'If \code{pval} is a data frame, 1st column contains the network nodes and 2nd column contains statistical values.
 #'@param fc a numeric vector of fold changes with name attributes identical to the names of network nodes. Default is NULL.
 #'@param fdr a numeric value specifying false discovery rate. Default is 0.05.
+#'@param pcol a string specifying columnname containing p-values. This parameter is only for accepting the input from GUI.
 #'@param internalid a logical value indicating whether the network nodes are neo4j ids, if TRUE (default).
 #'It has no effect if there is no database installed.
 #'@param method a string specifying the method used to compute the subnetwork. Default is bionet.
@@ -39,14 +40,34 @@
 #'#pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790), stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
 #'#result <- computeSubnetwork(simnw$edges, simnw$nodes, pval=pval, internalid = F)
 #'@export
-computeSubnetwork <- function(edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, internalid=TRUE, method="bionet", returnas="dataframe") UseMethod("computeSubnetwork")
+computeSubnetwork <- function(edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, pcol=NULL, internalid=TRUE, method="bionet", returnas="dataframe") UseMethod("computeSubnetwork")
 #'@export
-computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, internalid=TRUE, method="bionet", returnas="dataframe"){
+computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, pcol=NULL, internalid=TRUE, method="bionet", returnas="dataframe"){
   out <- tryCatch(
     {
     tmparg <- try(method <- match.arg(tolower(method), c("bionet","sili"), several.ok = FALSE), silent = TRUE)
     if (class(tmparg) == "try-error") {
       stop("argument 'method' is not valid, choose one from the list: bionet,sili")
+    }
+    flagdf = FALSE
+    if(!is.null(pcol)){#get input data from GUI
+      datinput = pval #keep input data
+      flagdf = TRUE
+      if(!is.null(pval$grinn)){
+        pval = pval[,c('grinn',pcol)]
+      }else if(!is.null(pval$PubChem)){
+        pval = pval[,c('PubChem',pcol)]
+        colnames(datinput) = gsub("PubChem","grinn",colnames(datinput))
+      }else if(!is.null(pval$pubchem)){
+        pval = pval[,c('pubchem',pcol)]
+        colnames(datinput) = gsub("pubchem","grinn",colnames(datinput))
+      }else if(!is.null(pval$uniprot)){
+        pval = pval[,c('uniprot',pcol)]
+        colnames(datinput) = gsub("uniprot","grinn",colnames(datinput))
+      }else if(!is.null(pval$ensembl)){
+        pval = pval[,c('ensembl',pcol)]
+        colnames(datinput) = gsub("ensembl","grinn",colnames(datinput))
+      }
     }
     if (class(pval) == "data.frame") {
       if(internalid){#format pval: 1st id, 2nd pval, ... ,use only 1st and 2nd column
@@ -62,6 +83,13 @@ computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, f
     }
     if(tolower(method) == 'bionet'){
       outnw = callBionet(edgelist, nodelist, pval[pval!=0], fdr)
+      if(flagdf){#keep input data
+        networknode = outnw$nodes
+        networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+        networknode = networknode[,c(2,1,3:ncol(networknode))]
+        networknode[is.na(networknode)] = ""
+        outnw$nodes = networknode
+      }
     }else if(tolower(method) == 'sili'){
       stop('Under development')
     }else{

@@ -71,6 +71,9 @@ fetchHetNetworkByGID.default <- function(from=NULL, to=NULL, pattern, returnas="
         }else if(!is.null(from$PubChem)){
           from = from$PubChem
           colnames(datfrominput) = gsub("PubChem","grinn",colnames(datfrominput))
+        }else if(!is.null(from$pubchem)){
+          from = from$pubchem
+          colnames(datfrominput) = gsub("pubchem","grinn",colnames(datfrominput))
         }else if(!is.null(from$uniprot)){
           from = from$uniprot
           colnames(datfrominput) = gsub("uniprot","grinn",colnames(datfrominput))
@@ -88,6 +91,9 @@ fetchHetNetworkByGID.default <- function(from=NULL, to=NULL, pattern, returnas="
           }else if(!is.null(to$PubChem)){
             to = to$PubChem
             colnames(dattoinput) = gsub("PubChem","grinn",colnames(dattoinput))
+          }else if(!is.null(to$pubchem)){
+            to = to$pubchem
+            colnames(dattoinput) = gsub("pubchem","grinn",colnames(dattoinput))
           }else if(!is.null(to$uniprot)){
             to = to$uniprot
             colnames(dattoinput) = gsub("uniprot","grinn",colnames(dattoinput))

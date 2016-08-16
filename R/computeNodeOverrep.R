@@ -63,13 +63,24 @@ computeNodeOverrep.default <- function (txtinput, nodetype="compound", annotatio
       }
       require('dplyr')#load dplyr for opencpu
       nodetype = Hmisc::capitalize(nodetype)
-      if (class(txtinput) == "data.frame") {#get result from statistical analysis
-        if(!is.null(txtinput$PubChem)){
+      flagdf = FALSE
+      if (class(txtinput) == "data.frame" && !is.null(txtinput)) {#get result from statistical analysis
+        datinput = txtinput #keep input data
+        flagdf = TRUE
+        if(!is.null(txtinput$grinn)){
+          txtinput = txtinput$grinn
+        }else if(!is.null(txtinput$PubChem)){
           txtinput = txtinput$PubChem
+          colnames(datinput) = gsub("PubChem","grinn",colnames(datinput))
+        }else if(!is.null(txtinput$pubchem)){
+          txtinput = txtinput$pubchem
+          colnames(datinput) = gsub("pubchem","grinn",colnames(datinput))
         }else if(!is.null(txtinput$uniprot)){
           txtinput = txtinput$uniprot
+          colnames(datinput) = gsub("uniprot","grinn",colnames(datinput))
         }else if(!is.null(txtinput$ensembl)){
           txtinput = txtinput$ensembl
+          colnames(datinput) = gsub("ensembl","grinn",colnames(datinput))
         }
       }
       txtinput = unique(stringr::str_trim(unlist(txtinput))) #remove whiteline, duplicate
@@ -95,6 +106,11 @@ computeNodeOverrep.default <- function (txtinput, nodetype="compound", annotatio
             overDF = data.frame()
           }
           networknode = annonws$nodes[annonws$nodes$nodelabel != "Pathway", ] #not return pathway nodes
+          if(flagdf){#keep input data
+            networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            networknode = networknode[,c(2,1,3:ncol(networknode))]
+            networknode[is.na(networknode)] = ""
+          }
           list(nodes=networknode, edges=annonws$edges, overrepresentation=overDF) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), overrepresentation=data.frame()) #output
@@ -118,6 +134,11 @@ computeNodeOverrep.default <- function (txtinput, nodetype="compound", annotatio
             networknode = data.frame(id=txtinput, gid=txtinput, nodename=txtinput, nodelabel="Compound", nodexref='', stringsAsFactors = FALSE)
           }
           overDF = callHypergeo.mesh(edgelist=annonws$edges, nodelist=annonws$nodes, size=size, inputsize=length(txtinput))
+          if(flagdf){#keep input data
+            networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+            networknode = networknode[,c(2,1,3:ncol(networknode))]
+            networknode[is.na(networknode)] = ""
+          }
           list(nodes=networknode, edges=annonws$edges, overrepresentation=overDF) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), overrepresentation=data.frame()) #output

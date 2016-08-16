@@ -63,7 +63,12 @@
              inputTable.destroy();
              $('#inputdt').empty();
            }
-          inputTable = drawTableNw('#inputdt',object);
+			inputTable = drawTableNw('#inputdt',object);
+			$("#pvcol").empty(); // remove old options
+			$.each(object[0], function(key) {
+			  $("#pvcol").append($("<option></option>")
+			  .attr("value", key).text(key));
+			});//set stat column
         });//getObject
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//fileinput
@@ -77,15 +82,21 @@
            $('#inputdt').empty();
          }
         inputTable = drawTableNw('#inputdt',example);
+		$("#pvcol").empty(); // remove old options
+		$.each(example[0], function(key) {
+		  $("#pvcol").append($("<option></option>")
+		  .attr("value", key).text(key));
+		});//set stat column		
       });//get example object
     });//exinput
     $("#computeBtn").click(function(){
       var loadSpinner = showSpinner();
       var nodetype = $("#nodetype").val();
+	  var pvcol = $("#pvcol").val();//get stat column
       annotation = $('input[name="annotation"]:checked').val();
-      var internalid = $('#internalid').is(':checked');
+      //var internalid = $('#internalid').is(':checked');
       var method = $("#method").val();
-      var req = ocpu.call("computeNodeEnrichment",{nodedata:inp_session, pcol:null, nodetype:nodetype, annotation:annotation, internalid:internalid, method:method}, function(session) {//calls R function: computeNwEnrichment
+      var req = ocpu.call("computeNodeEnrichment",{nodedata:inp_session, pcol:pvcol, nodetype:nodetype, annotation:annotation, internalid:false, method:method}, function(session) {//calls R function: computeNwEnrichment
         compute_session = session;
         session.getStdout(function(outtxt){
           $("#consolemsg").text(outtxt);
@@ -145,7 +156,7 @@
             <h3>Enrichment analysis</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Perform enrichment analysis for the input, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
+              <i class="fa fa-info-circle"></i> Perform enrichment analysis for the input.
             </div>
           </div>
         </div>
@@ -160,30 +171,22 @@
               <div id="args" class="panel-body collapse in">
                 <form id="inpform" role="form">
                   <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-12">
                       <div class="form-group">
                         <label>Upload data:</label>
                         <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
-                        <p class="help-block">Tab-delimited input data (Try with <a id="exinput" href="#" type="reset">example data</a>)</p>
+						<p class="help-block">Tab-delimited input data contain p-values, fold-changes and etc. 
+						1st column = ID lists with PubChem or uniprot or ensembl as a header (see below), separate each column by tab. 
+						Metabox accepts PubChem CID for compounds, UniProt entry for proteins, Ensembl for genes. (try <a id="exinput" href="#" type="reset">example</a>)</p>
                       </div>
                     </div>
-                    <div class="col-lg-2">
-                      <div class="form-group">
-                        <label>Entity type:</label>
-                        <select id="nodetype" class="form-control">
-                          <option value="compound" selected>compound</option>
-                          <option value="protein">protein</option>
-                          <option value="gene">gene</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="col-lg-6">
+                    <!--div class="col-lg-6">
                       <div class="form-group">
                         <label>Use internal ids</label>
                         <input id="internalid"  name="internalid" type="checkbox" value="true">
                         <p class="help-block">Check whether input data use internal database ids</p>
                       </div>
-                    </div>
+                    </div-->
                   </div>
                   <!-- /.row -->
                   <div class="row">
@@ -202,7 +205,17 @@
                   <!-- /.row -->
                   <hr>
                   <div class="row">
-                    <div class="col-lg-6">
+					<div class="col-lg-3">
+					  <div class="form-group">
+						<label>Entity type:</label>
+						<select id="nodetype" class="form-control">
+						  <option value="compound" selected>compound</option>
+						  <option value="protein">protein</option>
+						  <option value="gene">gene</option>
+						</select>
+					  </div>
+					</div>
+                    <div class="col-lg-4">
                       <div class="form-group">
                         <label>Select method:</label> <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Method to compute enriched annotation terms from entity-level statistics"></i>
                         <select id="method" class="form-control">
@@ -214,7 +227,7 @@
                         </select>
                       </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-5">
                       <div class="form-group">
                         <label>Select annotation: </label>
                         <label class="radio-inline"><input type="radio" name="annotation" value="pathway" checked>Pathway</label>
@@ -222,6 +235,16 @@
                         <p class="help-block">Mesh annotation is available for Compound only.</p>
                       </div>
                     </div>
+                  </div>
+                  <!-- /.row -->
+				  <div class="row">
+                    <div class="col-lg-7">
+                      <div class="form-group">
+                        <label>Select entity-level statistics:</label>
+                        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Select a column that contains the entity-level statistics used for enrichemnt analysis"></i>
+                        <select id="pvcol" class="form-control"></select>
+                      </div>
+                    </div>  
                   </div>
                   <!-- /.row -->
                   <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
