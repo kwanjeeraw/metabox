@@ -68,7 +68,8 @@
       if($("#txtinput").val() == ""){
         x = inp_session;
       }else{
-        x = $("#txtinput").val().trim().split(/\s+/g);
+        //x = $("#txtinput").val().trim().split(/\s+/g);
+		x = tabToJSON($("#txtinput").val().trim(),"grinn");
       }
       var nodetype = $("#nodetype").val();
       var searchby = $("#searchby").val();
@@ -123,7 +124,7 @@
             <h3>Convert IDs</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Convert to internal database IDs, see <a href="http://kwanjeeraw.github.io/metabox" target="_blank" class="alert-link">here</a> for argument details.
+              <i class="fa fa-info-circle"></i> Convert to internal database IDs.
             </div>
           </div>
         </div>
@@ -140,7 +141,8 @@
                   <div class="form-group">
                     <label for="txtinput">External IDs:</label>
                     <textarea class="form-control" id="txtinput" name="txtinput" rows="5"></textarea>
-                    <p class="help-block">Separate each ID by a new line or space e.g. PubChem CIDs: 43 51 196 311 764 790 970 1005 1044 1060 1110 1188 10267 10413 27476 79025 107689 439168 439183 440641</p>
+                    <p class="help-block">
+					Separate each ID by a new line (try <a class="exlink" onclick='loadexamplelist("#txtinput","compounds")'>example</a>).</p>
                   </div>
                   <div class="row">
                     <div class="col-lg-6">
