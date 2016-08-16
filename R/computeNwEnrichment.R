@@ -151,6 +151,9 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
             nodelist = nodelist[,c(2,1,3:ncol(nodelist))]
             nodelist[is.na(nodelist)] = ""
           }
+          meminfo = merge(annonws$edges, nodelist, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          era = dplyr::left_join(era, memname, by=c('id'='source'))
           list(nodes=nodelist, edges=edgelist, enrichment=era, pairs=annonws$edges) #output
         }
         else{#no annotation found
@@ -174,6 +177,9 @@ computeNwEnrichment.default <- function (edgelist, nodelist, annotation="pathway
             nodelist = nodelist[,c(2,1,3:ncol(nodelist))]
             nodelist[is.na(nodelist)] = ""
           }
+          meminfo = merge(annopair, nodelist, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          era = dplyr::left_join(era, memname, by=c('id'='source'))
           list(nodes=nodelist, edges=edgelist, enrichment=era, pairs=annopair) #output
         }
         else{#no annotation found

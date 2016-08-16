@@ -64,6 +64,8 @@ computeNwWordCloud.default <- function (edgelist, nodelist, annotation="pathway"
           wc = wc[order(wc$freq, decreasing = TRUE),]
           wc$rank = seq(1:nrow(wc))
           wc = wc[,c(ncol(wc),1:(ncol(wc)-1))] #rearrange columns
+          meminfo = merge(annonws$edges, nodelist, by.x='target', by.y='id')
+          wc$membername = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))$membername
           list(nodes=nodelist, edges=edgelist, wordcloud=wc, pairs=annonws$edges) #output
         }
         else{#no annotation found
@@ -81,6 +83,8 @@ computeNwWordCloud.default <- function (edgelist, nodelist, annotation="pathway"
           wc = wc[order(wc$freq, decreasing = TRUE),]
           wc$rank = seq(1:nrow(wc))
           wc = wc[,c(ncol(wc),1:(ncol(wc)-5),(ncol(wc)-2),(ncol(wc)-1))] #rearrange columns
+          meminfo = merge(annopair, nodelist, by.x='target', by.y='id')
+          wc$membername = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))$membername
           list(nodes=nodelist, edges=edgelist, wordcloud=wc, pairs=annopair) #output
         }
         else{#no annotation found

@@ -150,6 +150,9 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
             networknode = networknode[,c(2,1,3:ncol(networknode))]
             networknode[is.na(networknode)] = ""
           }
+          meminfo = merge(annonws$edges, networknode, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          era = dplyr::left_join(era, memname, by=c('id'='source'))
           list(nodes=networknode, edges=annonws$edges, enrichment=era) #output
         }
         else{#no annotation found
@@ -187,6 +190,9 @@ computeNodeEnrichment.default <- function (nodedata, pcol=NULL, nodetype="compou
             networknode = networknode[,c(2,1,3:ncol(networknode))]
             networknode[is.na(networknode)] = ""
           }
+          meminfo = merge(annonws$edges, networknode, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          era = dplyr::left_join(era, memname, by=c('id'='source'))
           list(nodes=networknode, edges=annonws$edges, enrichment=era) #output
         }
         else{#no annotation found

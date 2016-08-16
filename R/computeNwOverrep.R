@@ -124,6 +124,9 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
             cat("No. of members is too small, returning no data ...\n")
             overDF = data.frame()
           }
+          meminfo = merge(annonws$edges, nodelist, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          overDF = dplyr::left_join(overDF, memname, by=c('id'='source'))
           list(nodes=nodelist, edges=edgelist, overrepresentation=overDF, pairs=annonws$edges) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), overrepresentation=data.frame(), pairs=data.frame()) #output
@@ -137,6 +140,9 @@ computeNwOverrep.default <- function (edgelist, nodelist, annotation="pathway", 
           annopair = dplyr::right_join(nodelist[,1:2],annonws$edges[,1:2],by=c('gid' = 'target'))[,c(3,1)]
           colnames(annopair) = c('source','target')
           overDF = callHypergeo.mesh(edgelist=annopair, nodelist=annonws$nodes, size=size, inputsize=nrow(nodelist))
+          meminfo = merge(annopair, nodelist, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          overDF = dplyr::left_join(overDF, memname, by=c('id'='source'))
           list(nodes=nodelist, edges=edgelist, overrepresentation=overDF, pairs=annopair) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), overrepresentation=data.frame(), pairs=data.frame()) #output

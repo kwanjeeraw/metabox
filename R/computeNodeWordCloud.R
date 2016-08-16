@@ -96,6 +96,8 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
             networknode = networknode[,c(2,1,3:ncol(networknode))]
             networknode[is.na(networknode)] = ""
           }
+          meminfo = merge(annonws$edges, networknode, by.x='target', by.y='id')
+          wc$membername = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))$membername
           list(nodes=networknode, edges=annonws$edges, wordcloud=wc) #output
         }
         else{#no annotation found
@@ -128,6 +130,8 @@ computeNodeWordCloud.default <- function (txtinput, nodetype="compound", annotat
             networknode = networknode[,c(2,1,3:ncol(networknode))]
             networknode[is.na(networknode)] = ""
           }
+          meminfo = merge(annonws$edges, networknode, by.x='target', by.y='id')
+          wc$membername = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))$membername
           list(nodes=networknode, edges=annonws$edges, wordcloud=wc) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), wordcloud=data.frame()) #output

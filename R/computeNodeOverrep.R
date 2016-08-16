@@ -111,6 +111,9 @@ computeNodeOverrep.default <- function (txtinput, nodetype="compound", annotatio
             networknode = networknode[,c(2,1,3:ncol(networknode))]
             networknode[is.na(networknode)] = ""
           }
+          meminfo = merge(annonws$edges, networknode, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          overDF = dplyr::left_join(overDF, memname, by=c('id'='source'))
           list(nodes=networknode, edges=annonws$edges, overrepresentation=overDF) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), overrepresentation=data.frame()) #output
@@ -139,6 +142,9 @@ computeNodeOverrep.default <- function (txtinput, nodetype="compound", annotatio
             networknode = networknode[,c(2,1,3:ncol(networknode))]
             networknode[is.na(networknode)] = ""
           }
+          meminfo = merge(annonws$edges, networknode, by.x='target', by.y='id')
+          memname = plyr::ddply(meminfo,c('source'),plyr::summarise,membername=list(nodename))
+          overDF = dplyr::left_join(overDF, memname, by=c('id'='source'))
           list(nodes=networknode, edges=annonws$edges, overrepresentation=overDF) #output
         }else{#no annotation found
           list(nodes=data.frame(), edges=data.frame(), overrepresentation=data.frame()) #output
