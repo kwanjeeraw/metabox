@@ -156,21 +156,23 @@ cat(qstring,"\n")
       }
       network = formatNetworkOutput(paths)
       networknode = network$nodes
-      if(flagfromdf && flagtodf){#keep from-to input data
-        fromtoinput = plyr::rbind.fill(datfrominput,dattoinput)
-        fromtoinput = unique(fromtoinput)
-        networknode = merge(networknode,fromtoinput,by.x='gid',by.y='grinn',all.x=TRUE)
-        networknode = networknode[,c(2,1,3:ncol(networknode))]
+      if(nrow(network$edges)>0){
+        if(flagfromdf && flagtodf){#keep from-to input data
+          fromtoinput = plyr::rbind.fill(datfrominput,dattoinput)
+          fromtoinput = unique(fromtoinput)
+          networknode = merge(networknode,fromtoinput,by.x='gid',by.y='grinn',all.x=TRUE)
+          networknode = networknode[,c(2,1,3:ncol(networknode))]
+        }
+        if(flagfromdf && !flagtodf){#keep from input data
+          networknode = merge(networknode,datfrominput,by.x='gid',by.y='grinn',all.x=TRUE)
+          networknode = networknode[,c(2,1,3:ncol(networknode))]
+        }
+        if(!flagfromdf && flagtodf){#keep to input data
+          networknode = merge(networknode,dattoinput,by.x='gid',by.y='grinn',all.x=TRUE)
+          networknode = networknode[,c(2,1,3:ncol(networknode))]
+        }
+        networknode[is.na(networknode)] = ""
       }
-      if(flagfromdf && !flagtodf){#keep from input data
-        networknode = merge(networknode,datfrominput,by.x='gid',by.y='grinn',all.x=TRUE)
-        networknode = networknode[,c(2,1,3:ncol(networknode))]
-      }
-      if(!flagfromdf && flagtodf){#keep to input data
-        networknode = merge(networknode,dattoinput,by.x='gid',by.y='grinn',all.x=TRUE)
-        networknode = networknode[,c(2,1,3:ncol(networknode))]
-      }
-      networknode[is.na(networknode)] = ""
       out = switch(returnas,
                    dataframe = list(nodes=networknode, edges=network$edges),
                    list = list(nodes = split(networknode, seq(nrow(networknode))), edges = split(network$edges, seq(nrow(network$edges)))),
