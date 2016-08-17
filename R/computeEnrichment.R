@@ -43,6 +43,7 @@ computeEnrichment.default <- function (edgelist, pval, fc=NULL, method="reporter
     }
     cat("Computing enrichment ...\n")
     gs = piano::loadGSC(edgelist, type="data.frame")
+    pval = pval[!is.na(pval)]
     gsaRes = piano::runGSA(geneLevelStats=pval, directions=fc, gsc=gs, geneSetStat=method, gsSizeLim=size)
     resTab = piano::GSAsummaryTable(gsaRes)
     cat("Formatting output ...\n")

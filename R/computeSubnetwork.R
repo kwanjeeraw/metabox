@@ -72,12 +72,14 @@ computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, f
     if (class(pval) == "data.frame") {
       if(internalid){#format pval: 1st id, 2nd pval, ... ,use only 1st and 2nd column
         pv = pval[,2]
+        pv = gsub('^$',1,pv) #replace blank to 1
         pv = as.numeric(pv)
         names(pv) = pval[,1]
         pval = pv
       }else{#format pval: 1st gid, 2nd pval, ... ,use only 1st and 2nd column, change gid to id
         merged = merge(nodelist, pval, by.x = colnames(nodelist)[2], by.y = colnames(pval)[1], all.y = TRUE)
         pv = merged[,ncol(nodelist)+1]
+        pv = gsub('^$',1,pv) #replace blank to 1
         pv = as.numeric(pv)
         names(pv) = merged$id
         pval = pv
