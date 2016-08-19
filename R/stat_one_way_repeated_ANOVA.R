@@ -47,25 +47,31 @@ stat_one_way_repeated_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
     para  = parSapply(cl, 1:ncol(data), FUN = function(j,data2,data,ezANOVA,stat_friedman_test_with_post_hoc,
                                                        stat_cure_Dunn_format,stat_combine_vector_1by1,i,
                                                        pairedANOVAmethod,pairedANOVAadjust,pairedANOVAposthoc){
-      data2$value = data[,j]
-      if(!pairedANOVAadjust == 'none'){
-        p_value = ezANOVA(data = data2, dv = value, wid = id, within = .(repvariable), type = 3)$`Sphericity Corrections`[paste0('p[',pairedANOVAadjust,']')]
-        if(is.null(p_value)){
+      # for(j in 1:ncol(data)){
+        data2$value = data[,j]
+        if(!pairedANOVAadjust == 'none'){
+          p_value = tryCatch(ezANOVA(data = data2, dv = value, wid = id, within = .(repvariable), type = 3)$`Sphericity Corrections`[paste0('p[',pairedANOVAadjust,']')],
+                             error=function(e){
+                               return("NA(too few samples)")
+                             })
+          if(is.null(p_value)){
+            p_value = ezANOVA(data = data2, dv = value, wid = id, within = .(repvariable), type = 3)$ANOVA$p
+          }
+        }else{
           p_value = ezANOVA(data = data2, dv = value, wid = id, within = .(repvariable), type = 3)$ANOVA$p
         }
-      }else{
-        p_value = ezANOVA(data = data2, dv = value, wid = id, within = .(repvariable), type = 3)$ANOVA$p
-      }
 
-      if(!pairedANOVAposthoc == 'none'){
-        test.temp = pairwise.t.test(paired = T, x = data2$value, g = data2$repvariable, p.adjust.method  = "bonf")$p.value
-        post_hoc = as.numeric(test.temp)[!is.na(as.numeric(test.temp))]
-      }else{
-        post_hoc = rep(NA, sum((length(unique(data2[,i]))-1):1))
-      }
+        if(!pairedANOVAposthoc == 'none'){
+          test.temp = pairwise.t.test(paired = T, x = data2$value, g = data2$repvariable, p.adjust.method  = "bonf")$p.value
+          post_hoc = as.numeric(test.temp)[!is.na(as.numeric(test.temp))]
+        }else{
+          post_hoc = rep(NA, sum((length(unique(data2[,i]))-1):1))
+        }
 
-      p_value = as.numeric(p_value)
-      c(p_value,post_hoc)#fdr
+        p_value = as.numeric(p_value)
+        c(p_value,post_hoc)#fdr
+      # }
+
     },data2,data,ezANOVA,stat_friedman_test_with_post_hoc,
     stat_cure_Dunn_format,stat_combine_vector_1by1,i,
     pairedANOVAmethod,pairedANOVAadjust,pairedANOVAposthoc)

@@ -817,7 +817,8 @@ result$power = "NOT AVAILABLE FOR TWO_WAY REPEATED DESIGN"
                                                             nonparamaineffect2pairedANOVAmethod,nonparamaineffect2pairedANOVAposthoc)
             variable1_simple_main_effect = by(dta,dta$variable1,FUN = function(x){ #variable1 simple main effect
               # x = dta[dta$variable1==levels(dta$variable1)[1],]
-              result = stat_one_way_repeated_ANOVA(data = e[dta$variable1==unique(x$variable1),],data2 = x,i=3,sudo_matrix=sudo_matrix2,factor_name,cl,
+              result = stat_one_way_repeated_ANOVA(data = e[dta$variable1==unique(x$variable1),],data2 = x,i=3,sudo_matrix=sudo_matrix2,
+                                                   factor_name,cl,
                                                    simplemaineffect2pairedANOVAmethod,simplemaineffect2pairedANOVAadjust,simplemaineffect2pairedANOVAposthoc,
                                                    nonparasimplemaineffect2pairedANOVAmethod,nonparasimplemaineffect2pairedANOVAposthoc) # the 3rd column is group.
               return(result)
