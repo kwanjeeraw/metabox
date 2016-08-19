@@ -26,6 +26,10 @@ COPY R.install /tmp
 RUN Rscript /tmp/R.install && \
 	rm /tmp/R.install
 
+# Add OpenCPU configuration
+RUN mkdir -p /etc/opencpu/
+COPY server.conf /etc/opencpu
+
 # Apache ports
 EXPOSE 80
 EXPOSE 443
