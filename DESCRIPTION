@@ -25,7 +25,6 @@ Imports:
     userfriendlyscience,
     ez,
     FSA,
-    WRS2,
     outliers,
     openxlsx,
     NLP,
