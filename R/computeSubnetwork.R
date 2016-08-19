@@ -1,6 +1,6 @@
 #'Compute a subnetwork
 #'@description compute a subnetwork from p-values of the nodes of a network.
-#'@usage computeSubnetwork(edgelist, nodelist, pval, fc, fdr, pcol, internalid, method, returnas)
+#'@usage computeSubnetwork(edgelist, nodelist, pval, fc, fdr, pcol, internalid, method, hasatt, returnas)
 #'@param edgelist a data frame of edges contains at least a source column (1st column) and a target column (2nd column).
 #'@param nodelist a data frame of nodes contains node attributes e.g. node id, node name, node xref. Default is NULL.
 #'@param pval a numeric vector or a two-column data frame of statistical values e.g. p-values.
@@ -12,6 +12,7 @@
 #'@param internalid a logical value indicating whether the network nodes are neo4j ids, if TRUE (default).
 #'It has no effect if there is no database installed.
 #'@param method a string specifying the method used to compute the subnetwork. Default is bionet.
+#'@param hasatt a logical value indicating whether node attributes are kept already. Used by GUI.
 #'@param returnas a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.
 #'@details
 #'For the method \code{bionet}, the function wraps around the main steps of \pkg{\link{BioNet}} including \code{\link{fitBumModel}}, \code{\link{scoreNodes}}, \code{\link{runFastHeinz}}
@@ -40,15 +41,16 @@
 #'#pval <- data.frame(pubchem=c(1110,10413,196,51,311,43,764,790), stat=runif(8, 0, 0.06)) #statistical values of pubchem compounds
 #'#result <- computeSubnetwork(simnw$edges, simnw$nodes, pval=pval, internalid = F)
 #'@export
-computeSubnetwork <- function(edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, pcol=NULL, internalid=TRUE, method="bionet", returnas="dataframe") UseMethod("computeSubnetwork")
+computeSubnetwork <- function(edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, pcol=NULL, internalid=TRUE, method="bionet", hasatt=FALSE, returnas="dataframe") UseMethod("computeSubnetwork")
 #'@export
-computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, pcol=NULL, internalid=TRUE, method="bionet", returnas="dataframe"){
+computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, fdr=0.05, pcol=NULL, internalid=TRUE, method="bionet", hasatt=FALSE, returnas="dataframe"){
   out <- tryCatch(
     {
     tmparg <- try(method <- match.arg(tolower(method), c("bionet","sili"), several.ok = FALSE), silent = TRUE)
     if (class(tmparg) == "try-error") {
       stop("argument 'method' is not valid, choose one from the list: bionet,sili")
     }
+    nodelist = nodelist[!duplicated(nodelist[,2]),]
     flagdf = FALSE
     if(!is.null(pcol)){#get input data from GUI
       datinput = pval #keep input data
@@ -89,7 +91,11 @@ computeSubnetwork.default <- function (edgelist, nodelist=NULL, pval, fc=NULL, f
       outnw = callBionet(edgelist, nodelist, pval[pval!=0], fdr)
       if(flagdf){#keep input data
         networknode = outnw$nodes
-        networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+        if(hasatt){
+          networknode = merge(networknode[,1:5],datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+        }else{
+          networknode = merge(networknode,datinput,by.x='gid',by.y='grinn',all.x=TRUE)
+        }
         networknode = networknode[,c(2,1,3:ncol(networknode))]
         networknode[is.na(networknode)] = ""
         outnw$nodes = networknode

@@ -4,7 +4,7 @@
 \alias{computeNwEnrichment}
 \title{Perform enrichment analysis on the input network}
 \usage{
-computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, pcol, internalid, method, size)
+computeNwEnrichment(edgelist, nodelist, annotation, pval, fc, pcol, internalid, method, size, hasatt)
 }
 \arguments{
 \item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
@@ -29,6 +29,8 @@ See details and see \code{\link{convertId}} for how to convert ids. It has no ef
 \item{method}{a string specifying the enrichment analysis method. It can be one of reporter (default), fisher, median, mean, stouffer. See \code{\link{runGSA}}}
 
 \item{size}{a numeric vector specifying the minimum and maximum number of members in each annotation term to be used in the analysis. Default is c(3,500).}
+
+\item{hasatt}{a logical value indicating whether node attributes are kept already. Used by GUI.}
 }
 \value{
 list of data frame of nodes, edges, enrichment and pairs. The pairs data frame contains annotation pairs. The data frame of enrichment contains the following components:

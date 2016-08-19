@@ -39,11 +39,10 @@
   <title>metabox</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
   <!-- Embedded script calling R -->
-  <script>
+  <script>    
   $(function(){
     //global var
     var compute_session;
-    var txtinput;
     var inputTable;
     var nodeTable;
     var edgeTable;
@@ -53,51 +52,72 @@
     var clobj;
     var fnobj;
     var cyImg;
-    var legendImg;
-    var url = getURLVars('rsess')+"R/.val/json";
+    var legendImg;    
+    var nurl = getURLVars('nsess')+"R/.val/json";
+	var url = getURLVars('rsess')+"R/.val/json";
 	var nodetype = getURLVars('idtype');
     var annotation;
     var fntype;
-    $.ajax({
+    $.ajax({//get stat
       url: url,
       type: 'GET',
       dataType: 'json',
       success: function (data) {
-        $("#inputnw").text('Input data overview:\nNo of entries from statistical analysis: '+data.length+'\n');        
-        //Table output
-        if (inputTable != undefined) {
-           inputTable.destroy();
-           $('#inputdt').empty();
-        }
-        inputTable = drawTableNw('#inputdt',data);//statinput
-        $("#computeBtn").click(function(){
-          var loadSpinner = showSpinner();    
-          var txtinput = data;
-          var coef = Number($("#coef").val());
-          var req = ocpu.call("computeSimilarity",{txtinput:txtinput, coef:coef}, function(session) {//calls R function: computeSimilarity
-            compute_session = session;
-            session.getStdout(function(outtxt){
-              $("#consolemsg").text(outtxt);
-            });
-            session.getObject(function(object){
-              robj = object;
-              //Table output
-              if (object.edges.length > 0) {
-                clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=true);
-                nodeTable = drawTableNw('#nodes',object.nodes);
-                edgeTable = drawTableNw('#edges',object.edges);
-              }else{
-                clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=false);
-              }
-              //Network output    
-              cyImg = drawNetwork(formatNode(object.nodes), formatEdge(object.edges),'cy');
-              cleanFnOutputs();
-            });//getObject    
-            hideSpinner(loadSpinner);
-          }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
-        });//computeBtn
-      }, error: function(){console.log("Ajax error: Cannot get data");}//success
-    });//ajax
+		$.ajax({//get network
+		  url: nurl,
+		  type: 'GET',
+		  dataType: 'json',
+		  success: function (ndata) {	
+			//Overview output
+			$("#inputnw").text('Input network overview:\nNo of nodes: '+ndata.nodes.length+'\n'+'No of edges: '+ndata.edges.length+
+			'\nInput data overview:\nNo of entries from statistical analysis: '+data.length+'\n');
+			//Table output
+			if (inputTable != undefined) {
+			   inputTable.destroy();
+			   $('#inputdt').empty();
+			}
+			inputTable = drawTableNw('#inputdt',data);//statinput
+			$("#pvcol").empty(); // remove old options
+			$.each(data[0], function(key) {
+			  $("#pvcol").append($("<option></option>")
+			  .attr("value", key).text(key));
+			});//set stat column
+			$("#computeBtn").click(function(){
+			  var loadSpinner = showSpinner();
+			  var fdr = Number($("#fdr").val());
+			  //var internalid = $('#internalid').is(':checked');
+			  var pvcol = $("#pvcol").val();//get stat column
+			  var req = ocpu.call("computeSubnetwork",{edgelist:ndata.edges, nodelist:ndata.nodes, pval:data, fdr:fdr, pcol:pvcol, internalid:false, hasatt:true}, function(session) {//calls R function: computeSubnetwork
+				compute_session = session;
+				session.getStdout(function(outtxt){
+				  $("#consolemsg").text(outtxt);
+				});
+				session.getObject(function(object){
+				  robj = object;
+				  //Table output
+				  if (object.edges.length > 0) {
+					clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=true);
+					nodeTable = drawTableNw('#nodes',object.nodes);
+					edgeTable = drawTableNw('#edges',object.edges);
+				  }else{
+					clear2Table(ndtable=nodeTable, edtable=edgeTable, nid='#nodes', eid='#edges', hasResult=false);
+				  }
+				  //Network output
+				  cyImg = drawNetwork(formatNode(object.nodes), formatEdge(object.edges),'cy');
+				  cleanFnOutputs();
+				});//getObject    
+				hideSpinner(loadSpinner);
+			  }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
+			});//computeBtn
+		  }, error: function(){console.log("Ajax error: Cannot get data");}//success
+		});//ajax network
+	  }, error: function(){console.log("Ajax error: Cannot get data");}//success
+	});//ajax stat
+    $("#clearBtn").click(function(){
+      if (inputTable != undefined) {
+        inputTable.clear().draw();
+      }
+    });//clearBtn
     $("#cloudBtn").click(function(){
       var loadSpinner = showSpinner(txt='** Updating Network and Ploting WordCloud ..');
       annotation = $('input[name="annotation"]:checked').val();
@@ -150,7 +170,7 @@
           fntype = "overrepresentation";
           var pienodes = formatPieNode(cld_object.nodes, cld_object.overrepresentation);
           cyImg = drawNetwork(pienodes[0], formatEdge(cld_object.edges),'cy');//update network
-          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid');
+          legendImg = drawNetwork(pienodes[1], formatEdge(""),'legendCy','grid'); 
         });//getObject
         hideSpinner(loadSpinner);
         $('#wdc').hide();
@@ -160,12 +180,8 @@
     $("#downloadBtn").click(function(){
       exportNwZip(robj.nodes, robj.edges, cyImg.png({bg: '#ffffff', scale:2}));       
     });//downloadBtn
-    $("#subnetworkBtn").click(function(){
-	  window.location = 'subnetworkrsess.html?nsess='+compute_session.getLoc()+'&rsess='+getURLVars('rsess')+'&idtype='+nodetype;//send r object	  
-    });//subnetworkBtn
     $("#enrBtn").click(function(){
-      //window.location = 'enrichment.html?rsess='+compute_session.getLoc();//send r object for enrichment
-	  window.location = 'enrichmentnsess.html?nsess='+compute_session.getLoc()+'&rsess='+getURLVars('rsess')+'&idtype='+nodetype;//send r object
+	  window.location = 'enrichmentnsess.html?nsess='+compute_session.getLoc()+'&rsess='+getURLVars('rsess')+'&idtype='+nodetype;//send r object	  
     });//enrBtn
     $("#downloadOut").click(function(){
       exportEnrichmentZip(robj.nodes, null, fnobj, clobj.pairs, cyImg.png({bg: '#ffffff', scale:2}), legendImg.png({bg: '#ffffff', scale:2}));
@@ -181,21 +197,22 @@
   });
   </script>
 </head>
+
 <body>
   <div id="wrapper">
     <!-- Navigation -->       
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div id="includedNav"></div>
-    </nav>  
+    </nav>   
     <div id="page-wrapper">
       <div class="container-fluid">
         <!-- Page Heading -->
         <div class="row">
           <div class="col-lg-12">
-            <h3>Compute chemical-structure similarity network</h3>
+            <h3>Compute subnetwork</h3>
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-              <i class="fa fa-info-circle"></i> Compute chemical structure similarity network.
+              <i class="fa fa-info-circle"></i> Compute an active subnetwork by integrating omic data on the input network.
             </div>
           </div>
         </div>
@@ -209,11 +226,10 @@
               </div>
               <div id="args" class="panel-body collapse in">
                 <form role="form">
-                  <h5>PubChem CIDs will be used for computing the similarity network.</h5>
                   <div class="row">
                     <div class="col-lg-12">
                       <ul class="nav nav-tabs">
-                        <li class="active"><a href="#networkOv" data-toggle="tab" data-value="NetworkOv">Input summary</a></li>
+                        <li class="active"><a href="#networkOv" data-toggle="tab" data-value="NetworkOv">Input network</a></li>
                         <li><a href="#dataOv" data-toggle="tab" data-value="DataOv">Input data</a></li>
                         <li class="pull-right"><h5>Input overview</h5></li>
                       </ul>
@@ -228,16 +244,25 @@
                     </div>
                   </div>
                   <!-- /.row -->
+                  <hr>
                   <div class="row">
                     <div class="col-lg-6">
                       <div class="form-group">
-                        <label for="coef">Minimum Tanimoto similarity correlation coefficient:</label>
-                        <input class="form-control" type="number" id="coef" name="coef" value="0.7" min="0.1" max="1" step="0.05">
+                        <label for="fdr">Maximum false discovery rate (FDR):</label>
+                        <input id="fdr" name="fdr" type="number" class="form-control" value="0.05" min="0" max="1" step="0.01">
+                      </div>
+                    </div>
+					<div class="col-lg-6">
+                      <div class="form-group">
+                        <label>Select entity-level statistics:</label>
+                        <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" data-html="true" title="Select a column that contains the entity-level statistics used for analysis"></i>
+                        <select id="pvcol" class="form-control"></select>
                       </div>
                     </div>
                   </div>
                   <!-- /.row -->
                   <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
+                  <button id="clearBtn" type="reset" class="btn btn-default">Clear</button>
                 </form>
               </div>
             </div>
@@ -277,7 +302,7 @@
               <div id="network" class="panel-body collapse in">
                 <div id="cy"></div>
                 <div class="nwLegend"><span>Network legend</span></div><br>
-                <div><img src="image/sim_legend.png"/></div>
+                <div><img src="image/legend.png"/></div>
                 <div id="legendCy"></div>
               </div>
             </div>
@@ -287,7 +312,6 @@
         <div class="row">
           <div class="col-lg-12">
             <button id="downloadBtn" type="button" class="btn btn-default" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Download network outputs"><i class="fa fa-download"></i> Download network</button>
-            <button id="subnetworkBtn" type="button" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Subnetwork page"><i class="fa fa-gears"></i> Subnetwork</button>
             <button id="enrBtn" type="button" class="btn btn-info" data-toggle="tooltip" data-placement="bottom" data-html="true" title="Go to Functional class scoring page"><i class="fa fa-pie-chart"></i> FnClassScoring</button>
           </div>
         </div>

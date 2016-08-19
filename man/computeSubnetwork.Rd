@@ -4,7 +4,7 @@
 \alias{computeSubnetwork}
 \title{Compute a subnetwork}
 \usage{
-computeSubnetwork(edgelist, nodelist, pval, fc, fdr, pcol, internalid, method, returnas)
+computeSubnetwork(edgelist, nodelist, pval, fc, fdr, pcol, internalid, method, hasatt, returnas)
 }
 \arguments{
 \item{edgelist}{a data frame of edges contains at least a source column (1st column) and a target column (2nd column).}
@@ -25,6 +25,8 @@ If \code{pval} is a data frame, 1st column contains the network nodes and 2nd co
 It has no effect if there is no database installed.}
 
 \item{method}{a string specifying the method used to compute the subnetwork. Default is bionet.}
+
+\item{hasatt}{a logical value indicating whether node attributes are kept already. Used by GUI.}
 
 \item{returnas}{a string specifying output type. It can be one of dataframe, list, json. Default is dataframe.}
 }
