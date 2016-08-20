@@ -79,6 +79,7 @@
           cleanFnOutputs();
         });//getObject    
         hideSpinner(loadSpinner);
+		$(".alertToRefresh").html("");
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);
 	  $(".alertToRefresh").html("Click Compute again to re-invoke server connection.");});//ocpu.call
     });//computeBtn

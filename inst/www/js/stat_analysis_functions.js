@@ -394,12 +394,12 @@ bootbox.dialog({
                     '<div class="col-md-4">'+select+' </div> ' +
                     '</div> ' +
                     '<div class="form-group"> ' +
-                    '<label class="col-md-4 control-label" for="multiplyordevide">Multiply or Devide?</label> ' +
+                    '<label class="col-md-4 control-label" for="multiplyordevide">Multiply or Divide?</label> ' +
                     '<div class="col-md-6"> <div class="radio"> <label for="multiplyordevide-0"> ' +
                     '<input type="radio" name="multiplyordevide" id="multiplyordevide-0" value="Multiply" checked="checked"> ' +
                     ' Multiply </label><span class="text-muted" style = "font-style: italic"> (after = before * weight)</span> ' +
                     '</div><div class="radio"> <label for="multiplyordevide-1"> ' +
-                    '<input type="radio" name="multiplyordevide" id="multiplyordevide-1" value="Devide"> Devide </label><span  style = "font-style: italic" class="text-muted"> (after = before / weight)</span> ' +
+                    '<input type="radio" name="multiplyordevide" id="multiplyordevide-1" value="Devide"> Divide </label><span  style = "font-style: italic" class="text-muted"> (after = before / weight)</span> ' +
                     '</div> ' +
                     '</div> </div>' +
                     '</form> </div>  </div>',
