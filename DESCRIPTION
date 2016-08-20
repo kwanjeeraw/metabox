@@ -15,6 +15,7 @@ Imports:
     igraph,
     Hmisc,
     plyr,
+    stringr,
     reshape2,
     doParallel,
     data.tree,

@@ -14,7 +14,7 @@
 #'
 #'
 stat_guess_factor = function(DATA){
-  library(stringr)
+  #library(stringr)
   pData = DATA$phenotype
 
   table_p = table(pData$subjectID)
