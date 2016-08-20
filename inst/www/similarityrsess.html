@@ -94,7 +94,8 @@
               cleanFnOutputs();
             });//getObject    
             hideSpinner(loadSpinner);
-          }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
+          }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);
+		  $(".alertToRefresh").html("Click Compute again to re-invoke server connection.");});//ocpu.call
         });//computeBtn
       }, error: function(){console.log("Ajax error: Cannot get data");}//success
     });//ajax
@@ -196,6 +197,7 @@
             <div class="alert alert-default alert-dismissable">
               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
               <i class="fa fa-info-circle"></i> Compute chemical structure similarity network.
+			  <p class="text-danger alertToRefresh"></p>
             </div>
           </div>
         </div>

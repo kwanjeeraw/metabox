@@ -79,7 +79,8 @@
           cleanFnOutputs();
         });//getObject    
         hideSpinner(loadSpinner);
-      }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
+      }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);
+	  $(".alertToRefresh").html("Click Compute again to re-invoke server connection.");});//ocpu.call
     });//computeBtn
     $("#cloudBtn").click(function(){
       var loadSpinner = showSpinner(txt='** Updating Network and Ploting WordCloud ..');
@@ -214,6 +215,7 @@
                   <!-- /.row -->
                   <button id="computeBtn" type="button" class="btn btn-primary">Compute</button>
                   <button id="clearBtn" type="reset" class="btn btn-default">Clear</button>
+				  <p class="text-danger alertToRefresh"></p>
                 </form>
               </div>
             </div>
