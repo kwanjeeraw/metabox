@@ -94,6 +94,8 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
   colnames(result) = c(paste0("p_value_of_",factor_name),paste0("non_parametric_p_value_of_",factor_name),
                        stat_combine_vector_1by1(paste0("p_value_of_",rownames(temp)),paste0("non_parametric_p_value_of_",rownames(temp))))
 
-  result = result[,!sapply(result, function(x){sum(is.na(x))})==ncol(data)] #get rid of columns with ALL NA's.
-  return(result)
+  result2 = result[,!sapply(result, function(x){sum(is.na(x))})==ncol(data)] #get rid of columns with ALL NA's.
+  result2 = data.frame(result2, check.names = F, stringsAsFactors = F)
+  colnames(result2) = names(!sapply(result, function(x){sum(is.na(x))})==ncol(data))[!sapply(result, function(x){sum(is.na(x))})==ncol(data)]
+  return(result2)
 }

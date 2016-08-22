@@ -772,12 +772,13 @@ result$power = "NOT AVAILABLE FOR TWO_WAY REPEATED DESIGN"
             variable1_posthoc = stat_one_way_ANOVA(data = e,data2 = dta, i=2, sudo_matrix1, factor_name[1],cl,
                                                    maineffect1ANOVAmethod,maineffect1ANOVAposthoc,nonparamaineffect1ANOVAmethod,nonparamaineffect1ANOVAposthoc)
             repeated1_simple_main_effect = by(dta,dta$repeated1,FUN = function(x){ #variable1 simple main effect
-              # x = dta[dta$repeated1==levels(dta$repeated1)[4],]
+              # x = dta[dta$repeated1==levels(dta$repeated1)[1],]
               result = stat_one_way_ANOVA(data = e[dta$repeated1==unique(x$repeated1),],data2 = x,i=2,sudo_matrix=sudo_matrix1,factor_name[1],cl,
                                           simplemaineffect1ANOVAmethod,simplemaineffect1ANOVAposthoc,nonparasimplemaineffect1ANOVAmethod,nonparasimplemaineffect1ANOVAposthoc) # the 3rd column is group.
               return(result)
             })
             for(i in 1:length(repeated1_simple_main_effect)){
+
               colnames(repeated1_simple_main_effect[[i]]) = paste0(levels(dta$repeated1)[i],":_",colnames(repeated1_simple_main_effect[[i]]))
             }
             result_temp = repeated1_simple_main_effect[[1]]
