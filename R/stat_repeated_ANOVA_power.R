@@ -36,10 +36,10 @@ stat_repeated_ANOVA_power = function(e,p,f,dta,i, sig.level = 0.05, desired_powe
                                  sigma_mu = sqrt(sum((by(dta$value, dta$repeated1, mean, na.rm = T) - Gmean)^2* sample_size) /N)
                                  sigma = sd(dta$value, na.rm = T)
                                  f = sigma_mu/sigma
-                                 ncp = f^2 * mu * N
+                                 ncp = f^2 * mu * N * epsilon
 
                                  p.body = quote({
-                                   ncp = f^2 * mu * N
+                                   ncp = f^2 * mu * N * epsilon
                                    df2 = (N-k)*(m-1)*epsilon
                                    pf(qf(sig.level,df1,df2,lower.tail = F),df1,df2,ncp,lower.tail = F)
                                  })

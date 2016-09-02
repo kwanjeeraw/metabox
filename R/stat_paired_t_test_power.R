@@ -48,7 +48,7 @@ stat_paired_t_test_power = function(e,f,p,dta, i, sig.level = 0.05, desired_powe
                                  # }
 
 
-                                 return(c(pt(qt(sig.level,df,lower.tail = F),df,ncp,lower.tail = F),size))
+                                 return(c(pt(qt(sig.level/2,df,lower.tail = F),df,ncp,lower.tail = F),size))
                                },e,dta,sig.level,df,N,desired_power,pwr.t.test)
   power_sampleSize = t(power_sampleSize)
   power_sampleSize = data.frame(power_sampleSize)
