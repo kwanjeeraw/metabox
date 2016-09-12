@@ -1,1 +1,1 @@
-Success!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by 

@@ -55,8 +55,8 @@ uploaddata = function(){
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#independent_factor",null,guess_independent_factor);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#repeated_factor",null,guess_repeated_factor);
                 listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#confounding_factor",null,"dfdasfdasfewrf");
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#PCA_color",null,guess_independent_factor);
-                listSelector(obj2.column_names_of_pData,obj2.why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
+                listSelector(obj2.column_names_of_pData,null,"#PCA_color",null,guess_independent_factor);
+                listSelector(obj2.column_names_of_pData,null,"#Donut_color",null,"dfdasfdasfewrf");
 
                     var req = ocpu.call("stat_Study_Design",{
                     DATA:D,

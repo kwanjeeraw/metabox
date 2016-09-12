@@ -14,7 +14,7 @@
 #'@export
 
 stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns a expression data frame(eData),
-  # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\mx 69088_HepG2 cells_Hirahatake & Meissen_high fructose_summer course_08-2015_submit.xlsx"
+  # file = "C:\\Users\\Sili Fan\\Desktop\\statistics courses\\Statistical analysis datasets\\mx 107155 B\\mx 107155 _lung cancer tissue_summer course_08-2015_submit.xlsx"
 
   # t test
   # file = "C:\\Users\\Sili Fan\\Documents\\GitHub\\MetaBoxDiv2\\data\\two independent group\\mx_274941_Francisco Portell_human cells_06-2016_submit.xlsx"

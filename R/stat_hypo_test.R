@@ -218,6 +218,7 @@ if(length(independent_factor_name)==0){
 
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
+
         }else if(length(factor_name[!factor_name%in%repeated_factor_name])==1 & length(repeated_factor_name)==0 & (length(unique(dta[,2]))==2)){ # t test
           # basic statistics.
           result_stat = matrix(nrow = ncol(e),ncol = 1 + 1 + (length(unique(dta[,2])))* 2) # global mean, sd. and mean and sd for each group.
@@ -238,7 +239,7 @@ if(length(independent_factor_name)==0){
             result = stat_t_test(data = e,data2 = dta,i = 2,cl,
                                  ttestmethod,ttestcorrection, nonparattestmethod,nonparattestcorrection)
 
-            result = data.frame(f,result,check.names = F)
+            result = data.frame(f,result,result_stat,check.names = F)
 
           if(need_power){
             power = stat_t_test_power(e = e,dta=dta, i = 2,sig.level = 0.05, desired_power = desired_power,

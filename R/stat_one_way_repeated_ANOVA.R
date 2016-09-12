@@ -15,8 +15,12 @@
 #'
 stat_one_way_repeated_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
                                        pairedANOVAmethod, pairedANOVAadjust, pairedANOVAposthoc, nonparapairedANOVAmethod, nonparapairedANOVAposthoc){#factor_name: make the result a better column name.
-
-
+#
+#   pairedANOVAmethod = maineffect2pairedANOVAmethod;
+#   pairedANOVAadjust = maineffect2pairedANOVAadjust;
+#   pairedANOVAposthoc = maineffect2pairedANOVAposthoc;
+#   nonparapairedANOVAmethod = nonparamaineffect2pairedANOVAmethod;
+#   nonparapairedANOVAposthoc = nonparamaineffect2pairedANOVAposthoc
 
 
   data2$value = data[,1]

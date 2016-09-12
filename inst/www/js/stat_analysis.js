@@ -154,7 +154,7 @@ $("#Submit_To_Statistics").click(function(){
   }else{
 
 
-applystatistics()
+    applystatistics()
 
 
 
@@ -403,8 +403,8 @@ $(document).on("change","input[name='checkPhenotype']",function(){
      listSelector(pData_column,why_not_able,"#independent_factor",null,guess_independent_factor);
      listSelector(pData_column,why_not_able,"#repeated_factor",null,guess_repeated_factor);
      listSelector(pData_column,why_not_able,"#confounding_factor",null,"dfdasfdasfewrf");
-     listSelector(pData_column,why_not_able,"#PCA_color",null,guess_independent_factor);
-     listSelector(pData_column,why_not_able,"#Donut_color",null,"dfdasfdasfewrf");
+     listSelector(pData_column,null,"#PCA_color",null,guess_independent_factor);
+     listSelector(pData_column,null,"#Donut_color",null,"dfdasfdasfewrf");
 
 });
 

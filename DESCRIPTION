@@ -24,13 +24,17 @@ Imports:
     dunn.test,
     userfriendlyscience,
     ez,
-	coin,
-	multcomp,
-	colorspace,
+    coin,
+    multcomp,
+    colorspace,
     FSA,
     outliers,
     openxlsx,
     NLP,
     digest,
-    dplyr
-RoxygenNote: 5.0.1.9000
+    dplyr,
+    RCurl,
+    Hmisc,
+    data.tree,
+    tm
+RoxygenNote: 5.0.1
