@@ -17,7 +17,7 @@ RUN apt-get -y install \
 	r-base-core \
 	libcurl4-gnutls-dev \
 	libssl-dev \
-	libgsl-dev \
+	libgsl0-dev \
 	libxml2-dev \
 	libprotobuf-dev \
 	protobuf-compiler
