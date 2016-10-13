@@ -1,4 +1,5 @@
-FROM ubuntu:16.04
+FROM ubuntu:14.04
+MAINTAINER Sajjan Singh Mehta "ssmehta@ucdavis.edu"
 
 # Set non-interactive mode
 ENV DEBIAN_FRONTEND noninteractive
@@ -16,7 +17,7 @@ RUN apt-get -y install \
 	r-base-core \
 	libcurl4-gnutls-dev \
 	libssl-dev \
-	libgsl-dev \
+	libgsl0-dev \
 	libxml2-dev \
 	libprotobuf-dev \
 	protobuf-compiler
