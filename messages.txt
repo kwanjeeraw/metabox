@@ -1,1 +1,11 @@
-The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by 
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  1 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  2 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  3 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  5 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  7 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  15 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  18 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  19 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  20 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  25 th feature contains missing value and they have been removed!
+The data uploaded doesn't have phenotype_index, subjectID, feature_index and they are added automatically. You can examine them by  26 th feature contains missing value and they have been removed!

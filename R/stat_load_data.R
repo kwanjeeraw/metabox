@@ -134,7 +134,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
     #1. cannot have missing value.
     num_of_missing = vector()
     for(i in 1:ncol(eData)){
-      num_of_missing[i] = sum(is.na(eData[,i]))
+      num_of_missing[i] = sum(eData[,i]=="NA")
     }
     if(sum(num_of_missing>0)){
       message = paste(message,  fData$feature_index[num_of_missing>0], "th feature contains missing value and they have been removed!")
@@ -144,7 +144,7 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
 
     #2. cannot have constant value
     constant_feature = sapply(eData, sd) == 0
-    if(sum(constant_feature)>0){
+    if(sum(constant_feature,na.rm = T)>0){
       message  = paste(message,  fData$feature_index[constant_feature], "th feature is constant and they have been removed!")
     }
     eData = eData[, !constant_feature]
