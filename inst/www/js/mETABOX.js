@@ -542,12 +542,14 @@ function drawNetwork(objNode, objEdge, pid, lyout = "cose"){
         .selector('edge[type = "CONTROL"]')
           .style({
             'line-color': '#00b100',
-            'target-arrow-color': '#00b100'
+            'target-arrow-color': '#00b100',
+			'target-arrow-shape': 'triangle'
           })
         .selector('edge[type = "CONVERSION"]')
           .style({
             'line-color': '#ff9aff',
-            'target-arrow-color': '#ff9aff'
+            'target-arrow-color': '#ff9aff',
+			'target-arrow-shape': 'triangle'
           })
         .selector('edge[type = "GENETIC_ASSOCIATION"]')
           .style({

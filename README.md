@@ -1,7 +1,7 @@
 # metabox
 a toolbox for metabolomic data analysis, visualization and ‘omic’ integration
 
-Version: 1.1 (13 September 2016)
+Version: 1.2 (01 December 2016)
 
 Description
 =========
