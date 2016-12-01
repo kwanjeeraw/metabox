@@ -563,14 +563,17 @@ if(length(independent_factor_name)==0){
 
         if(!twowaypairedANOVAmethod == 'none'){
           interaction = parSapply(cl, 1:ncol(e),function(i,e,dta,ezANOVA,twowaypairedANOVAadjust,num_factor_repeated1,num_factor_repeated2){
-            dta$value = e[,i]
-            if(twowaypairedANOVAadjust == 'none'| (num_factor_repeated1==2 & num_factor_repeated2==2)){
-              interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id, within = .(repeated1,repeated2), type = 3)$ANOVA[3,5]
-            }else{
-              interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id,
-                                                        within = .(repeated1,repeated2),
-                                                        type = 3)$`Sphericity Corrections`[paste0('p[',twowaypairedANOVAadjust,']')][3,1]
-            }
+            # for(i in 1:ncol(e)){
+              dta$value = e[,i]
+              if(twowaypairedANOVAadjust == 'none'| (num_factor_repeated1==2 & num_factor_repeated2==2)){
+                interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id, within = .(repeated1,repeated2), type = 3)$ANOVA[3,5]
+              }else{
+                interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id,
+                                                          within = .(repeated1,repeated2),
+                                                          type = 3)$`Sphericity Corrections`[paste0('p[',twowaypairedANOVAadjust,']')][3,1]
+              }
+            # }
+            
 
             # interaction_repeated1_repeated2_nonPara = pbad2way(value ~repeated1*repeated2,
             #                                                    data = dta,est = "median")$AB.p.value

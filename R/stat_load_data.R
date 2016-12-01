@@ -170,9 +170,19 @@ stat_load_data = function(file,sheetIndex = NULL, from_example=NULL){ # returns 
 
 
     rownames(pData) = as.character(1:nrow(pData))
+    eData[eData==0] = 1
     result <- list(expression = eData, feature = fData, phenotype = pData, duplicatedID=duplicatedID)
+    
     # e = e_ori = eData; p = p_ori = pData; f = fData;
-
+    
+    # e_after_sample_normalization = e
+    # if(log_para=="exp"){
+    #   log_para = exp(1)
+    # }
+    # log_para = as.numeric(log_para)
+    # e_after_transformation = log(e_after_sample_normalization,base = log(exp(log_para)))
+    # e_after_scaling = stat_pareto_scale(e_after_transformation)
+    # e = e_after_scaling
 
 
 
