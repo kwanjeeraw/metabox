@@ -213,9 +213,10 @@ nonparamaineffect2pairedANOVAmethod : nonparamaineffect2pairedANOVAmethod,nonpar
 nonparamaineffect2pairedttestmethod : nonparamaineffect2pairedttestmethod,nonparamaineffect2pairedttestcorrection : nonparamaineffect2pairedttestcorrection,nonparasimplemaineffect2pairedttestmethod : nonparasimplemaineffect2pairedttestmethod,nonparasimplemaineffect2pairedttestcorrection : nonparasimplemaineffect2pairedttestcorrection,
 
 mixedANOVA : mixedANOVA,mixedANOVAadjust : mixedANOVAadjust,
-nonparamixedANOVA : nonparamixedANOVA
+nonparamixedANOVA : nonparamixedANOVA,
 
-
+bootstrap:document.getElementById('bootstrap_needed').checked,
+bootstrap_num: $("#bootstrap_num").val()
 
 
 

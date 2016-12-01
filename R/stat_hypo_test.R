@@ -53,8 +53,10 @@ stat_hypo_test = function(e,p,f,
                      nonparamaineffect2pairedttestmethod = 'paired utest',nonparamaineffect2pairedttestcorrection = 'fdr',nonparasimplemaineffect2pairedttestmethod = 'paired utest',nonparasimplemaineffect2pairedttestcorrection = 'fdr',
 
                      mixedANOVA = 'mixed anova',mixedANOVAadjust = 'GG',
-                     nonparamixedANOVA ='nonpara mixed anova'
+                     nonparamixedANOVA ='nonpara mixed anova',
 
+
+                     bootstrap = FALSE, bootstrap_num=500
                      # e = e_ori = DATA$expression;p = p_ori = DATA$phenotype; f = DATA$feature;
 
                      ){#For repeated study design, samples should match.
@@ -158,6 +160,29 @@ if(length(independent_factor_name)==0){
          }
         }
       }
+
+
+
+
+      # bootstrap
+      if(bootstrap){
+        if()
+        bootstrap_num = as.numeric(bootstrap_num)
+        bootindex = sample(1:nrow(e),bootstrap_num,replace = T)
+        e = e[bootindex,]
+        p = p[bootindex,]
+      }
+
+
+
+
+
+
+
+
+
+
+
 
       dta = data.frame(value = e[,1], p[factor_name[!factor_name%in%repeated_factor_name]],p[repeated_factor_name])
       if(is.null(repeated_factor_name)){
@@ -573,7 +598,7 @@ if(length(independent_factor_name)==0){
                                                           type = 3)$`Sphericity Corrections`[paste0('p[',twowaypairedANOVAadjust,']')][3,1]
               }
             # }
-            
+
 
             # interaction_repeated1_repeated2_nonPara = pbad2way(value ~repeated1*repeated2,
             #                                                    data = dta,est = "median")$AB.p.value
