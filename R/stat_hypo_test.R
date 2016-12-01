@@ -166,11 +166,12 @@ if(length(independent_factor_name)==0){
 
       # bootstrap
       if(bootstrap){
-        if()
-        bootstrap_num = as.numeric(bootstrap_num)
-        bootindex = sample(1:nrow(e),bootstrap_num,replace = T)
-        e = e[bootindex,]
-        p = p[bootindex,]
+        if(is.null(repeated_factor_name)){
+          bootstrap_num = as.numeric(bootstrap_num)
+          bootindex = sample(1:nrow(e),bootstrap_num,replace = T)
+          e = e[bootindex,]
+          p = p[bootindex,]
+        }
       }
 
 
