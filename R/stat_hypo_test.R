@@ -66,7 +66,7 @@ stat_hypo_test = function(e,p,f,
 
 
   library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(outliers);library(pwr);library(reshape2);
-
+  library(perm);
   if(as.numeric(desired_power)>100 | as.numeric(desired_power) < 0 | is.na(as.numeric(desired_power))){
     stop("desired_power must between 0 ~ 100")
   }

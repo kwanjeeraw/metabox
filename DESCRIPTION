@@ -11,6 +11,7 @@ License: GNU GENERAL PUBLIC LICENSE Version 3
 LazyData: true
 Imports:
     RCurl,
+	perm,
     jsonlite,
     igraph,
     Hmisc,
