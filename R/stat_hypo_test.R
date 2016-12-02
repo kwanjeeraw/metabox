@@ -284,11 +284,6 @@ if(length(independent_factor_name)==0){
                 paste0(colnames(result)[ncol(f)+1],"bootstrap_fdr"))
           }
 
-
-
-
-
-
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
 
