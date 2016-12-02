@@ -24,6 +24,7 @@ Imports:
     dunn.test,
     userfriendlyscience,
     ez,
+    MASS,
     coin,
     multcomp,
     colorspace,
