@@ -165,14 +165,14 @@ if(length(independent_factor_name)==0){
 
 
       # bootstrap
-      if(bootstrap){
-        if(is.null(repeated_factor_name)){
-          bootstrap_num = as.numeric(bootstrap_num)
-          bootindex = sample(1:nrow(e),bootstrap_num,replace = T)
-          e = e[bootindex,]
-          p = p[bootindex,]
-        }
-      }
+      # if(bootstrap){
+      #   if(is.null(repeated_factor_name)){
+      #     bootstrap_num = as.numeric(bootstrap_num)
+      #     bootindex = sample(1:nrow(e),bootstrap_num,replace = T)
+      #     e = e[bootindex,]
+      #     p = p[bootindex,]
+      #   }
+      # }
 
 
 
@@ -242,6 +242,53 @@ if(length(independent_factor_name)==0){
             result = cbind(result,result_power)
           }
 
+
+
+
+
+          if(bootstrap){
+            bootstrap_p = vector()
+
+            # for(i in 1:ncol(e)){
+            #   dta$value = e_ori[,i]
+            #   boot.t = function(dta, i) {
+            #     data = dta[i,]
+            #     test = t.test(data$value~data$variable1, var.eq=T)
+            #     c(test$statistic,
+            #       test$p.value)
+            #   }
+            #   boot.out = tryCatch(boot(data=dta, statistic=boot.t, R=bootstrap_num
+            #                            ),error=function(e){
+            #     NULL
+            #   })
+            #   if(is.null(boot.out)){
+            #     print(i)
+            #     bootstrap_p[i] = result[i,ncol(f)+1]
+            #   }else{
+            #     bootstrap_p[i] = mean(abs(boot.out$t[,1]) >= abs(boot.out$t0[1]))
+            #   }
+            # }
+            # bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+
+
+            bootstrap_p = parSapply(cl=cl,1:ncol(e),function(i,e,permKS,dta){
+
+              dta$value = e[,i]
+              return(permKS(dta$value~dta$variable1,alternative = 'two.sided')$p.values[1])
+
+            },e,permTS,dta)
+            bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+            result = cbind(result,bootstrap_p,bootstrap_p_fdr)
+            colnames(result)[(ncol(result)-1):ncol(result)] =
+              c(paste0(colnames(result)[ncol(f)+1],"bootstrap"),
+                paste0(colnames(result)[ncol(f)+1],"bootstrap_fdr"))
+          }
+
+
+
+
+
+
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
 
@@ -266,6 +313,47 @@ if(length(independent_factor_name)==0){
                                  ttestmethod,ttestcorrection, nonparattestmethod,nonparattestcorrection)
 
             result = data.frame(f,result,result_stat,check.names = F)
+
+
+            if(bootstrap){
+              bootstrap_p = vector()
+
+              # for(i in 1:ncol(e)){
+              #   dta$value = e_ori[,i]
+              #   boot.t = function(dta, i) {
+              #     data = dta[i,]
+              #     test = t.test(data$value~data$variable1, var.eq=T)
+              #     c(test$statistic,
+              #       test$p.value)
+              #   }
+              #   boot.out = tryCatch(boot(data=dta, statistic=boot.t, R=bootstrap_num
+              #                            ),error=function(e){
+              #     NULL
+              #   })
+              #   if(is.null(boot.out)){
+              #     print(i)
+              #     bootstrap_p[i] = result[i,ncol(f)+1]
+              #   }else{
+              #     bootstrap_p[i] = mean(abs(boot.out$t[,1]) >= abs(boot.out$t0[1]))
+              #   }
+              # }
+              # bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+
+
+              bootstrap_p = parSapply(cl=cl,1:ncol(e),function(i,e,permTS,dta){
+
+                dta$value = e[,i]
+                  return(permTS(dta$value~dta$variable1,alternative = 'two.sided')$p.values[1])
+
+              },e,permTS,dta)
+              bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+              result = cbind(result,bootstrap_p,bootstrap_p_fdr)
+              colnames(result)[(ncol(result)-1):ncol(result)] =
+                c(paste0(colnames(result)[ncol(f)+1],"bootstrap"),
+                  paste0(colnames(result)[ncol(f)+1],"bootstrap_fdr"))
+            }
+
+
 
           if(need_power){
             power = stat_t_test_power(e = e,dta=dta, i = 2,sig.level = 0.05, desired_power = desired_power,
