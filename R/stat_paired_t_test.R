@@ -19,7 +19,7 @@ stat_paired_t_test = function(data,data2,i,cl,
 
 
   data_wide <- data.frame(# to prevent that the id are not sorted in both group.
-    ID=1:max(as.numeric(as.character(data2$id))),
+    ID=data2$id,
     group1=data2$value[data2[,i]==levels(data2[,i])[1]],
     group2=data2$value[data2[,i]==levels(data2[,i])[2]]
   )
@@ -31,7 +31,7 @@ stat_paired_t_test = function(data,data2,i,cl,
     p_value  = parSapply(cl, 1:ncol(data), FUN = function(j,data2,data,i){
       data2$value = data[,j]
       data_wide <- data.frame(# to prevent that the id are not sorted in both group.
-        ID=1:max(as.numeric(as.character(data2$id))),
+        ID=data2$id,
         group1=data2$value[data2[,i]==levels(data2[,i])[1]],
         group2=data2$value[data2[,i]==levels(data2[,i])[2]]
       )
@@ -50,7 +50,7 @@ stat_paired_t_test = function(data,data2,i,cl,
     nonparap_value =    parSapply(cl, 1:ncol(data), FUN = function(j,data2,data,i){
       data2$value = data[,j]
       data_wide <- data.frame(# to prevent that the id are not sorted in both group.
-        ID=1:max(as.numeric(as.character(data2$id))),
+        ID=data2$id,
         group1=data2$value[data2[,i]==levels(data2[,i])[1]],
         group2=data2$value[data2[,i]==levels(data2[,i])[2]]
       )

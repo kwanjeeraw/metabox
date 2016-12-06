@@ -53,8 +53,10 @@ stat_hypo_test = function(e,p,f,
                      nonparamaineffect2pairedttestmethod = 'paired utest',nonparamaineffect2pairedttestcorrection = 'fdr',nonparasimplemaineffect2pairedttestmethod = 'paired utest',nonparasimplemaineffect2pairedttestcorrection = 'fdr',
 
                      mixedANOVA = 'mixed anova',mixedANOVAadjust = 'GG',
-                     nonparamixedANOVA ='nonpara mixed anova'
+                     nonparamixedANOVA ='nonpara mixed anova',
 
+
+                     bootstrap = FALSE, bootstrap_num=500
                      # e = e_ori = DATA$expression;p = p_ori = DATA$phenotype; f = DATA$feature;
 
                      ){#For repeated study design, samples should match.
@@ -64,7 +66,7 @@ stat_hypo_test = function(e,p,f,
 
 
   library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(outliers);library(pwr);library(reshape2);
-
+  library(perm);
   if(as.numeric(desired_power)>100 | as.numeric(desired_power) < 0 | is.na(as.numeric(desired_power))){
     stop("desired_power must between 0 ~ 100")
   }
@@ -159,6 +161,30 @@ if(length(independent_factor_name)==0){
         }
       }
 
+
+
+
+      # bootstrap
+      # if(bootstrap){
+      #   if(is.null(repeated_factor_name)){
+      #     bootstrap_num = as.numeric(bootstrap_num)
+      #     bootindex = sample(1:nrow(e),bootstrap_num,replace = T)
+      #     e = e[bootindex,]
+      #     p = p[bootindex,]
+      #   }
+      # }
+
+
+
+
+
+
+
+
+
+
+
+
       dta = data.frame(value = e[,1], p[factor_name[!factor_name%in%repeated_factor_name]],p[repeated_factor_name])
       if(is.null(repeated_factor_name)){
         colnames(dta) = c("value", paste0("variable",1:sum(!factor_name%in%repeated_factor_name)))
@@ -216,6 +242,48 @@ if(length(independent_factor_name)==0){
             result = cbind(result,result_power)
           }
 
+
+
+
+
+          if(bootstrap){
+            bootstrap_p = vector()
+
+            # for(i in 1:ncol(e)){
+            #   dta$value = e_ori[,i]
+            #   boot.t = function(dta, i) {
+            #     data = dta[i,]
+            #     test = t.test(data$value~data$variable1, var.eq=T)
+            #     c(test$statistic,
+            #       test$p.value)
+            #   }
+            #   boot.out = tryCatch(boot(data=dta, statistic=boot.t, R=bootstrap_num
+            #                            ),error=function(e){
+            #     NULL
+            #   })
+            #   if(is.null(boot.out)){
+            #     print(i)
+            #     bootstrap_p[i] = result[i,ncol(f)+1]
+            #   }else{
+            #     bootstrap_p[i] = mean(abs(boot.out$t[,1]) >= abs(boot.out$t0[1]))
+            #   }
+            # }
+            # bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+
+
+            bootstrap_p = parSapply(cl=cl,1:ncol(e),function(i,e,permKS,dta){
+
+              dta$value = e[,i]
+              return(permKS(dta$value~dta$variable1,alternative = 'two.sided')$p.values[1])
+
+            },e,permTS,dta)
+            bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+            result = cbind(result,bootstrap_p,bootstrap_p_fdr)
+            colnames(result)[(ncol(result)-1):ncol(result)] =
+              c(paste0(colnames(result)[ncol(f)+1],"bootstrap"),
+                paste0(colnames(result)[ncol(f)+1],"bootstrap_fdr"))
+          }
+
           writeLines(jsonlite::toJSON(colnames(result)),"colnames.json")#!!!
 
 
@@ -240,6 +308,47 @@ if(length(independent_factor_name)==0){
                                  ttestmethod,ttestcorrection, nonparattestmethod,nonparattestcorrection)
 
             result = data.frame(f,result,result_stat,check.names = F)
+
+
+            if(bootstrap){
+              bootstrap_p = vector()
+
+              # for(i in 1:ncol(e)){
+              #   dta$value = e_ori[,i]
+              #   boot.t = function(dta, i) {
+              #     data = dta[i,]
+              #     test = t.test(data$value~data$variable1, var.eq=T)
+              #     c(test$statistic,
+              #       test$p.value)
+              #   }
+              #   boot.out = tryCatch(boot(data=dta, statistic=boot.t, R=bootstrap_num
+              #                            ),error=function(e){
+              #     NULL
+              #   })
+              #   if(is.null(boot.out)){
+              #     print(i)
+              #     bootstrap_p[i] = result[i,ncol(f)+1]
+              #   }else{
+              #     bootstrap_p[i] = mean(abs(boot.out$t[,1]) >= abs(boot.out$t0[1]))
+              #   }
+              # }
+              # bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+
+
+              bootstrap_p = parSapply(cl=cl,1:ncol(e),function(i,e,permTS,dta){
+
+                dta$value = e[,i]
+                  return(permTS(dta$value~dta$variable1,alternative = 'two.sided')$p.values[1])
+
+              },e,permTS,dta)
+              bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
+              result = cbind(result,bootstrap_p,bootstrap_p_fdr)
+              colnames(result)[(ncol(result)-1):ncol(result)] =
+                c(paste0(colnames(result)[ncol(f)+1],"bootstrap"),
+                  paste0(colnames(result)[ncol(f)+1],"bootstrap_fdr"))
+            }
+
+
 
           if(need_power){
             power = stat_t_test_power(e = e,dta=dta, i = 2,sig.level = 0.05, desired_power = desired_power,
@@ -563,14 +672,17 @@ if(length(independent_factor_name)==0){
 
         if(!twowaypairedANOVAmethod == 'none'){
           interaction = parSapply(cl, 1:ncol(e),function(i,e,dta,ezANOVA,twowaypairedANOVAadjust,num_factor_repeated1,num_factor_repeated2){
-            dta$value = e[,i]
-            if(twowaypairedANOVAadjust == 'none'| (num_factor_repeated1==2 & num_factor_repeated2==2)){
-              interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id, within = .(repeated1,repeated2), type = 3)$ANOVA[3,5]
-            }else{
-              interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id,
-                                                        within = .(repeated1,repeated2),
-                                                        type = 3)$`Sphericity Corrections`[paste0('p[',twowaypairedANOVAadjust,']')][3,1]
-            }
+            # for(i in 1:ncol(e)){
+              dta$value = e[,i]
+              if(twowaypairedANOVAadjust == 'none'| (num_factor_repeated1==2 & num_factor_repeated2==2)){
+                interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id, within = .(repeated1,repeated2), type = 3)$ANOVA[3,5]
+              }else{
+                interaction_repeated1_repeated2 = ezANOVA(data = dta, dv = value, wid = id,
+                                                          within = .(repeated1,repeated2),
+                                                          type = 3)$`Sphericity Corrections`[paste0('p[',twowaypairedANOVAadjust,']')][3,1]
+              }
+            # }
+
 
             # interaction_repeated1_repeated2_nonPara = pbad2way(value ~repeated1*repeated2,
             #                                                    data = dta,est = "median")$AB.p.value
