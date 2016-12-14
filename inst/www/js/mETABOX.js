@@ -3,7 +3,7 @@
 function JSONToTabConvertor(JSONData,ShowHeader) {
     //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
     var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
-    var CSV = '';    
+    var CSV = '';
         //This condition will generate the Label/Header
     if (ShowHeader) {
         var row = "";
@@ -27,7 +27,7 @@ function JSONToTabConvertor(JSONData,ShowHeader) {
         //add a line break after each row
         CSV += row + '\r\n';
     }
-    if (CSV == '') {        
+    if (CSV == '') {
         alert("Invalid data");
     }
     return CSV;
@@ -58,7 +58,7 @@ function tabToJSON(tab,moltype) {
 				obj[moltype] = lines[i];
 				outjson.push(obj);
 			}
-		}	
+		}
 	}
 	return JSON.parse(JSON.stringify(outjson)); //return JSON object
 }
@@ -113,11 +113,11 @@ function exportNwZip(nodes, edges, img){
     zip.file("network.png", img.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});
     zip.generateAsync({type:"base64"})
     .then(function (content) {
-      var a = document.createElement('a'); 
+      var a = document.createElement('a');
       a.href="data:application/zip;base64,"+content;
       a.download = "OUTPUT.zip";
       a.click();
-    });    
+    });
 }
 
 //@function export enrichment outputs as a zip file
@@ -134,20 +134,20 @@ function exportEnrichmentZip(nodes, edges, enrichment, pairs, img, nlegend){
     if (nlegend != null) {zip.file("nodeLegend.png", nlegend.replace(/^data:image\/(png|jpg);base64,/, ""), {base64: true});}
     zip.generateAsync({type:"base64"})
     .then(function (content) {
-      var a = document.createElement('a'); 
+      var a = document.createElement('a');
       a.href="data:application/zip;base64,"+content;
       a.download = "OUTPUT.zip";
       a.click();
-    });    
+    });
 }
 
 //@function export tab-delimited text file
 //@param content array of json objects
 function exportTxtFile(content){
-    var a = document.createElement('a'); 
+    var a = document.createElement('a');
     a.href = "data:text/plain," + escape(JSONToTabConvertor(content,true));
     a.download = "OUTPUT.txt";
-    a.click(); 
+    a.click();
 }
 
 //@function format cytoscape json elements
@@ -157,10 +157,10 @@ function formatCyJSON(network){
     var edgels = [];
     Object.keys(network.elements.nodes).forEach(function(idx) {
         nodels.push(network.elements.nodes[idx].data);
-    }); 
+    });
     Object.keys(network.elements.edges).forEach(function(idx) {
         edgels.push(network.elements.edges[idx].data);
-    }); 
+    });
     return {'nodes':nodels,'edges':edgels};
 }
 
@@ -309,7 +309,7 @@ function clear2Table(ndtable, edtable, nid, eid, hasResult) {
         if (ndtable != undefined) {
             ndtable.clear().draw();
             edtable.clear().draw();
-        }    
+        }
     }
     $(nid).empty();
     $(eid).empty();
@@ -331,7 +331,7 @@ function clear3Table(ndtable, edtable, pwtable, nid, eid, pid, hasResult) {
             ndtable.clear().draw();
             edtable.clear().draw();
             pwtable.clear().draw();
-        }    
+        }
     }
     $(nid).empty();
     $(eid).empty();
@@ -401,11 +401,11 @@ function formatPieNode(nodeArr, enrichArr) {
     for (var i = 0; i < nodeArr.length; i++) {//format list of nodes for cytoscapeJS
         nodels.push({
             data: nodeArr[i]
-        }); 
+        });
         Object.keys(enrichArr).forEach(function(idx) {
           if(enrichArr[idx].member.indexOf(nodeArr[i].id)!= -1){
               var pie = "pie" + enrichArr[idx].rank;
-              nodels[i].data[pie] = 1; 
+              nodels[i].data[pie] = 1;
           }
         });
     }
@@ -484,14 +484,14 @@ function drawNetwork(objNode, objEdge, pid, lyout = "cose"){
             'pie-9-background-color': '#FD49FF',
             'pie-9-background-size': 'mapData(pie9, 0, 10, 0, 100)',
             'pie-10-background-color': '#00715E',
-            'pie-10-background-size': 'mapData(pie10, 0, 10, 0, 100)'           
+            'pie-10-background-size': 'mapData(pie10, 0, 10, 0, 100)'
           })
         .selector('node[nodelabel = "Legend"]')
           .style({
             'shape':'rectangle',
             'color':'#000',
             'font-size':14
-          })  
+          })
         .selector('node[nodelabel = "Phenotype"]')
           .style({
             'shape':'octagon'
@@ -523,7 +523,7 @@ function drawNetwork(objNode, objEdge, pid, lyout = "cose"){
         .selector('edge')
           .style({
             'width': 3
-          }) 
+          })
         .selector('edge[type = "ANNOTATION"]')
           .style({
             'line-color': '#8C8C8C',
@@ -532,24 +532,28 @@ function drawNetwork(objNode, objEdge, pid, lyout = "cose"){
         .selector('edge[type = "BIOCHEMICAL_REACTION"]')
           .style({
             'line-color': '#ff3333',
-            'target-arrow-color': '#ff3333'
+            'target-arrow-color': '#ff3333',
+			      'target-arrow-shape': 'triangle',
+			      'source-arrow-color': '#ff3333',
+			      'source-arrow-shape': 'triangle'
           })
         .selector('edge[type = "CATALYSIS"]')
           .style({
             'line-color': '#577ae4',
-            'target-arrow-color': '#577ae4'
+            'target-arrow-color': '#577ae4',
+            'target-arrow-shape': 'triangle'
           })
         .selector('edge[type = "CONTROL"]')
           .style({
             'line-color': '#00b100',
             'target-arrow-color': '#00b100',
-			'target-arrow-shape': 'triangle'
+			      'target-arrow-shape': 'triangle'
           })
         .selector('edge[type = "CONVERSION"]')
           .style({
             'line-color': '#ff9aff',
             'target-arrow-color': '#ff9aff',
-			'target-arrow-shape': 'triangle'
+			      'target-arrow-shape': 'triangle'
           })
         .selector('edge[type = "GENETIC_ASSOCIATION"]')
           .style({
@@ -603,7 +607,7 @@ function drawNetwork(objNode, objEdge, pid, lyout = "cose"){
           })
     });
     cy.on('tap', 'node', function(e){
-      var node = e.cyTarget; 
+      var node = e.cyTarget;
       var neighborhood = node.neighborhood().add(node);
       cy.elements().addClass('faded');
       neighborhood.removeClass('faded');
