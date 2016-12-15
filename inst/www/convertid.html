@@ -31,15 +31,15 @@
   <!-- App CSS -->
   <link href="bootstrap/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css">
   <!-- Load nav menu -->
-  <script> 
+  <script>
   $(function(){
-    $("#includedNav").load("nav.html");  
+    $("#includedNav").load("nav.html");
   });
   </script>
   <title>metabox</title>
   <link rel="shortcut icon" href="image/favicon.ico" type="image/x-icon">
   <!-- Embedded script calling R -->
-  <script>    
+  <script>
   $(function(){
     //global var
     var inp_session;
@@ -63,7 +63,7 @@
       }).fail(function() {alert("Error: " + req.responseText);});//ocpu.call
     });//fileinput
     $("#computeBtn").click(function(){
-      var loadSpinner = showSpinner();   
+      var loadSpinner = showSpinner();
       var x;
       if($("#txtinput").val() == ""){
         x = inp_session;
@@ -93,7 +93,7 @@
             }
             $('#nodes').empty();
           }
-        });//getObject    
+        });//getObject
         hideSpinner(loadSpinner);
       }).fail(function() {alert("Error: " + req.responseText); hideSpinner(loadSpinner);});//ocpu.call
     });//computeBtn
@@ -103,7 +103,7 @@
       }
     });//clearBtn
     $("#downloadBtn").click(function(){
-      exportTxtFile(robj);     
+      exportTxtFile(robj);
     });//downloadBtn
     $('[data-toggle="tooltip"]').tooltip(); //initialize tooltip
   });
@@ -112,10 +112,10 @@
 
 <body>
   <div id="wrapper">
-    <!-- Navigation -->       
+    <!-- Navigation -->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div id="includedNav"></div>
-    </nav>   
+    </nav>
     <div id="page-wrapper">
       <div class="container-fluid">
         <!-- Page Heading -->
@@ -149,7 +149,7 @@
                       <div class="form-group">
                         <label>or Upload a file:</label>
                         <input type='file' id="fileinput" name="fileinput" accept='text/plain'>
-                        <p class="help-block">Tab-delimited input file, 1st column = IDs</p>
+                        <p class="help-block">Tab-delimited input file, 1st column = input IDs</p>
                       </div>
                     </div>
                   </div>
