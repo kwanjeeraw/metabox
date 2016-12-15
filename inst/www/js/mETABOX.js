@@ -199,7 +199,7 @@ function hideSpinner(spinner){
 
 //@function get URL variables
 //@param param, name of variable
-//@based http://stackoverflow.com/questions/8460265/
+//@ref http://stackoverflow.com/questions/8460265/
 function getURLVars(param)
 {
     var vars = [], hash;
