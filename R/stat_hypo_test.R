@@ -313,27 +313,6 @@ if(length(independent_factor_name)==0){
             if(bootstrap){
               bootstrap_p = vector()
 
-              # for(i in 1:ncol(e)){
-              #   dta$value = e_ori[,i]
-              #   boot.t = function(dta, i) {
-              #     data = dta[i,]
-              #     test = t.test(data$value~data$variable1, var.eq=T)
-              #     c(test$statistic,
-              #       test$p.value)
-              #   }
-              #   boot.out = tryCatch(boot(data=dta, statistic=boot.t, R=bootstrap_num
-              #                            ),error=function(e){
-              #     NULL
-              #   })
-              #   if(is.null(boot.out)){
-              #     print(i)
-              #     bootstrap_p[i] = result[i,ncol(f)+1]
-              #   }else{
-              #     bootstrap_p[i] = mean(abs(boot.out$t[,1]) >= abs(boot.out$t0[1]))
-              #   }
-              # }
-              # bootstrap_p_fdr = p.adjust(bootstrap_p,"fdr")
-
 
               bootstrap_p = parSapply(cl=cl,1:ncol(e),function(i,e,permTS,dta){
 
