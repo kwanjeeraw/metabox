@@ -1,4 +1,4 @@
-//@src http://jsfiddle.net/motowilliams/7rL2C/
+//@ref http://jsfiddle.net/motowilliams/7rL2C/
 //@function convert json to tab-delimited format
 function JSONToTabConvertor(JSONData,ShowHeader) {
     //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
