@@ -28,10 +28,10 @@ stat_cure_Dunn_format = function(x,sudo_matrix, temp){ # sudo_matrix is not goin
 
     return(result)
   }else if(ncol(temp)==1){
-    result = temp
-    for(i in 1:nrow(result)){
-      result[i,1] = x[which(rownames(x)%in%rownames(temp)[i]),1]
-    }
+    result = x
+    # for(i in 1:nrow(result)){
+    #   result[i,1] = x[which(rownames(x)%in%rownames(temp)[i]),1]
+    # }
 
     return(result)
 

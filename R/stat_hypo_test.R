@@ -66,6 +66,7 @@ stat_hypo_test = function(e,p,f,
 
 
   library(parallel);library(userfriendlyscience);library(ez);library(FSA);library(outliers);library(pwr);library(reshape2);
+
   library(perm);
   if(as.numeric(desired_power)>100 | as.numeric(desired_power) < 0 | is.na(as.numeric(desired_power))){
     stop("desired_power must between 0 ~ 100")
@@ -214,10 +215,9 @@ if(length(independent_factor_name)==0){
 
 
 
-
           result_stat = matrix(nrow = ncol(e),ncol = 1 + 1 + (length(unique(dta[,2])))* 2) # global mean, sd. and mean and sd for each group.
           for(i in 1:ncol(e)){
-            dta$value = e_ori[,i]
+            dta$value = e[,i]
             result_stat[i,1] = mean(dta$value,na.rm = T)
             result_stat[i,2:(1+length(unique(dta[,2])))] = by(dta$value, dta[,2],mean,na.rm = T)
             result_stat[i,(1+length(unique(dta[,2])))+1] = sd(dta$value,na.rm = T)
@@ -229,7 +229,7 @@ if(length(independent_factor_name)==0){
                                     "Global Standard Deviation", paste("Standard Deviation of", names( by(dta$value, dta[,2],sd,na.rm = T))))
 
 
-
+# result = f
 
           result = stat_one_way_ANOVA(data = e,data2 = dta,i = 2,sudo_matrix,factor_name,cl,
                                       ANOVAmethod,ANOVAposthoc,nonparaANOVAmethod,nonparaANOVAposthoc)
@@ -973,6 +973,7 @@ result$power = "NOT AVAILABLE FOR TWO_WAY REPEATED DESIGN"
 
 
           result = cbind(result,result_stat)
+
         if(need_power){
           result_power = stat_mixed_ANOVA_power(e=e,p=p,dta=dta,sig.level = 0.05,desired_power = desired_power,factor_name = factor_name,epsilon=1,cl=cl)
 

@@ -50,7 +50,8 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
 
     post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']][,6]
     temp = data.frame(post.hoc)
-    rownames(temp) = gsub(":", " - ", rownames(temp)) # the " - " is important for stat_cure_Dunn_format
+    rownames(temp) = rownames(posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']])
+    rownames(temp) = gsub("-", " - ", rownames(temp)) # the " - " is important for stat_cure_Dunn_format
 
     nonpara  = parSapply(cl, 1:ncol(data), FUN = function(j,data2,data,stat_friedman_test_with_post_hoc,
                                                           stat_cure_Dunn_format,i,temp,
@@ -59,10 +60,11 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
       p_value_nonPara = kruskal.test(data2$value ~ data2[,i])$p.value
 
 
-      if(nonparaANOVAposthoc=='dunn'){
-        x = data.frame(dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res[,c(1,4)],row.names =1)
-        post.hoc_nonPara =stat_cure_Dunn_format(x = x,sudo_matrix,temp = temp)[,1]
-      }else if(nonparaANOVAposthoc == 'none'){
+      # if(!nonparaANOVAposthoc=='none'){
+      #   x = data.frame(dunnTest(data2$value,data2[,i],kw =T, method="bonferroni")$res[,c(1,4)],row.names =1)
+      #   post.hoc_nonPara =stat_cure_Dunn_format(x = x,sudo_matrix,temp = temp)[,1]
+      # }else
+        if(nonparaANOVAposthoc == 'none'){
         post.hoc_nonPara = rep(NA,sum(1:(length(unique(data2[,i]))-1)))
       }else{
         x = as.vector(pairwise.wilcox.test(data2$value, g=data2[,i], p.adjust.method = "bonferroni",
@@ -77,8 +79,6 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
     posthocTGH,dunnTest,nonparaANOVAposthoc)
 
 
-
-
   }
 
 
@@ -90,7 +90,8 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
   # assign rownames and colnames.
   post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']][,6]
   temp = data.frame(post.hoc)
-  rownames(temp) = gsub(":", "_vs_", rownames(temp)) #last three lines are for the correction of the format of the Dunn procedure.
+  rownames(temp) = rownames(posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']])
+  rownames(temp) = gsub("-", "_vs_", rownames(temp)) #last three lines are for the correction of the format of the Dunn procedure.
   colnames(result) = c(paste0("p_value_of_",factor_name),paste0("non_parametric_p_value_of_",factor_name),
                        stat_combine_vector_1by1(paste0("p_value_of_",rownames(temp)),paste0("non_parametric_p_value_of_",rownames(temp))))
 
