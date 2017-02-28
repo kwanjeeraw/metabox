@@ -33,12 +33,12 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
       if(ANOVAposthoc == 'none'){
         post.hoc = rep(NA,sum(1:(length(unique(data2[,i]))-1)))
       }else{
-        post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[[ANOVAposthoc]][,6]
+        post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[["games.howell"]][,6]
       }
 
 
 
-      c(p_value = p_value, post.hoc)
+      return(c(p_value = p_value, post.hoc))
     },data2,data,stat_friedman_test_with_post_hoc,
     stat_cure_Dunn_format,i,
     posthocTGH,dunnTest,ANOVAmethod,ANOVAposthoc)
