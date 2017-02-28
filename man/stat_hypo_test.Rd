@@ -79,7 +79,8 @@ stat_hypo_test(e, p, f, e_ori, p_ori, e_before, p_before,
   nonparasimplemaineffect2pairedttestmethod = "paired utest",
   nonparasimplemaineffect2pairedttestcorrection = "fdr",
   mixedANOVA = "mixed anova", mixedANOVAadjust = "GG",
-  nonparamixedANOVA = "nonpara mixed anova")
+  nonparamixedANOVA = "nonpara mixed anova", bootstrap = FALSE,
+  bootstrap_num = 500)
 }
 \description{
 hypothesis test
