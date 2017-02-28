@@ -311,7 +311,7 @@ if(log_para=="auto"){
     e_after_scaling = data.frame(e_after_scaling)
     colnames(e_after_scaling) = colnames(e);rownames(e_after_scaling) = rownames(e);
   }else{
-    e_after_scaling = data.frame(e_after_scaling)
+    e_after_scaling = data.frame(e_after_transformation)
     colnames(e_after_scaling) = colnames(e[!p$phenotype_index%in%sample_index,]);rownames(e_after_scaling) = rownames(e[!p$phenotype_index%in%sample_index,]);
   }
 

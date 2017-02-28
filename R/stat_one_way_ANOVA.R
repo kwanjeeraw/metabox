@@ -33,7 +33,7 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
       if(ANOVAposthoc == 'none'){
         post.hoc = rep(NA,sum(1:(length(unique(data2[,i]))-1)))
       }else{
-        post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[[ANOVAposthoc]][,3]
+        post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[[ANOVAposthoc]][,6]
       }
 
 
@@ -48,7 +48,7 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
     nonpara = matrix(NA,nrow = sum(1:(length(unique(data2[,i]))-1))+1,ncol = ncol(data))
   }else{
 
-    post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']][,3]
+    post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']][,6]
     temp = data.frame(post.hoc)
     rownames(temp) = gsub(":", " - ", rownames(temp)) # the " - " is important for stat_cure_Dunn_format
 
@@ -88,7 +88,7 @@ stat_one_way_ANOVA = function(data,data2,i,sudo_matrix,factor_name,cl,
   result = data.frame(t(result),stringsAsFactors = FALSE)
 
   # assign rownames and colnames.
-  post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']][,3]
+  post.hoc = posthocTGH(data2$value , data2[,i], digits=4)$output[['games.howell']][,6]
   temp = data.frame(post.hoc)
   rownames(temp) = gsub(":", "_vs_", rownames(temp)) #last three lines are for the correction of the format of the Dunn procedure.
   colnames(result) = c(paste0("p_value_of_",factor_name),paste0("non_parametric_p_value_of_",factor_name),
