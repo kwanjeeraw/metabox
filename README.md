@@ -23,7 +23,7 @@ biocLite(c('impute','preprocessCore','GO.db','AnnotationDbi','WGCNA','piano','qp
 
 #Install metabox
 install_github('kwanjeeraw/metabox')
-
+install.packages("openssl")
 #Install OpenCPU single-user server
 install.packages("opencpu")
 library(opencpu)
