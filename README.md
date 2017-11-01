@@ -30,6 +30,7 @@ library(opencpu)
 
 ## Run metabox on a web browser
 opencpu$browse("library/metabox/www")
+ocpu_start_app("metabox")
 
 ```
 
